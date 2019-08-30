@@ -1,4 +1,4 @@
-= soirv8 - Son of IRV8 
+# soirv8 - Son of IRV8 
 
 A project for upgrading irv8 to work witht the
 latest v8 build.
@@ -10,7 +10,7 @@ used to upgrade the code to track the latest.
 pyv8 is a dormant project but contains good starting code to port as
 part of the upgrade effort.
 
-== Build Instructions ==
+## Build Instructions
 
 This code links with v8 built as a static library.  So v8 must be cloned
 and built from source, with options to output a static lib.
@@ -21,7 +21,7 @@ the native python build toolchain will be used.
 
 Currently this only builds on Ubuntu 18.04.
 
-=== Building V8 ===
+### Building V8
 
 1. V8 (and Chromium) use Google's build toolchain called [Depot
    Tools](https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up)
@@ -54,7 +54,7 @@ $ ninja -C out.gn/x64.release.sample v8_monolith
 
    This will take some time.
 
-=== Building soirv8 ===
+### Building soirv8
 
 1. Right now we are using a standard CMake build process.
 
