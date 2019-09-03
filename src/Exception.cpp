@@ -36,6 +36,19 @@ CJavascriptStackTracePtr CJavascriptStackTrace::GetCurrentStackTrace(
   return boost::shared_ptr<CJavascriptStackTrace>(new CJavascriptStackTrace(isolate, st));
 }
 
+CJavascriptStackFramePtr CJavascriptStackTrace::GetFrame(size_t idx) const
+{
+  v8::HandleScope handle_scope(m_isolate);
+
+  v8::TryCatch try_catch(m_isolate);
+
+  v8::Handle<v8::StackFrame> frame = Handle()->GetFrame(m_isolate, idx);
+
+  if (frame.IsEmpty()) CJavascriptException::ThrowIf(m_isolate, try_catch);
+
+  return boost::shared_ptr<CJavascriptStackFrame>(new CJavascriptStackFrame(m_isolate, frame));
+}
+
 void CJavascriptStackTrace::Dump(std::ostream& os) const
 {
   v8::HandleScope handle_scope(m_isolate);
@@ -72,19 +85,132 @@ void CJavascriptStackTrace::Dump(std::ostream& os) const
   }
 }
 
-CJavascriptStackFramePtr CJavascriptStackTrace::GetFrame(size_t idx) const
+const std::string CJavascriptStackFrame::GetScriptName() const
 {
   v8::HandleScope handle_scope(m_isolate);
 
-  v8::TryCatch try_catch(m_isolate);
+  v8::String::Utf8Value name(m_isolate, Handle()->GetScriptName());
 
-  v8::Handle<v8::StackFrame> frame = Handle()->GetFrame(m_isolate, idx);
-
-  if (frame.IsEmpty()) CJavascriptException::ThrowIf(m_isolate, try_catch);
-
-  return boost::shared_ptr<CJavascriptStackFrame>(new CJavascriptStackFrame(m_isolate, frame));
+  return std::string(*name, name.length());
 }
+const std::string CJavascriptStackFrame::GetFunctionName() const
+{
+  v8::HandleScope handle_scope(m_isolate);
 
+  v8::String::Utf8Value name(m_isolate, Handle()->GetFunctionName());
+
+  return std::string(*name, name.length());
+}
+const std::string CJavascriptException::GetName(void)
+{
+  if (m_exc.IsEmpty()) return std::string();
+
+  assert(m_isolate->InContext());
+
+  v8::HandleScope handle_scope(m_isolate);
+
+  v8::String::Utf8Value msg(m_isolate, v8::Handle<v8::String>::Cast(Exception()->ToObject(m_isolate->GetCurrentContext()).ToLocalChecked()->Get(m_isolate->GetCurrentContext(), v8::String::NewFromUtf8(m_isolate, "name").ToLocalChecked()).ToLocalChecked()));
+
+  return std::string(*msg, msg.length());
+}
+const std::string CJavascriptException::GetMessage(void)
+{
+  if (m_exc.IsEmpty()) return std::string();
+
+  assert(m_isolate->InContext());
+
+  v8::HandleScope handle_scope(m_isolate);
+
+  v8::String::Utf8Value msg(m_isolate, v8::Handle<v8::String>::Cast(Exception()->ToObject(m_isolate->GetCurrentContext()).ToLocalChecked()->Get(m_isolate->GetCurrentContext(), v8::String::NewFromUtf8(m_isolate, "message").ToLocalChecked()).ToLocalChecked()));
+
+  return std::string(*msg, msg.length());
+}
+const std::string CJavascriptException::GetScriptName(void)
+{
+  assert(m_isolate->InContext());
+
+  v8::HandleScope handle_scope(m_isolate);
+
+  if (!m_msg.IsEmpty() && !Message()->GetScriptResourceName().IsEmpty() &&
+      !Message()->GetScriptResourceName()->IsUndefined())
+  {
+    v8::String::Utf8Value name(m_isolate, Message()->GetScriptResourceName());
+
+    return std::string(*name, name.length());
+  }
+
+  return std::string();
+}
+int CJavascriptException::GetLineNumber(void)
+{
+  assert(m_isolate->InContext());
+
+  v8::HandleScope handle_scope(m_isolate);
+
+  return m_msg.IsEmpty() ? 1 : Message()->GetLineNumber(m_isolate->GetCurrentContext()).ToChecked();
+}
+int CJavascriptException::GetStartPosition(void)
+{
+  assert(m_isolate->InContext());
+
+  v8::HandleScope handle_scope(m_isolate);
+
+  return m_msg.IsEmpty() ? 1 : Message()->GetStartPosition();
+}
+int CJavascriptException::GetEndPosition(void)
+{
+  assert(m_isolate->InContext());
+
+  v8::HandleScope handle_scope(m_isolate);
+
+  return m_msg.IsEmpty() ? 1 : Message()->GetEndPosition();
+}
+int CJavascriptException::GetStartColumn(void)
+{
+  assert(m_isolate->InContext());
+
+  v8::HandleScope handle_scope(m_isolate);
+
+  return m_msg.IsEmpty() ? 1 : Message()->GetStartColumn();
+}
+int CJavascriptException::GetEndColumn(void)
+{
+  assert(m_isolate->InContext());
+
+  v8::HandleScope handle_scope(m_isolate);
+
+  return m_msg.IsEmpty() ? 1 : Message()->GetEndColumn();
+}
+const std::string CJavascriptException::GetSourceLine(void)
+{
+  assert(m_isolate->InContext());
+
+  v8::HandleScope handle_scope(m_isolate);
+
+  if (!m_msg.IsEmpty() && !Message()->GetSourceLine(m_isolate->GetCurrentContext()).IsEmpty())
+  {
+    v8::String::Utf8Value line(m_isolate, Message()->GetSourceLine(m_isolate->GetCurrentContext()).ToLocalChecked());
+
+    return std::string(*line, line.length());
+  }
+
+  return std::string();
+}
+const std::string CJavascriptException::GetStackTrace(void)
+{
+  assert(m_isolate->InContext());
+
+  v8::HandleScope handle_scope(m_isolate);
+
+  if (!m_stack.IsEmpty())
+  {
+    v8::String::Utf8Value stack(m_isolate, v8::Handle<v8::String>::Cast(Stack()));
+
+    return std::string(*stack, stack.length());
+  }
+
+  return std::string();
+}
 const std::string CJavascriptException::Extract(v8::Isolate *isolate, v8::TryCatch& try_catch)
 {
   assert(isolate->InContext());
