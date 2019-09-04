@@ -7,7 +7,7 @@
 #include <vector>
 #include <iterator>
 
-//#include "utf8.h" //TODO port me
+#include "utf8.h"
 //#include "Locker.h" //TODO port me
 //#include "V8Internal.h"
 
@@ -112,6 +112,41 @@ v8::Handle<v8::String> ToString(py::object str)
 
   return ToString(py::object(py::handle<>(::PyObject_Str(str.ptr()))));
 }
+
+v8::Handle<v8::String> DecodeUtf8(const std::string& str)
+{
+  v8::EscapableHandleScope scope(v8::Isolate::GetCurrent());
+
+  std::vector<uint16_t> data;
+
+  try
+  {
+    utf8::utf8to16(str.begin(), str.end(), std::back_inserter(data));
+
+    return scope.Escape(v8::String::NewFromTwoByte(v8::Isolate::GetCurrent(), &data[0], v8::NewStringType::kNormal, data.size()).ToLocalChecked());
+  }
+  catch (const std::exception&)
+  {
+  	return scope.Escape(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), str.c_str(), v8::NewStringType::kNormal, str.size()).ToLocalChecked());
+  }
+}
+
+const std::string EncodeUtf8(const std::wstring& str)
+{
+  std::vector<uint8_t> data;
+
+  if (sizeof(wchar_t) == sizeof(uint16_t))
+  {
+    utf8::utf16to8(str.begin(), str.end(), std::back_inserter(data));
+  }
+  else
+  {
+    utf8::utf32to8(str.begin(), str.end(), std::back_inserter(data));
+  }
+
+  return std::string((const char *) &data[0], data.size());
+}
+
 
 CPythonGIL::CPythonGIL()
 {

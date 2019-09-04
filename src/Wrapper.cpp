@@ -1,4 +1,6 @@
+#include <stdlib.h>
 #include <iostream>
+#include <vector>
 
 //Python includes
 #include <boost/python/raw_function.hpp>
@@ -10,6 +12,9 @@
 
 //Our includes
 #include "Wrapper.h"
+//#include "Context.h"
+#include "Utils.h"
+
 
 #define TERMINATE_EXECUTION_CHECK(returnValue) \
   if(v8::Isolate::GetCurrent()->IsExecutionTerminating()) { \
@@ -17,6 +22,18 @@
     ::PyErr_SetString(PyExc_RuntimeError, "execution is terminating"); \
     return returnValue; \
   }
+
+#define CHECK_V8_CONTEXT() \
+  if (v8::Isolate::GetCurrent()->GetCurrentContext().IsEmpty()) { \
+    throw CJavascriptException("Javascript object out of context", PyExc_UnboundLocalError); \
+  }
+
+std::ostream& operator <<(std::ostream& os, const CJavascriptObject& obj)
+{
+  obj.Dump(os);
+
+  return os;
+}
 
 
 void CWrapper::Expose(void)
@@ -753,8 +770,7 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
 
     if (jsobj.Object().IsEmpty())
     {
-      //throw CJavascriptException("Refer to a null object", ::PyExc_AttributeError);
-      throw std::string("TODO port CJavascriptException");
+      throw CJavascriptException("Refer to a null object", ::PyExc_AttributeError);
     }
 
     //TODO port me
@@ -872,13 +888,90 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
 
     }
 
-  //TODO port me
-  //if (result.IsEmpty()) CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
+  if (result.IsEmpty()) CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
 
   return handle_scope.Escape(result);
 }
 
+void CJavascriptObject::CheckAttr(v8::Handle<v8::String> name) const
+{
+  assert(v8::Isolate::GetCurrent()->InContext());
 
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  if (!Object()->Has(context, name).ToChecked())
+  {
+    std::ostringstream msg;
+
+    msg << "'" << *v8::String::Utf8Value(isolate, Object()->ObjectProtoToString(context).ToLocalChecked())
+        << "' object has no attribute '" 
+        << *v8::String::Utf8Value(isolate, name) << "'";
+
+    throw CJavascriptException(msg.str(), ::PyExc_AttributeError);
+  }
+}
+
+py::object CJavascriptObject::GetAttr(const std::string& name)
+{
+/* TODO port me
+#ifdef SUPPORT_PROBES
+  if (WRAPPER_JS_OBJECT_GETATTR_ENABLED()) {
+    WRAPPER_JS_OBJECT_GETATTR(&m_obj, name.c_str());
+  }
+#endif
+*/
+
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  v8::TryCatch try_catch(isolate);
+
+  v8::Handle<v8::String> attr_name = DecodeUtf8(name);
+
+  CheckAttr(attr_name);
+
+  v8::Handle<v8::Value> attr_value = Object()->Get(context, attr_name).ToLocalChecked();
+
+  if (attr_value.IsEmpty())
+    CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
+
+  return CJavascriptObject::Wrap(attr_value, Object());
+}
+
+void CJavascriptObject::SetAttr(const std::string& name, py::object value)
+{
+/* TODO port me
+#ifdef SUPPORT_PROBES
+  if (WRAPPER_JS_OBJECT_SETATTR_ENABLED()) {
+    WRAPPER_JS_OBJECT_SETATTR(&m_obj, name.c_str(), value.ptr());
+  }
+#endif
+*/
+
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  v8::TryCatch try_catch(isolate);
+
+  v8::Handle<v8::String> attr_name = DecodeUtf8(name);
+  v8::Handle<v8::Value> attr_obj = CPythonObject::Wrap(value);
+
+  if (Object()->Has(context, attr_name).ToChecked())
+  {
+    v8::Handle<v8::Value> UNUSED_VAR(attr_value) = Object()->Get(context, attr_name).ToLocalChecked();
+  }
+
+  if (!Object()->Set(context, attr_name, attr_obj).ToChecked())
+    CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
+}
 
 
 // =====================================================================
@@ -887,6 +980,44 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
 
 // =====================================================================
 // CJavascriptObject Start 
+// =====================================================================
+void CJavascriptObject::Dump(std::ostream& os) const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+  if (m_obj.IsEmpty())
+    os << "None";
+  else if (Object()->IsInt32())
+    os << Object()->Int32Value(context).ToChecked();
+  else if (Object()->IsNumber())
+    os << Object()->NumberValue(context).ToChecked();
+  else if (Object()->IsBoolean())
+    os << Object()->BooleanValue(isolate);
+  else if (Object()->IsNull())
+    os << "None";
+  else if (Object()->IsUndefined())
+    os << "N/A";
+  else if (Object()->IsString())
+    os << *v8::String::Utf8Value(isolate, v8::Handle<v8::String>::Cast(Object()));
+  else
+  {
+    v8::Handle<v8::String> s = Object()->ToString(context).ToLocalChecked();
+
+    if (s.IsEmpty())
+      s = Object()->ObjectProtoToString(context).ToLocalChecked();
+
+    if (!s.IsEmpty())
+      os << *v8::String::Utf8Value(isolate, s);
+  }
+}
+
+
+// =====================================================================
+// CJavascriptObject -- TESTED FUNCTIONS begin
 // =====================================================================
 
 py::object CJavascriptObject::Wrap(v8::Handle<v8::Value> value, v8::Handle<v8::Object> self)
