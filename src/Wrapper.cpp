@@ -893,6 +893,14 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
   return handle_scope.Escape(result);
 }
 
+// =====================================================================
+// CPythonObject End 
+// =====================================================================
+
+// =====================================================================
+// CJavaScriptObject Start - UNTESTED 
+// =====================================================================
+
 void CJavascriptObject::CheckAttr(v8::Handle<v8::String> name) const
 {
   assert(v8::Isolate::GetCurrent()->InContext());
@@ -973,22 +981,114 @@ void CJavascriptObject::SetAttr(const std::string& name, py::object value)
     CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
 }
 
+void CJavascriptObject::DelAttr(const std::string& name)
+{
+/* TODO port me
+#ifdef SUPPORT_PROBES
+  if (WRAPPER_JS_OBJECT_DELATTR_ENABLED()) {
+    WRAPPER_JS_OBJECT_DELATTR(&m_obj, name.c_str());
+  }
+#endif
+*/
 
-// =====================================================================
-// CPythonObject End 
-// =====================================================================
+  CHECK_V8_CONTEXT();
 
-// =====================================================================
-// CJavascriptObject Start 
-// =====================================================================
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  v8::TryCatch try_catch(isolate);
+
+  v8::Handle<v8::String> attr_name = DecodeUtf8(name);
+
+  CheckAttr(attr_name);
+
+  if (!Object()->Delete(context, attr_name).ToChecked())
+    CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
+}
+
+py::list CJavascriptObject::GetAttrList(void)
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+  CPythonGIL python_gil;
+
+  py::list attrs;
+
+  TERMINATE_EXECUTION_CHECK(attrs);
+
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  v8::TryCatch try_catch(isolate);
+
+  v8::Handle<v8::Array> props = Object()->GetPropertyNames(context).ToLocalChecked();
+
+  for (size_t i=0; i<props->Length(); i++)
+  {
+    attrs.append(CJavascriptObject::Wrap(props->Get(context, v8::Integer::New(v8::Isolate::GetCurrent(), i)).ToLocalChecked()));
+  }
+
+  if (try_catch.HasCaught()) CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
+
+  return attrs;
+}
+
+int CJavascriptObject::GetIdentityHash(void)
+{
+  CHECK_V8_CONTEXT();
+
+  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+
+  return Object()->GetIdentityHash();
+}
+
+CJavascriptObjectPtr CJavascriptObject::Clone(void)
+{
+  CHECK_V8_CONTEXT();
+
+  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+
+  return CJavascriptObjectPtr(new CJavascriptObject(Object()->Clone()));
+}
+
+bool CJavascriptObject::Contains(const std::string& name)
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  v8::TryCatch try_catch(isolate);
+
+  bool found = Object()->Has(context, DecodeUtf8(name)).ToChecked();
+
+  if (try_catch.HasCaught()) CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
+
+  return found;
+}
+
+bool CJavascriptObject::Equals(CJavascriptObjectPtr other) const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  return other.get() && Object()->Equals(context, other->Object()).ToChecked();
+}
+
 void CJavascriptObject::Dump(std::ostream& os) const
 {
   CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
-
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
   if (m_obj.IsEmpty())
     os << "None";
   else if (Object()->IsInt32())
@@ -1015,6 +1115,44 @@ void CJavascriptObject::Dump(std::ostream& os) const
   }
 }
 
+CJavascriptObject::operator long() const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  if (m_obj.IsEmpty())
+    throw CJavascriptException("argument must be a string or a number, not 'NoneType'", ::PyExc_TypeError);
+
+  return Object()->Int32Value(context).ToChecked();
+}
+CJavascriptObject::operator double() const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  if (m_obj.IsEmpty())
+    throw CJavascriptException("argument must be a string or a number, not 'NoneType'", ::PyExc_TypeError);
+
+  return Object()->NumberValue(context).ToChecked();
+}
+
+CJavascriptObject::operator bool() const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+
+  if (m_obj.IsEmpty()) return false;
+
+  return Object()->BooleanValue(isolate);
+}
 
 // =====================================================================
 // CJavascriptObject -- TESTED FUNCTIONS begin
