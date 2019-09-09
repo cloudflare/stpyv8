@@ -8,6 +8,7 @@
 namespace py = boost::python;
 */
 
+#include <iostream>
 #include <map>
 #include <sstream>
 
