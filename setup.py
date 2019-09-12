@@ -6,7 +6,6 @@ source_files = ["Exception.cpp",
                 "Context.cpp",
                 "Engine.cpp",
                 "Wrapper.cpp",
-                "Exception.cpp",
                 "Utils.cpp",
                 "SoirV8.cpp"]
 
@@ -19,7 +18,7 @@ library_dirs = [os.path.join("lib", lib, "lib") for lib in third_party_libraries
 # FIXME
 # Revert to env variables?
 include_dirs.append('/home/buffer/v8/include')
-library_dirs.append('/home/buffer/v8/out.gn/x64.release.sample')
+library_dirs.append('/home/buffer/v8/out.gn/x64.release.sample/obj/')
 
 libraries = []
 extra_compile_args = []
@@ -33,7 +32,7 @@ if os.name == "nt":
   extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
   extra_link_args += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
 elif os.name == "posix":
-  libraries = ["boost_python", "v8", "rt"]
+  libraries = ["boost_python", "boost_system", "v8_monolith", "rt"]
 
 
 soirv8 = Extension(name               = "_SoirV8",
