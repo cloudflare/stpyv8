@@ -7,7 +7,6 @@ add_executable( port
     src/Wrapper.cpp
     src/Exception.cpp
     src/Utils.cpp
-    src/Context.cpp
     src/Engine.cpp
 )
 
@@ -24,6 +23,7 @@ find_library(
 target_link_libraries( port
     ${V8_MONOLITH}
     boost_python
+    boost_system
     python2.7
     pthread
 )

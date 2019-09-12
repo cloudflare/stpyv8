@@ -2,15 +2,12 @@
 #include <iostream>
 #include <vector>
 
-//Python includes
 #include <boost/python/raw_function.hpp>
 #include <descrobject.h>
 #include <datetime.h>
 
-//V8 includes
 #include "libplatform/libplatform.h"
 
-//Our includes
 #include "Wrapper.h"
 //#include "Context.h"
 #include "Utils.h"
