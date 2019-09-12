@@ -12,11 +12,6 @@
   CEngine::CounterTable CEngine::m_counters;
 #endif
 
-//TODO port me
-//#ifdef SUPPORT_AST
-//  #include "AST.h"
-//#endif
-
 void CEngine::Expose(void)
 {
 #ifndef SUPPORT_SERIALIZE
@@ -140,11 +135,6 @@ void CEngine::Expose(void)
     .def("run", &CScript::Run, "Execute the compiled code.")
 
     /*
-  #ifdef SUPPORT_AST
-    .def("visit", &CScript::visit, (py::arg("handler"),
-                                    py::arg("mode") = v8i::CLASSIC_MODE),
-         "Visit the AST of code with the callback handler.")
-  #endif
   */
     ;
 
@@ -382,15 +372,6 @@ py::object CEngine::ExecuteScript(v8::Handle<v8::Script> script)
 
   return CJavascriptObject::Wrap(result.ToLocalChecked());
 }
-
-#ifdef SUPPORT_AST
-/*
-void CScript::visit(py::object handler, v8i::LanguageMode mode) const
-{
-  //...
-}
-*/
-#endif
 
 const std::string CScript::GetSource(void) const
 {
