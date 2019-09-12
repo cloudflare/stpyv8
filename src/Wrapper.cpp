@@ -37,6 +37,109 @@ void CWrapper::Expose(void)
 {
   //TODO port me
   std::cout << "Stub" << std::endl;
+
+  PyDateTime_IMPORT;
+
+  py::class_<CJavascriptObject, boost::noncopyable>("JSObject", py::no_init)
+    .def("__getattr__", &CJavascriptObject::GetAttr)
+    .def("__setattr__", &CJavascriptObject::SetAttr)
+    .def("__delattr__", &CJavascriptObject::DelAttr)
+
+    .def("__hash__", &CJavascriptObject::GetIdentityHash)
+    .def("clone", &CJavascriptObject::Clone, "Clone the object.")
+
+  #if PY_MAJOR_VERSION < 3
+    .add_property("__members__", &CJavascriptObject::GetAttrList)
+  #else
+    .def("__dir__", &CJavascriptObject::GetAttrList)
+  #endif
+
+    // Emulating dict object
+    .def("keys", &CJavascriptObject::GetAttrList, "Get a list of an object's attributes.")
+
+    .def("__getitem__", &CJavascriptObject::GetAttr)
+    .def("__setitem__", &CJavascriptObject::SetAttr)
+    .def("__delitem__", &CJavascriptObject::DelAttr)
+
+    .def("__contains__", &CJavascriptObject::Contains)
+
+    .def(int_(py::self))
+    .def(float_(py::self))
+    .def(str(py::self))
+
+    .def("__nonzero__", &CJavascriptObject::operator bool)
+    .def("__eq__", &CJavascriptObject::Equals)
+    .def("__ne__", &CJavascriptObject::Unequals)
+
+    /*
+    .def("create", &CJavascriptFunction::CreateWithArgs,
+         (py::arg("constructor"),
+          py::arg("arguments") = py::tuple(),
+          py::arg("propertiesObject") = py::dict()),
+         "Creates a new object with the specified prototype object and properties.")
+          .staticmethod("create")
+	  */
+    ;
+
+  py::class_<CJavascriptNull, py::bases<CJavascriptObject>, boost::noncopyable>("JSNull")
+    .def("__nonzero__", &CJavascriptNull::nonzero)
+    .def("__str__", &CJavascriptNull::str)
+    ;
+
+  py::class_<CJavascriptUndefined, py::bases<CJavascriptObject>, boost::noncopyable>("JSUndefined")
+    .def("__nonzero__", &CJavascriptUndefined::nonzero)
+    .def("__str__", &CJavascriptUndefined::str)
+    ;
+
+  py::class_<CJavascriptArray, py::bases<CJavascriptObject>, boost::noncopyable>("JSArray", py::no_init)
+    .def(py::init<py::object>())
+
+    .def("__len__", &CJavascriptArray::Length)
+
+    .def("__getitem__", &CJavascriptArray::GetItem)
+    .def("__setitem__", &CJavascriptArray::SetItem)
+    .def("__delitem__", &CJavascriptArray::DelItem)
+
+    .def("__iter__", py::range(&CJavascriptArray::begin, &CJavascriptArray::end))
+
+    .def("__contains__", &CJavascriptArray::Contains)
+    ;
+
+  /*
+  py::class_<CJavascriptFunction, py::bases<CJavascriptObject>, boost::noncopyable>("JSFunction", py::no_init)
+    .def("__call__", py::raw_function(&CJavascriptFunction::CallWithArgs))
+
+    .def("apply", &CJavascriptFunction::ApplyJavascript,
+         (py::arg("self"),
+          py::arg("args") = py::list(),
+          py::arg("kwds") = py::dict()),
+          "Performs a function call using the parameters.")
+    .def("apply", &CJavascriptFunction::ApplyPython,
+         (py::arg("self"),
+          py::arg("args") = py::list(),
+          py::arg("kwds") = py::dict()),
+          "Performs a function call using the parameters.")
+    .def("invoke", &CJavascriptFunction::Invoke,
+          (py::arg("args") = py::list(),
+           py::arg("kwds") = py::dict()),
+          "Performs a binding method call using the parameters.")
+
+    .def("setName", &CJavascriptFunction::SetName)
+
+    .add_property("name", &CJavascriptFunction::GetName, &CJavascriptFunction::SetName, "The name of function")
+    .add_property("owner", &CJavascriptFunction::GetOwner)
+
+    .add_property("linenum", &CJavascriptFunction::GetLineNumber, "The line number of function in the script")
+    .add_property("colnum", &CJavascriptFunction::GetColumnNumber, "The column number of function in the script")
+    .add_property("resname", &CJavascriptFunction::GetResourceName, "The resource name of script")
+    .add_property("inferredname", &CJavascriptFunction::GetInferredName, "Name inferred from variable or property assignment of this function")
+    .add_property("lineoff", &CJavascriptFunction::GetLineOffset, "The line offset of function in the script")
+    .add_property("coloff", &CJavascriptFunction::GetColumnOffset, "The column offset of function in the script")
+    ;
+*/
+    py::objects::class_value_wrapper<boost::shared_ptr<CJavascriptObject>,
+    py::objects::make_ptr_instance<CJavascriptObject,
+    py::objects::pointer_holder<boost::shared_ptr<CJavascriptObject>,CJavascriptObject> > >();
 }
 
 
@@ -1689,6 +1792,8 @@ int main(int argc, char* argv[])
   const char* code = "date1 = new Date('December 17, 1995 03:24:00');";
 
   Py_Initialize();
+
+  /*
   PyDateTime_IMPORT;
 
   py::class_<CJavascriptObject, boost::noncopyable>("JSObject", py::no_init)
@@ -1701,7 +1806,8 @@ int main(int argc, char* argv[])
   py::objects::class_value_wrapper<boost::shared_ptr<CJavascriptObject>,
     py::objects::make_ptr_instance<CJavascriptObject,
     py::objects::pointer_holder<boost::shared_ptr<CJavascriptObject>,CJavascriptObject> > >();
-
+*/
+  CWrapper::Expose();
   v8::V8::InitializeICUDefaultLocation(argv[0]);
   v8::V8::InitializeExternalStartupData(argv[0]);
   std::unique_ptr<v8::Platform> platform = v8::platform::NewDefaultPlatform();
