@@ -18,20 +18,14 @@ class CIsolate
   v8::Isolate *m_isolate;
   bool m_owner;
 public:
-  CIsolate(bool owner=false) : m_owner(owner) {
-      v8::Isolate::CreateParams create_params;
-      create_params.array_buffer_allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
-      m_isolate = v8::Isolate::New(create_params); 
-  }
-  CIsolate(v8::Isolate *isolate) : m_isolate(isolate), m_owner(false) {}
-  ~CIsolate(void) { if (m_owner) m_isolate->Dispose(); }
+  CIsolate(bool owner);
+  CIsolate(v8::Isolate *isolate);
+  ~CIsolate(void);
 
-  v8::Isolate *GetIsolate(void) { return m_isolate; }
+  v8::Isolate *GetIsolate(void);
 
   CJavascriptStackTracePtr GetCurrentStackTrace(int frame_limit,
-    v8::StackTrace::StackTraceOptions options = v8::StackTrace::kOverview) {
-    return CJavascriptStackTrace::GetCurrentStackTrace(m_isolate, frame_limit, options);
-  }
+    v8::StackTrace::StackTraceOptions options);
 
   static py::object GetCurrent(void);
 
@@ -67,7 +61,7 @@ public:
   void Enter(void) { v8::HandleScope handle_scope(v8::Isolate::GetCurrent()); Handle()->Enter(); }
   void Leave(void) { v8::HandleScope handle_scope(v8::Isolate::GetCurrent()); Handle()->Exit(); }
 
-  // bool HasOutOfMemoryException(void) { v8::HandleScope handle_scope(v8::Isolate::GetCurrent()); return Handle()->HasOutOfMemoryException(); }
+  bool HasOutOfMemoryException(void);
 
   py::object Evaluate(const std::string& src, const std::string name = std::string(),
                       int line = -1, int col = -1, py::object precompiled = py::object());
@@ -76,7 +70,7 @@ public:
 
   static py::object GetEntered(void);
   static py::object GetCurrent(void);
-  //static py::object GetCalling(void);
+  static py::object GetCalling(void);
   static bool InContext(void) { return v8::Isolate::GetCurrent()->InContext(); }
 
   static void Expose(void);
