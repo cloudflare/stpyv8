@@ -10,6 +10,7 @@ add_executable( port
     src/Engine.cpp
     src/Context.cpp
     src/SoirV8.cpp
+    src/Main.cpp
 )
 
 include_directories(
