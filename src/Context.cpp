@@ -3,14 +3,22 @@
 #include "Wrapper.h"
 #include "Engine.h"
 
+#include "libplatform/libplatform.h"
 
+std::unique_ptr<v8::Platform> platform;
 
-CIsolate::CIsolate(bool owner=false) : m_owner(owner) 
+CIsolate::CIsolate(bool owner=false, std::string argv=std::string()) : m_owner(owner)
 {
+  v8::V8::InitializeICUDefaultLocation(argv.c_str());
+  v8::V8::InitializeExternalStartupData(argv.c_str());
+  platform = v8::platform::NewDefaultPlatform();
+  v8::V8::InitializePlatform(platform.get());
+  v8::V8::Initialize();
+
   v8::Isolate::CreateParams create_params;
   create_params.array_buffer_allocator =
     v8::ArrayBuffer::Allocator::NewDefaultAllocator();
-  m_isolate = v8::Isolate::New(create_params); 
+  m_isolate = v8::Isolate::New(create_params);
 }
 CIsolate::CIsolate(v8::Isolate *isolate) : m_isolate(isolate), m_owner(false) 
 {
@@ -32,11 +40,10 @@ CJavascriptStackTracePtr CIsolate::GetCurrentStackTrace(int frame_limit,
   return CJavascriptStackTrace::GetCurrentStackTrace(m_isolate, frame_limit, options);
 }
 
-
 void CContext::Expose(void)
 {
   py::class_<CIsolate, boost::noncopyable>("JSIsolate", "JSIsolate is an isolated instance of the V8 engine.", py::no_init)
-    .def(py::init<bool>((py::arg("owner") = false)))
+    .def(py::init<bool, std::string>((py::arg("owner") = false, py::arg("argv") = std::string())))
 
     .add_static_property("current", &CIsolate::GetCurrent,
                          "Returns the entered isolate for the current thread or NULL in case there is no current isolate.")
@@ -135,7 +142,8 @@ CContext::CContext(const CContext& context)
 CContext::CContext(py::object global, py::list extensions)
   : m_global(global)
 {
-  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
 
   std::shared_ptr<v8::ExtensionConfiguration> cfg;
   std::vector<std::string> ext_names;

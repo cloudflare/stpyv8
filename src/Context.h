@@ -18,7 +18,7 @@ class CIsolate
   v8::Isolate *m_isolate;
   bool m_owner;
 public:
-  CIsolate(bool owner);
+  CIsolate(bool owner, std::string argv);
   CIsolate(v8::Isolate *isolate);
   ~CIsolate(void);
 

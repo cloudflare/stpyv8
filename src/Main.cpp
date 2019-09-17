@@ -11,6 +11,7 @@
 #include "Wrapper.h"
 #include "Context.h"
 #include "Utils.h"
+#include "Engine.h"
 
 static v8::Isolate* GetNewIsolate()
 {
@@ -156,10 +157,62 @@ int main__test_wrapping_v8_code(int argc, char* argv[])
   return 0;
 }
 
+BOOST_PYTHON_MODULE(SOIRV8)
+{
+  CJavascriptException::Expose();
+  CWrapper::Expose(); 
+  CContext::Expose();
+  CEngine::Expose();
+}
+
+#if PY_MAJOR_VERSION >= 3
+#   define INIT_MODULE PyInit_SOIRV8
+    extern "C" PyObject* INIT_MODULE();
+#else
+#   define INIT_MODULE initSOIRV8
+    extern "C" void INIT_MODULE();
+#endif
+
 int main(int argc, char* argv[])
 {
-  std::cout << "Calling expose" << std::endl;
-  CContext::Expose();
+  std::cout << "Init python" << std::endl;
+  PyImport_AppendInittab((char*)"SOIRV8", INIT_MODULE);
+  Py_Initialize();
+  PyDateTime_IMPORT;
+
+  /*
+  std::cout << "Init V8" << std::endl;
+  v8::V8::InitializeICUDefaultLocation(argv[0]);
+  v8::V8::InitializeExternalStartupData(argv[0]);
+  std::unique_ptr<v8::Platform> platform = v8::platform::NewDefaultPlatform();
+  v8::V8::InitializePlatform(platform.get());
+  v8::V8::Initialize();
+  */
+
+  std::cout << "Argv0: " << argv[0] << std::endl;
+
+  const char* code =
+    "print('Importing')\n"
+    "import SOIRV8\n"
+    "x = SOIRV8.JSNull()\n"
+    "print(x)\n"
+    //"y = SOIRV8.JSIsolate(False,'./port')\n"
+    "y = SOIRV8.JSIsolate()\n"
+    "print('Hot dang, an isolate: {}'.format(y))\n"
+    "y.enter()\n"
+    "print('Entered')\n"
+    "z = SOIRV8.JSContext()\n"
+    "print('Hotter dang, a context: {}'.format(z))\n"
+    "result = 42"
+    ;
+
+  try {
+    py::object pyvar = run_python_code(code);
+  } catch (py::error_already_set& e) {
+    PyErr_PrintEx(0);
+    return 1;
+  }
+
   return 0;
 }
 

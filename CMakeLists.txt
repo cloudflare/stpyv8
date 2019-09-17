@@ -9,7 +9,6 @@ add_executable( port
     src/Utils.cpp
     src/Engine.cpp
     src/Context.cpp
-    src/SoirV8.cpp
     src/Main.cpp
 )
 
