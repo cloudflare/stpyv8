@@ -27,20 +27,6 @@ void CJavascriptException::Expose(void)
     .def(str(py::self))
     ;
 
-  /*
-   * This is throwing a 'boost::python::error_already_set' indicating a
-   * python error of some sort.  TODO to track down.
-   * example stack trace:
-
-#4  0x00007f89f865baf1 in std::terminate() () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-#5  0x00007f89f865bd24 in __cxa_throw () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-#6  0x00007f89f931b852 in boost::python::throw_error_already_set() () from /usr/lib/x86_64-linux-gnu/libboost_python-py27.so.1.65.1
-#7  0x00007f89f930efe5 in boost::python::objects::enum_base::enum_base(char const*, _object* (*)(void const*), void* (*)(_object*), void (*)(_object*, boost::python::converter::rvalue_from_python_stage1_data*), boost::python::type_info, char const*) () from /usr/lib/x86_64-linux-gnu/libboost_python-py27.so.1.65.1
-#8  0x000055df23f05fd9 in boost::python::enum_<v8::StackTrace::StackTraceOptions>::enum_ (this=0x7fffd67cb9a8, name=0x55df24afb9b8 "JSStackTraceOptions", doc=0x0)
-    at /usr/include/boost/python/enum.hpp:45
-#9  0x000055df23f00856 in CJavascriptException::Expose () at /home/philsyme/soirv8/src/Exception.cpp:33
-#10 0x000055df23f3e785 in main (argc=1, argv=0x7fffd67cbb08) at /home/philsyme/soirv8/src/Main.cpp:175
-  
    py::enum_<v8::StackTrace::StackTraceOptions>("JSStackTraceOptions")
     .value("LineNumber", v8::StackTrace::kLineNumber)
     .value("ColumnOffset", v8::StackTrace::kColumnOffset)
@@ -51,7 +37,6 @@ void CJavascriptException::Expose(void)
     .value("Overview", v8::StackTrace::kOverview)
     .value("Detailed", v8::StackTrace::kDetailed)
     ;
-  */
 
   py::class_<CJavascriptStackFrame>("JSStackFrame", py::no_init)
     .add_property("lineNum", &CJavascriptStackFrame::GetLineNumber)
