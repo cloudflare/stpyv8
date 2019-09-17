@@ -1,3 +1,8 @@
+/*
+ * Rough working notes and random flailing for learning
+ * To be deleted
+ */
+
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
@@ -173,21 +178,12 @@ BOOST_PYTHON_MODULE(SOIRV8)
     extern "C" void INIT_MODULE();
 #endif
 
-int main(int argc, char* argv[])
+int main__run_code(int argc, char* argv[])
 {
   std::cout << "Init python" << std::endl;
   PyImport_AppendInittab((char*)"SOIRV8", INIT_MODULE);
   Py_Initialize();
   PyDateTime_IMPORT;
-
-  /*
-  std::cout << "Init V8" << std::endl;
-  v8::V8::InitializeICUDefaultLocation(argv[0]);
-  v8::V8::InitializeExternalStartupData(argv[0]);
-  std::unique_ptr<v8::Platform> platform = v8::platform::NewDefaultPlatform();
-  v8::V8::InitializePlatform(platform.get());
-  v8::V8::Initialize();
-  */
 
   std::cout << "Argv0: " << argv[0] << std::endl;
 
@@ -208,6 +204,26 @@ int main(int argc, char* argv[])
 
   try {
     py::object pyvar = run_python_code(code);
+  } catch (py::error_already_set& e) {
+    PyErr_PrintEx(0);
+    return 1;
+  }
+
+  return 0;
+}
+
+int main(int argc, char* argv[])
+{
+  std::cout << "Init python" << std::endl;
+  PyImport_AppendInittab((char*)"SOIRV8", INIT_MODULE);
+  Py_Initialize();
+  PyDateTime_IMPORT;
+
+  std::cout << "Run code file" << std::endl;
+  try {
+    py::object main_module = py::import("__main__");
+    py::object main_namespace = main_module.attr("__dict__");
+    py::exec_file("../test/smalltest.py", main_namespace, main_namespace);
   } catch (py::error_already_set& e) {
     PyErr_PrintEx(0);
     return 1;
