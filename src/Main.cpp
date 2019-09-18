@@ -162,7 +162,7 @@ int main__test_wrapping_v8_code(int argc, char* argv[])
   return 0;
 }
 
-BOOST_PYTHON_MODULE(SOIRV8)
+BOOST_PYTHON_MODULE(_SoirV8)
 {
   CJavascriptException::Expose();
   CWrapper::Expose(); 
@@ -171,17 +171,17 @@ BOOST_PYTHON_MODULE(SOIRV8)
 }
 
 #if PY_MAJOR_VERSION >= 3
-#   define INIT_MODULE PyInit_SOIRV8
+#   define INIT_MODULE PyInit_SoirV8
     extern "C" PyObject* INIT_MODULE();
 #else
-#   define INIT_MODULE initSOIRV8
+#   define INIT_MODULE init_SoirV8
     extern "C" void INIT_MODULE();
 #endif
 
 int main__run_code(int argc, char* argv[])
 {
   std::cout << "Init python" << std::endl;
-  PyImport_AppendInittab((char*)"SOIRV8", INIT_MODULE);
+  PyImport_AppendInittab((char*)"_SoirV8", INIT_MODULE);
   Py_Initialize();
   PyDateTime_IMPORT;
 
@@ -189,15 +189,15 @@ int main__run_code(int argc, char* argv[])
 
   const char* code =
     "print('Importing')\n"
-    "import SOIRV8\n"
-    "x = SOIRV8.JSNull()\n"
+    "import _SoirV8\n"
+    "x = _SoirV8.JSNull()\n"
     "print(x)\n"
-    //"y = SOIRV8.JSIsolate(False,'./port')\n"
-    "y = SOIRV8.JSIsolate()\n"
+    //"y = _SoirV8.JSIsolate(False,'./port')\n"
+    "y = _SoirV8.JSIsolate()\n"
     "print('Hot dang, an isolate: {}'.format(y))\n"
     "y.enter()\n"
     "print('Entered')\n"
-    "z = SOIRV8.JSContext()\n"
+    "z = _SoirV8.JSContext()\n"
     "print('Hotter dang, a context: {}'.format(z))\n"
     "result = 42"
     ;
@@ -215,7 +215,7 @@ int main__run_code(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
   std::cout << "Init python" << std::endl;
-  PyImport_AppendInittab((char*)"SOIRV8", INIT_MODULE);
+  PyImport_AppendInittab((char*)"_SoirV8", INIT_MODULE);
   Py_Initialize();
   PyDateTime_IMPORT;
 
