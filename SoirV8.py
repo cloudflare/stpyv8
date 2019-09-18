@@ -9,15 +9,9 @@ import collections
 import functools
 import json
 
-from six import StringIO
+import six
 from six.moves import input
 from six.moves import _thread as thread
-
-# FIXME Move to six
-is_py3k = sys.version_info[0] > 2
-
-if is_py3k:
-    unicode = str
 
 import _SoirV8
 
@@ -72,7 +66,7 @@ class JSError(Exception):
         return str(self._impl)
 
     def __unicode__(self, *args, **kwargs):
-        return unicode(self._impl)
+        return six.u(self._impl)
 
     def __getattribute__(self, attr):
         impl = super(JSError, self).__getattribute__("_impl")
@@ -131,6 +125,7 @@ JSArray     = _SoirV8.JSArray
 JS_ESCAPABLE = re.compile(r'([^\x00-\x7f])')
 HAS_UTF8     = re.compile(r'[\x80-\xff]')
 
+
 def _js_escape_unicode_re_callack(match):
     n = ord(match.group(0))
     if n < 0x10000:
@@ -141,6 +136,7 @@ def _js_escape_unicode_re_callack(match):
         s1 = 0xd800 | ((n >> 10) & 0x3ff)
         s2 = 0xdc00 | (n & 0x3ff)
         return '\\u%04x\\u%04x' % (s1, s2)
+
 
 def js_escape_unicode(text):
     """Return an ASCII-only representation of a JavaScript string"""
