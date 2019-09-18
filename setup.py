@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import os, os.path
+
+import os
 from distutils.core import setup, Extension
 
 source_files = ["Exception.cpp", 
@@ -15,10 +16,9 @@ third_party_libraries = ["python", "boost", "v8"]
 include_dirs = [os.path.join("lib", lib, "inc") for lib in third_party_libraries]
 library_dirs = [os.path.join("lib", lib, "lib") for lib in third_party_libraries]
 
-# FIXME
-# Revert to env variables?
-include_dirs.append('/home/buffer/v8/include')
-library_dirs.append('/home/buffer/v8/out.gn/x64.release.sample/obj/')
+V8_HOME = os.getenv('V8_HOME', os.getenv('HOME'))
+include_dirs.append(os.path.join(V8_HOME, 'v8/include'))
+library_dirs.append(os.path.join(V8_HOME, 'v8/out.gn/x64.release.sample/obj/'))
 
 libraries = []
 extra_compile_args = []
