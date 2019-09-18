@@ -223,7 +223,7 @@ int main(int argc, char* argv[])
   try {
     py::object main_module = py::import("__main__");
     py::object main_namespace = main_module.attr("__dict__");
-    py::exec_file("../test/smalltest.py", main_namespace, main_namespace);
+    py::exec_file("../tests/smalltest.py", main_namespace, main_namespace);
   } catch (py::error_already_set& e) {
     PyErr_PrintEx(0);
     return 1;
