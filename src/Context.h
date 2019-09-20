@@ -13,6 +13,21 @@ class CIsolate;
 typedef boost::shared_ptr<CContext> CContextPtr;
 typedef boost::shared_ptr<CIsolate> CIsolatePtr;
 
+class CPlatform
+{
+  private:
+  static bool inited;
+  static std::unique_ptr<v8::Platform> platform;
+
+  std::string argv;
+
+  public:
+  CPlatform(std::string argv0);
+  ~CPlatform();
+  void Init();
+};
+
+
 class CIsolate
 {
   v8::Isolate *m_isolate;

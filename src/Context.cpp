@@ -5,16 +5,31 @@
 
 #include "libplatform/libplatform.h"
 
-std::unique_ptr<v8::Platform> platform;
+std::unique_ptr<v8::Platform> CPlatform::platform;
+bool CPlatform::inited = false;
 
-CIsolate::CIsolate(bool owner=false, std::string argv=std::string()) : m_owner(owner)
+CPlatform::CPlatform(std::string argv0=std::string()) : argv(argv0)
 {
+}
+
+CPlatform::~CPlatform()
+{
+}
+
+void CPlatform::Init()
+{
+  if(inited) return;
+
   v8::V8::InitializeICUDefaultLocation(argv.c_str());
   v8::V8::InitializeExternalStartupData(argv.c_str());
   platform = v8::platform::NewDefaultPlatform();
   v8::V8::InitializePlatform(platform.get());
   v8::V8::Initialize();
+  inited = true;
+}
 
+CIsolate::CIsolate(bool owner=false, std::string argv=std::string()) : m_owner(owner)
+{
   v8::Isolate::CreateParams create_params;
   create_params.array_buffer_allocator =
     v8::ArrayBuffer::Allocator::NewDefaultAllocator();
@@ -42,6 +57,11 @@ CJavascriptStackTracePtr CIsolate::GetCurrentStackTrace(int frame_limit,
 
 void CContext::Expose(void)
 {
+  py::class_<CPlatform, boost::noncopyable>("JSPlatform", "JSPlatform allows the V8 platform to be initialized", py::no_init)
+    .def(py::init<std::string>((py::arg("argv") = std::string())))
+    .def("init", &CPlatform::Init, "Initializes the platform")
+    ;
+
   py::class_<CIsolate, boost::noncopyable>("JSIsolate", "JSIsolate is an isolated instance of the V8 engine.", py::no_init)
     .def(py::init<bool, std::string>((py::arg("owner") = false, py::arg("argv") = std::string())))
 
@@ -103,6 +123,10 @@ void CContext::Expose(void)
 
     .def("__nonzero__", &CContext::IsEntered, "the context has been entered.")
     ;
+
+  py::objects::class_value_wrapper<boost::shared_ptr<CPlatform>,
+    py::objects::make_ptr_instance<CPlatform,
+    py::objects::pointer_holder<boost::shared_ptr<CPlatform>,CPlatform> > >();
 
   py::objects::class_value_wrapper<boost::shared_ptr<CIsolate>,
     py::objects::make_ptr_instance<CIsolate,
