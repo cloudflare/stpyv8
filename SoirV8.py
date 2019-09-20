@@ -337,7 +337,6 @@ class JSContext(_SoirV8.JSContext):
         # if JSLocker.active:
         #    self.lock = JSLocker()
         #    self.lock.enter()
-
         if ctxt:
             _SoirV8.JSContext.__init__(self, ctxt)
         else:
@@ -345,7 +344,6 @@ class JSContext(_SoirV8.JSContext):
 
     def __enter__(self):
         self.enter()
-
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):

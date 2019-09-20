@@ -2,31 +2,27 @@ import sys
 import unittest
 import logging
 
-import _SoirV8
+from SoirV8 import JSIsolate
+from SoirV8 import JSPlatform
+
 
 class TestIsolate(unittest.TestCase):
-   
-    plat = None
-
-    def makeplat(self):
-        if(self.plat is None):
-            self.plat =  _SoirV8.JSPlatform()
-            self.plat.init()
+    @classmethod
+    def setUpClass(self):
+        self.platform = JSPlatform()
+        self.platform.init()
 
     def testBase(self):
-        #with _SoirV8.JSIsolate() as isolate:   #TODO __exit__ not defined?
-        self.makeplat()
-        isolate = _SoirV8.JSIsolate()
-        isolate.enter()     #TODO have to call enter first?
-        self.assertIsNotNone(isolate.current)
-        self.assertFalse(isolate.locked)
+        with JSIsolate() as isolate:
+            self.assertIsNotNone(isolate.current)
+            self.assertFalse(isolate.locked)
 
     def testEnterLeave(self):
-        self.makeplat()
-        isolate = _SoirV8.JSIsolate()
-        curr = isolate.current
+        isolate = JSIsolate()
+
         isolate.enter()
         self.assertIsNotNone(isolate.current)
+
         isolate.leave()
         self.assertIsNotNone(isolate.current)
 
