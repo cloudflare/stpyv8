@@ -38,7 +38,8 @@ __all__ = ["ReadOnly",
            "profiler",
            "JSExtension",
            "JSLocker",
-           "JSUnlocker"]
+           "JSUnlocker",
+           "JSPlatform"]
 
 
 class JSAttribute(object):
@@ -121,6 +122,8 @@ JSNull      = _SoirV8.JSNull
 JSUndefined = _SoirV8.JSUndefined
 JSArray     = _SoirV8.JSArray
 # JSFunction  = _SoirV8.JSFunction
+JSPlatform  = _SoirV8.JSPlatform
+
 
 JS_ESCAPABLE = re.compile(r'([^\x00-\x7f])')
 HAS_UTF8     = re.compile(r'[\x80-\xff]')
