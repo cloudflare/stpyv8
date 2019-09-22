@@ -35,9 +35,6 @@ std::ostream& operator <<(std::ostream& os, const CJavascriptObject& obj)
 
 void CWrapper::Expose(void)
 {
-  //TODO port me
-  std::cout << "Stub" << std::endl;
-
   PyDateTime_IMPORT;
 
   py::class_<CJavascriptObject, boost::noncopyable>("JSObject", py::no_init)
@@ -71,14 +68,12 @@ void CWrapper::Expose(void)
     .def("__eq__", &CJavascriptObject::Equals)
     .def("__ne__", &CJavascriptObject::Unequals)
 
-    /*
     .def("create", &CJavascriptFunction::CreateWithArgs,
          (py::arg("constructor"),
           py::arg("arguments") = py::tuple(),
           py::arg("propertiesObject") = py::dict()),
          "Creates a new object with the specified prototype object and properties.")
           .staticmethod("create")
-	  */
     ;
 
   py::class_<CJavascriptNull, py::bases<CJavascriptObject>, boost::noncopyable>("JSNull")
@@ -105,7 +100,6 @@ void CWrapper::Expose(void)
     .def("__contains__", &CJavascriptArray::Contains)
     ;
 
-  /*
   py::class_<CJavascriptFunction, py::bases<CJavascriptObject>, boost::noncopyable>("JSFunction", py::no_init)
     .def("__call__", py::raw_function(&CJavascriptFunction::CallWithArgs))
 
@@ -136,7 +130,6 @@ void CWrapper::Expose(void)
     .add_property("lineoff", &CJavascriptFunction::GetLineOffset, "The line offset of function in the script")
     .add_property("coloff", &CJavascriptFunction::GetColumnOffset, "The column offset of function in the script")
     ;
-*/
     py::objects::class_value_wrapper<boost::shared_ptr<CJavascriptObject>,
     py::objects::make_ptr_instance<CJavascriptObject,
     py::objects::pointer_holder<boost::shared_ptr<CJavascriptObject>,CJavascriptObject> > >();
@@ -1685,6 +1678,254 @@ bool CJavascriptArray::Contains(py::object item)
   return false;
 }
 
+py::object CJavascriptFunction::CallWithArgs(py::tuple args, py::dict kwds)
+{
+  CHECK_V8_CONTEXT();
+
+  size_t argc = ::PyTuple_Size(args.ptr());
+
+  if (argc == 0) throw CJavascriptException("missed self argument", ::PyExc_TypeError);
+
+  py::object self = args[0];
+  py::extract<CJavascriptFunction&> extractor(self);
+
+  if (!extractor.check()) throw CJavascriptException("missed self argument", ::PyExc_TypeError);
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+
+  v8::TryCatch try_catch(isolate);
+
+  CJavascriptFunction& func = extractor();
+  py::list argv(args.slice(1, py::_));
+
+  return func.Call(func.Self(), argv, kwds);
+}
+
+py::object CJavascriptFunction::Call(v8::Handle<v8::Object> self, py::list args, py::dict kwds)
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  v8::TryCatch try_catch(isolate);
+
+  v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
+
+  size_t args_count = ::PyList_Size(args.ptr()), kwds_count = ::PyMapping_Size(kwds.ptr());
+
+  std::vector< v8::Handle<v8::Value> > params(args_count + kwds_count);
+
+  for (size_t i=0; i<args_count; i++)
+  {
+    params[i] = CPythonObject::Wrap(args[i]);
+  }
+
+  py::list values = kwds.values();
+
+  for (size_t i=0; i<kwds_count; i++)
+  {
+    params[args_count+i] = CPythonObject::Wrap(values[i]);
+  }
+
+  v8::Handle<v8::Value> result;
+
+  Py_BEGIN_ALLOW_THREADS
+
+  result = func->Call(context, 
+    self.IsEmpty() ? v8::Isolate::GetCurrent()->GetCurrentContext()->Global() : self,
+    params.size(), params.empty() ? NULL : &params[0]).ToLocalChecked();
+
+  Py_END_ALLOW_THREADS
+
+  if (result.IsEmpty()) CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
+
+  return CJavascriptObject::Wrap(result);
+}
+
+py::object CJavascriptFunction::CreateWithArgs(CJavascriptFunctionPtr proto, py::tuple args, py::dict kwds)
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+
+  if (proto->Object().IsEmpty())
+    throw CJavascriptException("Object prototype may only be an Object", ::PyExc_TypeError);
+
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  v8::TryCatch try_catch(isolate);
+
+  v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(proto->Object());
+
+  size_t args_count = ::PyTuple_Size(args.ptr());
+
+  std::vector< v8::Handle<v8::Value> > params(args_count);
+
+  for (size_t i=0; i<args_count; i++)
+  {
+    params[i] = CPythonObject::Wrap(args[i]);
+  }
+
+  v8::Handle<v8::Object> result;
+
+  Py_BEGIN_ALLOW_THREADS
+
+  result = func->NewInstance(context, params.size(), params.empty() ? NULL : &params[0]).ToLocalChecked();
+
+  Py_END_ALLOW_THREADS
+
+  if (result.IsEmpty()) CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
+
+  size_t kwds_count = ::PyMapping_Size(kwds.ptr());
+  py::list items = kwds.items();
+
+  for (size_t i=0; i<kwds_count; i++)
+  {
+    py::tuple item(items[i]);
+
+    py::str key(item[0]);
+    py::object value = item[1];
+
+    result->Set(context, ToString(key), CPythonObject::Wrap(value));
+  }
+
+  return CJavascriptObject::Wrap(result);
+}
+
+py::object CJavascriptFunction::ApplyJavascript(CJavascriptObjectPtr self, py::list args, py::dict kwds)
+{
+  CHECK_V8_CONTEXT();
+
+  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+
+  return Call(self->Object(), args, kwds);
+}
+
+py::object CJavascriptFunction::ApplyPython(py::object self, py::list args, py::dict kwds)
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  return Call(CPythonObject::Wrap(self)->ToObject(context).ToLocalChecked(), args, kwds);
+}
+
+py::object CJavascriptFunction::Invoke(py::list args, py::dict kwds)
+{
+  CHECK_V8_CONTEXT();
+
+  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+
+  return Call(Self(), args, kwds);
+}
+
+const std::string CJavascriptFunction::GetName(void) const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+
+  v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
+
+  v8::String::Utf8Value name(isolate, v8::Handle<v8::String>::Cast(func->GetName()));
+
+  return std::string(*name, name.length());
+}
+
+void CJavascriptFunction::SetName(const std::string& name)
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+
+  v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
+
+  func->SetName(v8::String::NewFromUtf8(isolate, name.c_str(), v8::NewStringType::kNormal, name.size()).ToLocalChecked());
+}
+
+int CJavascriptFunction::GetLineNumber(void) const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+
+  v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
+
+  return func->GetScriptLineNumber();
+}
+int CJavascriptFunction::GetColumnNumber(void) const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+
+  v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
+
+  return func->GetScriptColumnNumber();
+}
+const std::string CJavascriptFunction::GetResourceName(void) const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+
+  v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
+
+  v8::String::Utf8Value name(isolate, v8::Handle<v8::String>::Cast(func->GetScriptOrigin().ResourceName()));
+
+  return std::string(*name, name.length());
+}
+const std::string CJavascriptFunction::GetInferredName(void) const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
+
+  v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
+
+  v8::String::Utf8Value name(isolate, v8::Handle<v8::String>::Cast(func->GetInferredName()));
+
+  return std::string(*name, name.length());
+}
+int CJavascriptFunction::GetLineOffset(void) const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+
+  v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
+
+  return func->GetScriptOrigin().ResourceLineOffset()->Value();
+}
+
+int CJavascriptFunction::GetColumnOffset(void) const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+
+  v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
+
+  return func->GetScriptOrigin().ResourceColumnOffset()->Value();
+}
+py::object CJavascriptFunction::GetOwner(void) const
+{
+  CHECK_V8_CONTEXT();
+
+  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+
+  return CJavascriptObject::Wrap(Self());
+}
 
 
 

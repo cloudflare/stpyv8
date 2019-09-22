@@ -26,7 +26,7 @@ __all__ = ["ReadOnly",
            "JSNull",
            "JSUndefined",
            "JSArray",
-           # "JSFunction",
+           "JSFunction",
            "JSClass",
            "JSEngine",
            "JSContext",
@@ -121,7 +121,7 @@ JSObject    = _SoirV8.JSObject
 JSNull      = _SoirV8.JSNull
 JSUndefined = _SoirV8.JSUndefined
 JSArray     = _SoirV8.JSArray
-# JSFunction  = _SoirV8.JSFunction
+JSFunction  = _SoirV8.JSFunction
 JSPlatform  = _SoirV8.JSPlatform
 
 

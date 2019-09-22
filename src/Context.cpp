@@ -140,6 +140,10 @@ void CContext::Expose(void)
 py::object CIsolate::GetCurrent(void)
 {
   v8::Isolate *isolate = v8::Isolate::GetCurrent();
+  if(isolate == nullptr || (!isolate->IsInUse()))
+  {
+    return py::object();
+  }
 
   v8::HandleScope handle_scope(isolate);
 

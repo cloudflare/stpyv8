@@ -18,13 +18,11 @@ class TestIsolate(unittest.TestCase):
             self.assertFalse(isolate.locked)
 
     def testEnterLeave(self):
-        isolate = JSIsolate()
-
-        isolate.enter()
-        self.assertIsNotNone(isolate.current)
-
-        isolate.leave()
-        self.assertIsNotNone(isolate.current)
+        with JSIsolate() as isolate:
+            isolate.enter()
+            self.assertIsNotNone(isolate.current)
+            isolate.leave()
+            self.assertIsNotNone(isolate.current)
 
 if __name__ == '__main__':
     level = logging.DEBUG if "-v" in sys.argv else logging.WARN
