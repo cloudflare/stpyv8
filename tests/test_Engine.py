@@ -7,7 +7,8 @@ import unittest
 import logging
 
 from datetime import *
-from SoirV8 import *
+
+import SoirV8
 
 is_py3k = sys.version_info[0] > 2
 
@@ -15,32 +16,32 @@ is_py3k = sys.version_info[0] > 2
 class TestContext(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.platform = JSPlatform()
+        self.platform = SoirV8.JSPlatform()
         self.platform.init()
 
-        self.isolate = JSIsolate()
+        self.isolate = SoirV8.JSIsolate()
         self.isolate.enter()  #TODO remove?
 
 class TestEngine(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.platform = JSPlatform()
+        self.platform = SoirV8.JSPlatform()
         self.platform.init()
 
-        self.isolate = JSIsolate()
+        self.isolate = SoirV8.JSIsolate()
         self.isolate.enter()  #TODO remove?
 
     def testClassProperties(self):
-        with JSContext() as ctxt:
-            self.assertTrue(str(JSEngine.version).startswith("7."))
-            # self.assertFalse(JSEngine.dead)
+        with SoirV8.JSContext() as ctxt:
+            self.assertTrue(str(SoirV8.JSEngine.version).startswith("7."))
+            # self.assertFalse(SoirV8.JSEngine.dead)
 
     def testCompile(self):
-        with JSContext() as ctxt:
-            with JSEngine() as engine:
+        with SoirV8.JSContext() as ctxt:
+            with SoirV8.JSEngine() as engine:
                 s = engine.compile("1+2")
 
-                self.assertTrue(isinstance(s, JSScript))
+                self.assertTrue(isinstance(s, SoirV8.JSScript))
 
                 self.assertEqual("1+2", s.source)
                 self.assertEqual(3, int(s.run()))
@@ -48,8 +49,8 @@ class TestEngine(unittest.TestCase):
                 self.assertRaises(SyntaxError, engine.compile, "1+")
 
     def _testPrecompile(self):
-        with JSContext() as ctxt:
-            with JSEngine() as engine:
+        with SoirV8.JSContext() as ctxt:
+            with SoirV8.JSEngine() as engine:
                 data = engine.precompile("1+2")
 
                 self.assertTrue(data)
@@ -57,7 +58,7 @@ class TestEngine(unittest.TestCase):
 
                 s = engine.compile("1+2", precompiled=data)
 
-                self.assertTrue(isinstance(s, _PyV8.JSScript))
+                self.assertTrue(isinstance(s, _PyV8.SoirV8.JSScript))
 
                 self.assertEqual("1+2", s.source)
                 self.assertEqual(3, int(s.run()))
@@ -65,31 +66,31 @@ class TestEngine(unittest.TestCase):
                 self.assertRaises(SyntaxError, engine.precompile, "1+")
 
     def testUnicodeSource(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             var = u'测试'
 
             def __getattr__(self, name):
                 if (name if is_py3k else name.decode('utf-8')) == u'变量':
                     return self.var
 
-                return JSClass.__getattr__(self, name)
+                return SoirV8.JSClass.__getattr__(self, name)
 
         g = Global()
 
     def _testUnicodeSource(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             var = u'测试'
 
             def __getattr__(self, name):
                 if (name if is_py3k else name.decode('utf-8')) == u'变量':
                     return self.var
 
-                return JSClass.__getattr__(self, name)
+                return SoirV8.JSClass.__getattr__(self, name)
 
         g = Global()
 
-        with JSContext(g) as ctxt:
-            with JSEngine() as engine:
+        with SoirV8.JSContext(g) as ctxt:
+            with SoirV8.JSEngine() as engine:
                 src = u"""
                 function 函数() { return 变量.length; }
 
@@ -105,7 +106,7 @@ class TestEngine(unittest.TestCase):
 
                 s = engine.compile(src, precompiled=data)
 
-                self.assertTrue(isinstance(s, _PyV8.JSScript))
+                self.assertTrue(isinstance(s, _PyV8.SoirV8.JSScript))
 
                 self.assertEqual(toNativeString(src), s.source)
                 self.assertEqual(2, s.run())
@@ -116,7 +117,7 @@ class TestEngine(unittest.TestCase):
 
                 func = getattr(ctxt.locals, func_name)
 
-                self.assertTrue(isinstance(func, _PyV8.JSFunction))
+                self.assertTrue(isinstance(func, _PyV8.SoirV8.JSFunction))
 
                 self.assertEqual(func_name, func.name)
                 self.assertEqual("", func.resname)
@@ -134,7 +135,7 @@ class TestEngine(unittest.TestCase):
 
     def _testExtension(self):
         extSrc = """function hello(name) { return "hello " + name + " from javascript"; }"""
-        extJs = JSExtension("hello/javascript", extSrc)
+        extJs = SoirV8.JSExtension("hello/javascript", extSrc)
 
         self.assertTrue(extJs)
         self.assertEqual("hello/javascript", extJs.name)
@@ -144,28 +145,28 @@ class TestEngine(unittest.TestCase):
 
         TestEngine.extJs = extJs
 
-        with JSContext(extensions=['hello/javascript']) as ctxt:
+        with SoirV8.JSContext(extensions=['hello/javascript']) as ctxt:
             self.assertEqual("hello flier from javascript", ctxt.eval("hello('flier')"))
 
         # test the auto enable property
 
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             self.assertRaises(ReferenceError, ctxt.eval, "hello('flier')")
 
         extJs.autoEnable = True
         self.assertTrue(extJs.autoEnable)
 
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             self.assertEqual("hello flier from javascript", ctxt.eval("hello('flier')"))
 
         extJs.autoEnable = False
         self.assertFalse(extJs.autoEnable)
 
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             self.assertRaises(ReferenceError, ctxt.eval, "hello('flier')")
 
         extUnicodeSrc = u"""function helloW(name) { return "hello " + name + " from javascript"; }"""
-        extUnicodeJs = JSExtension(u"helloW/javascript", extUnicodeSrc)
+        extUnicodeJs = SoirV8.JSExtension(u"helloW/javascript", extUnicodeSrc)
 
         self.assertTrue(extUnicodeJs)
         self.assertEqual("helloW/javascript", extUnicodeJs.name)
@@ -175,7 +176,7 @@ class TestEngine(unittest.TestCase):
 
         TestEngine.extUnicodeJs = extUnicodeJs
 
-        with JSContext(extensions=['helloW/javascript']) as ctxt:
+        with SoirV8.JSContext(extensions=['helloW/javascript']) as ctxt:
             self.assertEqual("hello flier from javascript", ctxt.eval("helloW('flier')"))
 
             ret = ctxt.eval(u"helloW('世界')")
@@ -184,7 +185,7 @@ class TestEngine(unittest.TestCase):
 
     def _testNativeExtension(self):
         extSrc = "native function hello();"
-        extPy = JSExtension("hello/python", extSrc, lambda func: lambda name: "hello " + name + " from python", register=False)
+        extPy = SoirV8.JSExtension("hello/python", extSrc, lambda func: lambda name: "hello " + name + " from python", register=False)
         self.assertTrue(extPy)
         self.assertEqual("hello/python", extPy.name)
         self.assertEqual(extSrc, extPy.source)
@@ -195,41 +196,41 @@ class TestEngine(unittest.TestCase):
 
         TestEngine.extPy = extPy
 
-        with JSContext(extensions=['hello/python']) as ctxt:
+        with SoirV8.JSContext(extensions=['hello/python']) as ctxt:
             self.assertEqual("hello flier from python", ctxt.eval("hello('flier')"))
 
     def _testSerialize(self):
         data = None
 
-        self.assertFalse(JSContext.entered)
+        self.assertFalse(SoirV8.JSContext.entered)
 
-        with JSContext() as ctxt:
-            self.assertTrue(JSContext.entered)
+        with SoirV8.JSContext() as ctxt:
+            self.assertTrue(SoirV8.JSContext.entered)
 
             #ctxt.eval("function hello(name) { return 'hello ' + name; }")
 
-            data = JSEngine.serialize()
+            data = SoirV8.JSEngine.serialize()
 
         self.assertTrue(data)
         self.assertTrue(len(data) > 0)
 
-        self.assertFalse(JSContext.entered)
+        self.assertFalse(SoirV8.JSContext.entered)
 
-        #JSEngine.deserialize()
+        #SoirV8.JSEngine.deserialize()
 
-        self.assertTrue(JSContext.entered)
+        self.assertTrue(SoirV8.JSContext.entered)
 
-        self.assertEqual('hello flier', JSContext.current.eval("hello('flier');"))
+        self.assertEqual('hello flier', SoirV8.JSContext.current.eval("hello('flier');"))
 
     def testEval(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             self.assertEqual(3, int(ctxt.eval("1+2")))
 
     def testGlobal(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             version = "1.0"
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             vars = ctxt.locals
 
             # getter
@@ -244,19 +245,19 @@ class TestEngine(unittest.TestCase):
             self.assertEqual(2.0, float(vars.version))
 
     def _testThis(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             version = 1.0
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             self.assertEqual("[object Global]", str(ctxt.eval("this")))
 
             self.assertEqual(1.0, float(ctxt.eval("this.version")))
 
     def testObjectBuildInMethods(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             version = 1.0
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             self.assertEqual("[object Global]", str(ctxt.eval("this.toString()")))
             self.assertEqual("[object Global]", str(ctxt.eval("this.toLocaleString()")))
             self.assertEqual(Global.version, float(ctxt.eval("this.valueOf()").version))
@@ -266,13 +267,13 @@ class TestEngine(unittest.TestCase):
             self.assertFalse(ctxt.eval("this.hasOwnProperty(\"nonexistent\")"))
 
     def testPythonWrapper(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             s = [1, 2, 3]
             d = {'a': {'b': 'c'}, 'd': ['e', 'f']}
 
         g = Global()
 
-        with JSContext(g) as ctxt:
+        with SoirV8.JSContext(g) as ctxt:
             ctxt.eval("""
                 s[2] = s[1] + 2;
                 s[0] = s[1];
@@ -294,43 +295,43 @@ class TestEngine(unittest.TestCase):
         def callback(space, action, size):
             alloc[(space, action)] = alloc.setdefault((space, action), 0) + size
 
-        JSEngine.setMemoryAllocationCallback(callback)
+        SoirV8.JSEngine.setMemoryAllocationCallback(callback)
 
-        with JSContext() as ctxt:
-            self.assertFalse((JSObjectSpace.Code, JSAllocationAction.alloc) in alloc)
+        with SoirV8.JSContext() as ctxt:
+            self.assertFalse((SoirV8.JSObjectSpace.Code, SoirV8.JSAllocationAction.alloc) in alloc)
 
             ctxt.eval("var o = new Array(1000);")
 
-            self.assertTrue((JSObjectSpace.Code, JSAllocationAction.alloc) in alloc)
+            self.assertTrue((SoirV8.JSObjectSpace.Code, SoirV8.JSAllocationAction.alloc) in alloc)
 
-        JSEngine.setMemoryAllocationCallback(None)
+        SoirV8.JSEngine.setMemoryAllocationCallback(None)
 
     def _testOutOfMemory(self):
-        with JSIsolate():
-            JSEngine.setMemoryLimit(max_young_space_size=16 * 1024, max_old_space_size=4 * 1024 * 1024)
+        with SoirV8.JSIsolate():
+            SoirV8.JSEngine.setMemoryLimit(max_young_space_size=16 * 1024, max_old_space_size=4 * 1024 * 1024)
 
-            with JSContext() as ctxt:
-                JSEngine.ignoreOutOfMemoryException()
+            with SoirV8.JSContext() as ctxt:
+                SoirV8.JSEngine.ignoreOutOfMemoryException()
 
                 ctxt.eval("var a = new Array(); while(true) a.push(a);")
 
                 self.assertTrue(ctxt.hasOutOfMemoryException)
 
-                JSEngine.setMemoryLimit()
+                SoirV8.JSEngine.setMemoryLimit()
 
-                JSEngine.collect()
+                SoirV8.JSEngine.collect()
 
     def _testStackLimit(self):
-        with JSIsolate():
-            JSEngine.setStackLimit(256 * 1024)
+        with SoirV8.JSIsolate():
+            SoirV8.JSEngine.setStackLimit(256 * 1024)
 
-            with JSContext() as ctxt:
+            with SoirV8.JSContext() as ctxt:
                 oldStackSize = ctxt.eval("var maxStackSize = function(i){try{(function m(){++i&&m()}())}catch(e){return i}}(0); maxStackSize")
 
-        with JSIsolate():
-            JSEngine.setStackLimit(512 * 1024)
+        with SoirV8.JSIsolate():
+            SoirV8.JSEngine.setStackLimit(512 * 1024)
 
-            with JSContext() as ctxt:
+            with SoirV8.JSContext() as ctxt:
                 newStackSize = ctxt.eval("var maxStackSize = function(i){try{(function m(){++i&&m()}())}catch(e){return i}}(0); maxStackSize")
 
         self.assertTrue(newStackSize > oldStackSize * 2)

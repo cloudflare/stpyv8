@@ -2,23 +2,22 @@ import sys
 import unittest
 import logging
 
-from SoirV8 import JSIsolate
-from SoirV8 import JSPlatform
+import SoirV8
 
 
 class TestIsolate(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.platform = JSPlatform()
+        self.platform = SoirV8.JSPlatform()
         self.platform.init()
 
     def testBase(self):
-        with JSIsolate() as isolate:
+        with SoirV8.JSIsolate() as isolate:
             self.assertIsNotNone(isolate.current)
             self.assertFalse(isolate.locked)
 
     def testEnterLeave(self):
-        with JSIsolate() as isolate:
+        with SoirV8.JSIsolate() as isolate:
             isolate.enter()
             self.assertIsNotNone(isolate.current)
             isolate.leave()

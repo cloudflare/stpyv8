@@ -7,7 +7,8 @@ import unittest
 import logging
 
 from datetime import *
-from SoirV8 import *
+
+import SoirV8
 
 is_py3k = sys.version_info[0] > 2
 
@@ -25,10 +26,10 @@ else:
 
 
 def convert(obj):
-    if type(obj) == JSArray:
+    if type(obj) == SoirV8.JSArray:
         return [convert(v) for v in obj]
 
-    if type(obj) == JSObject:
+    if type(obj) == SoirV8.JSObject:
         return dict([[str(k), convert(obj.__getattr__(str(k)))] for k in (obj.__dir__() if is_py3k else obj.__members__)])
 
     return obj
@@ -37,14 +38,14 @@ def convert(obj):
 class TestWrapper(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.platform = JSPlatform()
+        self.platform = SoirV8.JSPlatform()
         self.platform.init()
 
-        self.isolate = JSIsolate()
+        self.isolate = SoirV8.JSIsolate()
         self.isolate.enter()  #TODO remove?
 
     def testObject(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             o = ctxt.eval("new Object()")
 
             self.assertTrue(hash(o) > 0)
@@ -57,7 +58,7 @@ class TestWrapper(unittest.TestCase):
         self.assertRaises(UnboundLocalError, o.clone)
 
     def testAutoConverter(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             ctxt.eval("""
                 var_i = 1;
                 var_f = 1.0;
@@ -104,19 +105,19 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue("var_f_obj" in attrs)
 
     def _testExactConverter(self):
-        class MyInteger(int, JSClass):
+        class MyInteger(int, SoirV8.JSClass):
             pass
 
-        class MyString(str, JSClass):
+        class MyString(str, SoirV8.JSClass):
             pass
 
-        class MyUnicode(unicode, JSClass):
+        class MyUnicode(unicode, SoirV8.JSClass):
             pass
 
-        class MyDateTime(time, JSClass):
+        class MyDateTime(time, SoirV8.JSClass):
             pass
 
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             var_bool = True
             var_int = 1
             var_float = 1.0
@@ -131,7 +132,7 @@ class TestWrapper(unittest.TestCase):
             var_myunicode = MyUnicode('myunicode')
             var_mytime = MyDateTime()
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             typename = ctxt.eval("(function (name) { return this[name].constructor.name; })")
             typeof = ctxt.eval("(function (name) { return typeof(this[name]); })")
 
@@ -155,7 +156,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual('object', typeof('var_mytime'))
 
     def testJavascriptWrapper(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             self.assertEqual(type(None), type(ctxt.eval("null")))
             self.assertEqual(type(None), type(ctxt.eval("undefined")))
             self.assertEqual(bool, type(ctxt.eval("true")))
@@ -163,12 +164,12 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(int, type(ctxt.eval("123")))
             self.assertEqual(float, type(ctxt.eval("3.14")))
             self.assertEqual(datetime, type(ctxt.eval("new Date()")))
-            self.assertEqual(JSArray, type(ctxt.eval("[1, 2, 3]")))
-            self.assertEqual(JSFunction, type(ctxt.eval("(function() {})")))
-            self.assertEqual(JSObject, type(ctxt.eval("new Object()")))
+            self.assertEqual(SoirV8.JSArray, type(ctxt.eval("[1, 2, 3]")))
+            self.assertEqual(SoirV8.JSFunction, type(ctxt.eval("(function() {})")))
+            self.assertEqual(SoirV8.JSObject, type(ctxt.eval("new Object()")))
 
     def testPythonWrapper(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             typeof = ctxt.eval("(function type(value) { return typeof value; })")
             protoof = ctxt.eval("(function protoof(value) { return Object.prototype.toString.apply(value); })")
 
@@ -192,7 +193,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual('[object Function]', protoof(int))
 
     def testFunction(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             func = ctxt.eval("""
                 (function ()
                 {
@@ -230,23 +231,23 @@ class TestWrapper(unittest.TestCase):
             def __call__(self, name):
                 return "hello " + name
 
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             hello = Hello()
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             self.assertEqual("hello world", ctxt.eval("hello('world')"))
 
     def testJSFunction(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             hello = ctxt.eval("(function (name) { return 'Hello ' + name; })")
 
-            self.assertTrue(isinstance(hello, JSFunction))
+            self.assertTrue(isinstance(hello, SoirV8.JSFunction))
             self.assertEqual("Hello world", hello('world'))
             self.assertEqual("Hello world", hello.invoke(['world']))
 
             obj = ctxt.eval("({ 'name': 'world', 'hello': function (name) { return 'Hello ' + name + ' from ' + this.name; }})")
             hello = obj.hello
-            self.assertTrue(isinstance(hello, JSFunction))
+            self.assertTrue(isinstance(hello, SoirV8.JSFunction))
             self.assertEqual("Hello world from world", hello('world'))
 
             tester = ctxt.eval("({ 'name': 'tester' })")
@@ -254,7 +255,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual("Hello world from json", hello.apply({ 'name': 'json' }, ['world']))
 
     def testConstructor(self):
-        with JSContext() as ctx:
+        with SoirV8.JSContext() as ctx:
             ctx.eval("""
                 var Test = function() {
                     this.trySomething();
@@ -268,32 +269,32 @@ class TestWrapper(unittest.TestCase):
                 };
                 """)
 
-            self.assertTrue(isinstance(ctx.locals.Test, JSFunction))
+            self.assertTrue(isinstance(ctx.locals.Test, SoirV8.JSFunction))
 
-            test = JSObject.create(ctx.locals.Test)
+            test = SoirV8.JSObject.create(ctx.locals.Test)
 
-            self.assertTrue(isinstance(ctx.locals.Test, JSObject))
+            self.assertTrue(isinstance(ctx.locals.Test, SoirV8.JSObject))
             self.assertEqual("soirv8", test.name);
 
-            test2 = JSObject.create(ctx.locals.Test2, ('John', 'Doe'))
+            test2 = SoirV8.JSObject.create(ctx.locals.Test2, ('John', 'Doe'))
 
             self.assertEqual("John Doe", test2.name);
 
-            test3 = JSObject.create(ctx.locals.Test2, ('John', 'Doe'), { 'email': 'john.doe@randommail.com' })
+            test3 = SoirV8.JSObject.create(ctx.locals.Test2, ('John', 'Doe'), { 'email': 'john.doe@randommail.com' })
 
             self.assertEqual("john.doe@randommail.com", test3.email);
 
     def testJSError(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             try:
                 ctxt.eval('throw "test"')
                 self.fail()
             except:
-                self.assertTrue(JSError, sys.exc_info()[0])
+                self.assertTrue(SoirV8.JSError, sys.exc_info()[0])
 
     def _testErrorInfo(self):
-        with JSContext() as ctxt:
-            with JSEngine() as engine:
+        with SoirV8.JSContext() as ctxt:
+            with SoirV8.JSEngine() as engine:
                 try:
                     engine.compile("""
                         function hello()
@@ -303,8 +304,8 @@ class TestWrapper(unittest.TestCase):
 
                         hello();""", "test", 10, 10).run()
                     self.fail()
-                except JSError as e:
-                    self.assertTrue(str(e).startswith('JSError: Error: hello world ( test @ 14 : 34 )  ->'))
+                except SoirV8.JSError as e:
+                    self.assertTrue(str(e).startswith('SoirV8.JSError: Error: hello world ( test @ 14 : 34 )  ->'))
                     self.assertEqual("Error", e.name)
                     self.assertEqual("hello world", e.message)
                     self.assertEqual("test", e.scriptName)
@@ -328,7 +329,7 @@ class TestWrapper(unittest.TestCase):
             ('g', 'test2', 1, 15),
             (None, 'test3', 1, None),
             (None, 'test3', 1, 1),
-        ], JSError.parse_stack("""Error: err
+        ], SoirV8.JSError.parse_stack("""Error: err
             at Error (unknown source)
             at test (native)
             at new <anonymous> (test0:3:5)
@@ -338,11 +339,11 @@ class TestWrapper(unittest.TestCase):
             at test3:1:1"""))
 
     def _testStackTrace(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             def GetCurrentStackTrace(self, limit):
-                return JSStackTrace.GetCurrentStackTrace(4, JSStackTrace.Options.Detailed)
+                return SoirV8.JSStackTrace.GetCurrentStackTrace(4, SoirV8.JSStackTrace.Options.Detailed)
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             st = ctxt.eval("""
                 function a()
                 {
@@ -367,11 +368,11 @@ class TestWrapper(unittest.TestCase):
                                 ' constructor' if f.isConstructor else '') for f in st]))
 
     def testPythonException(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             def raiseException(self):
                 raise RuntimeError("Hello")
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             r = ctxt.eval("""
                 msg ="";
                 try
@@ -392,7 +393,7 @@ class TestWrapper(unittest.TestCase):
         class TestException(Exception):
             pass
 
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             def raiseIndexError(self):
                 return [1, 2, 3][5]
 
@@ -411,7 +412,7 @@ class TestWrapper(unittest.TestCase):
             def raiseExceptions(self):
                 raise TestException()
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             ctxt.eval("try { this.raiseIndexError(); } catch (e) { msg = e; }")
 
             self.assertEqual("RangeError: list index out of range", str(ctxt.locals.msg))
@@ -435,7 +436,7 @@ class TestWrapper(unittest.TestCase):
             self.assertRaises(TestException, ctxt.eval, "this.raiseExceptions();")
 
     def _testArray(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             array = ctxt.eval("""
                 var array = new Array();
 
@@ -447,7 +448,7 @@ class TestWrapper(unittest.TestCase):
                 array;
                 """)
 
-            self.assertTrue(isinstance(array, JSArray))
+            self.assertTrue(isinstance(array, SoirV8.JSArray))
             self.assertEqual(10, len(array))
 
             self.assertTrue(5 in array)
@@ -487,8 +488,8 @@ class TestWrapper(unittest.TestCase):
 
             self.assertEqual([10, 7, 8, 8, 3, 2, 1], list(array))
 
-            ctxt.locals.array1 = JSArray(5)
-            ctxt.locals.array2 = JSArray([1, 2, 3, 4, 5])
+            ctxt.locals.array1 = SoirV8.JSArray(5)
+            ctxt.locals.array2 = SoirV8.JSArray([1, 2, 3, 4, 5])
 
             for i in range(len(ctxt.locals.array2)):
                 ctxt.locals.array1[i] = ctxt.locals.array2[i] * 10
@@ -521,16 +522,16 @@ class TestWrapper(unittest.TestCase):
                 self.assertEqual(arg[1], str(array))
                 self.assertEqual(arg[2], [array[i] for i in range(len(array))])
 
-            self.assertEqual(3, ctxt.eval("(function (arr) { return arr.length; })")(JSArray([1, 2, 3])))
-            self.assertEqual(2, ctxt.eval("(function (arr, idx) { return arr[idx]; })")(JSArray([1, 2, 3]), 1))
-            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(JSArray([1, 2, 3])))
-            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(JSArray((1, 2, 3))))
-            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(JSArray(range(3))))
+            self.assertEqual(3, ctxt.eval("(function (arr) { return arr.length; })")(SoirV8.JSArray([1, 2, 3])))
+            self.assertEqual(2, ctxt.eval("(function (arr, idx) { return arr[idx]; })")(SoirV8.JSArray([1, 2, 3]), 1))
+            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SoirV8.JSArray([1, 2, 3])))
+            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SoirV8.JSArray((1, 2, 3))))
+            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SoirV8.JSArray(range(3))))
 
-            [x for x in JSArray([1,2,3])]
+            [x for x in SoirV8.JSArray([1,2,3])]
 
     def testMultiDimArray(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             ret = ctxt.eval("""
                 ({
                     'test': function(){
@@ -545,11 +546,11 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual([[1, 'abla'], [2, 'ajkss']], convert(ret))
 
     def testLazyConstructor(self):
-        class Globals(JSClass):
+        class Globals(SoirV8.JSClass):
             def __init__(self):
-                self.array=JSArray([1,2,3])
+                self.array=SoirV8.JSArray([1,2,3])
 
-        with JSContext(Globals()) as ctxt:
+        with SoirV8.JSContext(Globals()) as ctxt:
             self.assertEqual(2, ctxt.eval("""array[1]"""))
 
     def _testForEach(self):
@@ -567,7 +568,7 @@ class TestWrapper(unittest.TestCase):
             for i in range(x):
                 yield i
 
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             func = ctxt.eval("""(function (k) {
                 var result = [];
                 for (var prop in k) {
@@ -584,7 +585,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(["0", "1", "2"], list(func(gen(3))))
 
     def testDict(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             obj = ctxt.eval("var r = { 'a' : 1, 'b' : 2 }; r")
 
             self.assertEqual(1, obj.a)
@@ -609,7 +610,7 @@ class TestWrapper(unittest.TestCase):
                                e: null }; x""")))
 
     def testDate(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             now1 = ctxt.eval("new Date();")
 
             self.assertTrue(now1)
@@ -627,12 +628,12 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue(str(func(now)).startswith(now.strftime("%a %b %d %Y %H:%M:%S")))
 
             ctxt.eval("function identity(x) { return x; }")
-            # JS only has millisecond resolution, so cut it off there
+            # SoirV8.JS only has millisecond resolution, so cut it off there
             now3 = now2.replace(microsecond=123000)
             self.assertEqual(now3, ctxt.locals.identity(now3))
 
     def testUnicode(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             self.assertEqual(u"人", toUnicodeString(ctxt.eval(u"\"人\"")))
             self.assertEqual(u"é", toUnicodeString(ctxt.eval(u"\"é\"")))
 
@@ -651,19 +652,19 @@ class TestWrapper(unittest.TestCase):
             def fs(self):
                 return FileSystemWarpper()
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             self.assertEqual(os.getcwd(), ctxt.eval("fs.cwd"))
 
     def testRefCount(self):
         count = sys.getrefcount(None)
 
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             pass
 
         g = Global()
         g_refs = sys.getrefcount(g)
 
-        with JSContext(g) as ctxt:
+        with SoirV8.JSContext(g) as ctxt:
             ctxt.eval("""
                 var none = null;
             """)
@@ -681,7 +682,7 @@ class TestWrapper(unittest.TestCase):
         self.assertEqual(g_refs, sys.getrefcount(g))
 
     def testProperty(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             def __init__(self, name):
                 self._name = name
 
@@ -698,7 +699,7 @@ class TestWrapper(unittest.TestCase):
 
         g = Global('world')
 
-        with JSContext(g) as ctxt:
+        with SoirV8.JSContext(g) as ctxt:
             self.assertEqual('world', ctxt.eval("name"))
             self.assertEqual('flier', ctxt.eval("this.name = 'flier';"))
             self.assertEqual('flier', ctxt.eval("name"))
@@ -711,11 +712,11 @@ class TestWrapper(unittest.TestCase):
             #self.assertEqual('fixed', ctxt.eval("name"))
 
     def testGetterAndSetter(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
            def __init__(self, testval):
                self.testval = testval
 
-        with JSContext(Global("Test Value A")) as ctxt:
+        with SoirV8.JSContext(Global("Test Value A")) as ctxt:
            self.assertEqual("Test Value A", ctxt.locals.testval)
            ctxt.eval("""
                this.__defineGetter__("test", function() {
@@ -745,7 +746,7 @@ class TestWrapper(unittest.TestCase):
                 owner.deleted = True
 
         def test():
-            with JSContext() as ctxt:
+            with SoirV8.JSContext() as ctxt:
                 fn = ctxt.eval("(function (obj) { obj.say(); })")
 
                 obj = Hello()
@@ -762,30 +763,30 @@ class TestWrapper(unittest.TestCase):
 
         self.assertFalse(owner.deleted)
 
-        JSEngine.collect()
+        SoirV8.JSEngine.collect()
         gc.collect()
 
         self.assertTrue(owner.deleted)
 
     def testNullInString(self):
-        with JSContext() as ctxt:
+        with SoirV8.JSContext() as ctxt:
             fn = ctxt.eval("(function (s) { return s; })")
 
             self.assertEqual("hello \0 world", fn("hello \0 world"))
 
     def _testLivingObjectCache(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             i = 1
             b = True
             o = object()
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             self.assertTrue(ctxt.eval("i == i"))
             self.assertTrue(ctxt.eval("b == b"))
             self.assertTrue(ctxt.eval("o == o"))
 
     def testNamedSetter(self):
-        class Obj(JSClass):
+        class Obj(SoirV8.JSClass):
             @property
             def p(self):
                 return self._p
@@ -794,13 +795,13 @@ class TestWrapper(unittest.TestCase):
             def p(self, value):
                 self._p = value
 
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             def __init__(self):
                 self.obj = Obj()
                 self.d = {}
                 self.p = None
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             ctxt.eval("""
             x = obj;
             x.y = 10;
@@ -812,15 +813,15 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(10, ctxt.locals.d['y'])
 
     def testWatch(self):
-        class Obj(JSClass):
+        class Obj(SoirV8.JSClass):
             def __init__(self):
                 self.p = 1
 
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             def __init__(self):
                 self.o = Obj()
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             ctxt.eval("""
             o.watch("p", function (id, oldval, newval) {
                 return oldval + newval;
@@ -848,11 +849,11 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(1, ctxt.eval("o.p"))
 
     def testReferenceError(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             def __init__(self):
                 self.s = self
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             self.assertRaises(ReferenceError, ctxt.eval, 'x')
 
             self.assertTrue(ctxt.eval("typeof(x) === 'undefined'"))
@@ -864,38 +865,38 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue(ctxt.eval("typeof(s.z) === 'undefined'"))
 
     def testRaiseExceptionInGetter(self):
-        class Document(JSClass):
+        class Document(SoirV8.JSClass):
             def __getattr__(self, name):
                 if name == 'y':
                     raise TypeError()
 
-                return JSClass.__getattr__(self, name)
+                return SoirV8.JSClass.__getattr__(self, name)
 
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             def __init__(self):
                 self.document = Document()
 
-        with JSContext(Global()) as ctxt:
+        with SoirV8.JSContext(Global()) as ctxt:
             self.assertEqual(None, ctxt.eval('document.x'))
             self.assertRaises(TypeError, ctxt.eval, 'document.y')
 
     def testUndefined(self):
-        class Global(JSClass):
+        class Global(SoirV8.JSClass):
             def returnNull(self):
-                return JSNull()
+                return SoirV8.JSNull()
 
             def returnUndefined(self):
-                return JSUndefined()
+                return SoirV8.JSUndefined()
 
             def returnNone(self):
                 return None
 
-        with JSContext(Global()) as ctxt:
-            self.assertFalse(bool(JSNull()))
-            self.assertFalse(bool(JSUndefined()))
+        with SoirV8.JSContext(Global()) as ctxt:
+            self.assertFalse(bool(SoirV8.JSNull()))
+            self.assertFalse(bool(SoirV8.JSUndefined()))
 
-            self.assertEqual("null", str(JSNull()))
-            self.assertEqual("undefined", str(JSUndefined()))
+            self.assertEqual("null", str(SoirV8.JSNull()))
+            self.assertEqual("undefined", str(SoirV8.JSUndefined()))
 
             self.assertTrue(ctxt.eval('null == returnNull()'))
             self.assertTrue(ctxt.eval('undefined == returnUndefined()'))
