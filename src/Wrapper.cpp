@@ -1024,10 +1024,13 @@ py::object CJavascriptObject::GetAttr(const std::string& name)
 #endif
 */
 
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   v8::TryCatch try_catch(isolate);
@@ -1054,10 +1057,13 @@ void CJavascriptObject::SetAttr(const std::string& name, py::object value)
 #endif
 */
 
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   v8::TryCatch try_catch(isolate);
@@ -1084,10 +1090,13 @@ void CJavascriptObject::DelAttr(const std::string& name)
 #endif
 */
 
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   v8::TryCatch try_catch(isolate);
@@ -1102,10 +1111,13 @@ void CJavascriptObject::DelAttr(const std::string& name)
 
 py::list CJavascriptObject::GetAttrList(void)
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   CPythonGIL python_gil;
 
   py::list attrs;
@@ -1130,28 +1142,33 @@ py::list CJavascriptObject::GetAttrList(void)
 
 int CJavascriptObject::GetIdentityHash(void)
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  CHECK_V8_CONTEXT();
 
   return Object()->GetIdentityHash();
 }
 
 CJavascriptObjectPtr CJavascriptObject::Clone(void)
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  CHECK_V8_CONTEXT();
 
   return CJavascriptObjectPtr(new CJavascriptObject(Object()->Clone()));
 }
 
 bool CJavascriptObject::Contains(const std::string& name)
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   v8::TryCatch try_catch(isolate);
@@ -1165,10 +1182,13 @@ bool CJavascriptObject::Contains(const std::string& name)
 
 bool CJavascriptObject::Equals(CJavascriptObjectPtr other) const
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   return other.get() && Object()->Equals(context, other->Object()).ToChecked();
@@ -1176,10 +1196,13 @@ bool CJavascriptObject::Equals(CJavascriptObjectPtr other) const
 
 void CJavascriptObject::Dump(std::ostream& os) const
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   if (m_obj.IsEmpty())
@@ -1210,10 +1233,13 @@ void CJavascriptObject::Dump(std::ostream& os) const
 
 CJavascriptObject::operator long() const
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   if (m_obj.IsEmpty())
@@ -1221,12 +1247,16 @@ CJavascriptObject::operator long() const
 
   return Object()->Int32Value(context).ToChecked();
 }
+
 CJavascriptObject::operator double() const
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   if (m_obj.IsEmpty())
@@ -1237,10 +1267,12 @@ CJavascriptObject::operator double() const
 
 CJavascriptObject::operator bool() const
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
 
   if (m_obj.IsEmpty()) return false;
 
@@ -1431,11 +1463,12 @@ void CJavascriptArray::LazyConstructor(void)
 
 size_t CJavascriptArray::Length(void)
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   LazyConstructor();
 
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  CHECK_V8_CONTEXT();
 
   return v8::Handle<v8::Array>::Cast(Object())->Length();
 }
@@ -1448,12 +1481,15 @@ py::object CJavascriptArray::GetItem(py::object key)
   }
 #endif
 
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   LazyConstructor();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   v8::TryCatch try_catch(isolate);
@@ -1505,12 +1541,15 @@ py::object CJavascriptArray::SetItem(py::object key, py::object value)
 #endif
 */
 
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   LazyConstructor();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   v8::TryCatch try_catch(isolate);
@@ -1591,12 +1630,15 @@ py::object CJavascriptArray::DelItem(py::object key)
 #endif
 */
 
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   LazyConstructor();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   v8::TryCatch try_catch(isolate);
@@ -1648,12 +1690,15 @@ py::object CJavascriptArray::DelItem(py::object key)
 
 bool CJavascriptArray::Contains(py::object item)
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   LazyConstructor();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   v8::TryCatch try_catch(isolate);
@@ -1680,7 +1725,7 @@ bool CJavascriptArray::Contains(py::object item)
 
 py::object CJavascriptFunction::CallWithArgs(py::tuple args, py::dict kwds)
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   size_t argc = ::PyTuple_Size(args.ptr());
 
@@ -1693,6 +1738,7 @@ py::object CJavascriptFunction::CallWithArgs(py::tuple args, py::dict kwds)
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+  CHECK_V8_CONTEXT();
 
   v8::TryCatch try_catch(isolate);
 
@@ -1704,10 +1750,13 @@ py::object CJavascriptFunction::CallWithArgs(py::tuple args, py::dict kwds)
 
 py::object CJavascriptFunction::Call(v8::Handle<v8::Object> self, py::list args, py::dict kwds)
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   v8::TryCatch try_catch(isolate);
@@ -1747,10 +1796,12 @@ py::object CJavascriptFunction::Call(v8::Handle<v8::Object> self, py::list args,
 
 py::object CJavascriptFunction::CreateWithArgs(CJavascriptFunctionPtr proto, py::tuple args, py::dict kwds)
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
 
   if (proto->Object().IsEmpty())
     throw CJavascriptException("Object prototype may only be an Object", ::PyExc_TypeError);
@@ -1798,19 +1849,23 @@ py::object CJavascriptFunction::CreateWithArgs(CJavascriptFunctionPtr proto, py:
 
 py::object CJavascriptFunction::ApplyJavascript(CJavascriptObjectPtr self, py::list args, py::dict kwds)
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  CHECK_V8_CONTEXT();
 
   return Call(self->Object(), args, kwds);
 }
 
 py::object CJavascriptFunction::ApplyPython(py::object self, py::list args, py::dict kwds)
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
+
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   return Call(CPythonObject::Wrap(self)->ToObject(context).ToLocalChecked(), args, kwds);
@@ -1818,19 +1873,22 @@ py::object CJavascriptFunction::ApplyPython(py::object self, py::list args, py::
 
 py::object CJavascriptFunction::Invoke(py::list args, py::dict kwds)
 {
-  CHECK_V8_CONTEXT();
+  //CHECK_V8_CONTEXT();
 
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  CHECK_V8_CONTEXT();
 
   return Call(Self(), args, kwds);
 }
 
 const std::string CJavascriptFunction::GetName(void) const
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
 
   v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
 
@@ -1841,10 +1899,12 @@ const std::string CJavascriptFunction::GetName(void) const
 
 void CJavascriptFunction::SetName(const std::string& name)
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+
+  CHECK_V8_CONTEXT();
 
   v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
 
@@ -1853,9 +1913,10 @@ void CJavascriptFunction::SetName(const std::string& name)
 
 int CJavascriptFunction::GetLineNumber(void) const
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  CHECK_V8_CONTEXT();
 
   v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
 
@@ -1863,9 +1924,10 @@ int CJavascriptFunction::GetLineNumber(void) const
 }
 int CJavascriptFunction::GetColumnNumber(void) const
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  CHECK_V8_CONTEXT();
 
   v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
 
@@ -1873,10 +1935,11 @@ int CJavascriptFunction::GetColumnNumber(void) const
 }
 const std::string CJavascriptFunction::GetResourceName(void) const
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+  CHECK_V8_CONTEXT();
 
   v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
 
@@ -1886,10 +1949,11 @@ const std::string CJavascriptFunction::GetResourceName(void) const
 }
 const std::string CJavascriptFunction::GetInferredName(void) const
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
+  CHECK_V8_CONTEXT();
 
   v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
 
@@ -1899,9 +1963,10 @@ const std::string CJavascriptFunction::GetInferredName(void) const
 }
 int CJavascriptFunction::GetLineOffset(void) const
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  CHECK_V8_CONTEXT();
 
   v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
 
@@ -1910,22 +1975,22 @@ int CJavascriptFunction::GetLineOffset(void) const
 
 int CJavascriptFunction::GetColumnOffset(void) const
 {
-  CHECK_V8_CONTEXT();
+  //CHECK_V8_CONTEXT();
 
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  CHECK_V8_CONTEXT();
 
   v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
 
   return func->GetScriptOrigin().ResourceColumnOffset()->Value();
 }
+
 py::object CJavascriptFunction::GetOwner(void) const
 {
-  CHECK_V8_CONTEXT();
+  // CHECK_V8_CONTEXT();
 
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  CHECK_V8_CONTEXT();
 
   return CJavascriptObject::Wrap(Self());
 }
-
-
-
