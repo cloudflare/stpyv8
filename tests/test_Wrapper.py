@@ -435,7 +435,7 @@ class TestWrapper(unittest.TestCase):
 
             self.assertRaises(TestException, ctxt.eval, "this.raiseExceptions();")
 
-    def _testArray(self):
+    def testArray(self):
         with SoirV8.JSContext() as ctxt:
             array = ctxt.eval("""
                 var array = new Array();
@@ -476,17 +476,19 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual([3, 2], array[-3:-1])
             self.assertEqual([], array[0:0])
 
-            array[1:3] = [9, 9, 9]
+            self.assertEqual([10, 9, 8, 7, 6, None, 4, 3, 2, 1], list(array))
 
-            self.assertEqual([10, 9, 9, 9, 7, 6, None, 4, 3, 2, 1], list(array))
+            array[1:3] = [9, 9]
 
-            array[5:8] = [8, 8]
+            self.assertEqual([10, 9, 9, 7, 6, None, 4, 3, 2, 1], list(array))
 
-            self.assertEqual([10, 9, 9, 9, 7, 8, 8, 3, 2, 1], list(array))
+            array[5:7] = [8, 8]
 
-            del array[1:4]
+            self.assertEqual([10, 9, 9, 7, 6, 8, 8, 3, 2, 1], list(array))
 
-            self.assertEqual([10, 7, 8, 8, 3, 2, 1], list(array))
+            del array[1]
+
+            self.assertEqual([10, None, 9, 7, 6, 8, 8, 3, 2, 1], list(array))
 
             ctxt.locals.array1 = SoirV8.JSArray(5)
             ctxt.locals.array2 = SoirV8.JSArray([1, 2, 3, 4, 5])
