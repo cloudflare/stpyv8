@@ -226,7 +226,7 @@ class TestWrapper(unittest.TestCase):
             func.setName("hello")
             self.assertEqual("hello", func.name)
 
-    def _testCall(self):
+    def testCall(self):
         class Hello(object):
             def __call__(self, name):
                 return "hello " + name
