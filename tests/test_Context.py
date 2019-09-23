@@ -14,37 +14,10 @@ class TestContext(unittest.TestCase):
         self.isolate = SoirV8.JSIsolate()
         self.isolate.enter()  #TODO remove?
 
-    def testBase(self):
-        context = SoirV8.JSContext()
-
-        self.assertIsNone(context.entered)
-        self.assertIsNone(context.current)
-        self.assertIsNone(context.calling)
-        self.assertFalse(context.inContext)
-
-        with context:
-            self.assertTrue(context.inContext)
-
     def testEval(self):
         with SoirV8.JSContext() as context:
             self.assertEqual(2, context.eval("1+1"))
             self.assertEqual('Hello world', context.eval("'Hello ' + 'world'"))
-
-    def testCopy(self):
-        context  = SoirV8.JSContext()
-        context2 = SoirV8.JSContext(context)
-
-        with context:
-            self.assertEqual(2, context2.eval("1+1"))
-
-    def testGlobal(self):
-        class Global(object):
-            name = "global"
-
-        g = Global()
-
-        with SoirV8.JSContext(g) as ctxt:
-            self.assertTrue(bool(SoirV8.JSContext.inContext))
 
     def testMultiNamespace(self):
         self.assertTrue(not bool(SoirV8.JSContext.inContext))
