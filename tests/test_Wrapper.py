@@ -644,7 +644,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(2, func(u"测试"))
 
     def testClassicStyleObject(self):
-        class FileSystemWarpper:
+        class FileSystemWrapper:
             @property
             def cwd(self):
                 return os.getcwd()
@@ -652,7 +652,7 @@ class TestWrapper(unittest.TestCase):
         class Global:
             @property
             def fs(self):
-                return FileSystemWarpper()
+                return FileSystemWrapper()
 
         with SoirV8.JSContext(Global()) as ctxt:
             self.assertEqual(os.getcwd(), ctxt.eval("fs.cwd"))
