@@ -1499,7 +1499,7 @@ py::object CJavascriptArray::GetItem(py::object key)
     Py_ssize_t arrayLen = v8::Handle<v8::Array>::Cast(Object())->Length();
     Py_ssize_t start, stop, step, sliceLen;
 
-    if (0 == ::PySlice_GetIndicesEx(PySlice_Cast(key.ptr()), arrayLen, &start, &stop, &step, &sliceLen))
+    if (0 == PySlice_GetIndicesEx(PySlice_Cast(key.ptr()), arrayLen, &start, &stop, &step, &sliceLen))
     {
       py::list slice;
 
@@ -1566,7 +1566,7 @@ py::object CJavascriptArray::SetItem(py::object key, py::object value)
       Py_ssize_t arrayLen = v8::Handle<v8::Array>::Cast(Object())->Length();
       Py_ssize_t start, stop, step, sliceLen;
 
-      if (0 == ::PySlice_GetIndicesEx(PySlice_Cast(key.ptr()), arrayLen, &start, &stop, &step, &sliceLen))
+      if (0 == PySlice_GetIndicesEx(PySlice_Cast(key.ptr()), arrayLen, &start, &stop, &step, &sliceLen))
       {
         /* TODO port me BUGBUG
          * This will require some work since we are trying to avoid the
@@ -1648,7 +1648,7 @@ py::object CJavascriptArray::DelItem(py::object key)
     Py_ssize_t arrayLen = v8::Handle<v8::Array>::Cast(Object())->Length();
     Py_ssize_t start, stop, step, sliceLen;
 
-    if (0 == ::PySlice_GetIndicesEx(PySlice_Cast(key.ptr()), arrayLen, &start, &stop, &step, &sliceLen))
+    if (0 == PySlice_GetIndicesEx(PySlice_Cast(key.ptr()), arrayLen, &start, &stop, &step, &sliceLen))
     {
       for (Py_ssize_t idx=stop; idx<arrayLen; idx++)
       {
