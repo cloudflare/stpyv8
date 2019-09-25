@@ -528,7 +528,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(2, ctxt.eval("(function (arr, idx) { return arr[idx]; })")(SoirV8.JSArray([1, 2, 3]), 1))
             self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SoirV8.JSArray([1, 2, 3])))
             self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SoirV8.JSArray((1, 2, 3))))
-            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SoirV8.JSArray(range(3))))
+            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SoirV8.JSArray(list(range(3)))))
 
             [x for x in SoirV8.JSArray([1,2,3])]
 
