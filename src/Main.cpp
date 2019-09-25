@@ -170,13 +170,15 @@ BOOST_PYTHON_MODULE(_SoirV8)
   CEngine::Expose();
 }
 
+
 #if PY_MAJOR_VERSION >= 3
-#   define INIT_MODULE PyInit_SoirV8
+#   define INIT_MODULE PyInit__SoirV8
     extern "C" PyObject* INIT_MODULE();
 #else
 #   define INIT_MODULE init_SoirV8
     extern "C" void INIT_MODULE();
 #endif
+
 
 int main__run_code(int argc, char* argv[])
 {
