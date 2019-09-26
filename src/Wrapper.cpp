@@ -78,11 +78,13 @@ void CWrapper::Expose(void)
 
   py::class_<CJavascriptNull, py::bases<CJavascriptObject>, boost::noncopyable>("JSNull")
     .def("__nonzero__", &CJavascriptNull::nonzero)
+    .def("__bool__", &CJavascriptNull::nonzero)
     .def("__str__", &CJavascriptNull::str)
     ;
 
   py::class_<CJavascriptUndefined, py::bases<CJavascriptObject>, boost::noncopyable>("JSUndefined")
     .def("__nonzero__", &CJavascriptUndefined::nonzero)
+    .def("__bool__", &CJavascriptUndefined::nonzero)
     .def("__str__", &CJavascriptUndefined::str)
     ;
 
