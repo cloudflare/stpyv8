@@ -76,8 +76,6 @@ public:
   void Enter(void) { v8::HandleScope handle_scope(v8::Isolate::GetCurrent()); Handle()->Enter(); }
   void Leave(void) { v8::HandleScope handle_scope(v8::Isolate::GetCurrent()); Handle()->Exit(); }
 
-  bool HasOutOfMemoryException(void);
-
   py::object Evaluate(const std::string& src, const std::string name = std::string(),
                       int line = -1, int col = -1, py::object precompiled = py::object());
   py::object EvaluateW(const std::wstring& src, const std::wstring name = std::wstring(),

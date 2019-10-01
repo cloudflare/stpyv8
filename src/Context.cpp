@@ -101,8 +101,6 @@ void CContext::Expose(void)
     .add_static_property("inContext", &CContext::InContext,
                          "Returns true if V8 has a current context.")
 
-    .add_property("hasOutOfMemoryException", &CContext::HasOutOfMemoryException)
-
     .def("eval", &CContext::Evaluate, (py::arg("source"),
                                        py::arg("name") = std::string(),
                                        py::arg("line") = -1,
@@ -305,11 +303,3 @@ py::object CContext::EvaluateW(const std::wstring& src,
 
   return script->Run();
 }
-
-bool CContext::HasOutOfMemoryException(void) 
-{ 
-  //TODO port me.  No trace of HasOutOfMemoryException in the new V8 api
-  //v8::HandleScope handle_scope(v8::Isolate::GetCurrent()); return Handle()->HasOutOfMemoryException(); 
-  return false;
-}
-
