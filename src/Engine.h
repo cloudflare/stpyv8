@@ -19,7 +19,7 @@ class CEngine
 {
   v8::Isolate *m_isolate;
 
-  static uint32_t *CalcStackLimitSize(uint32_t size);
+  static uintptr_t CalcStackLimitSize(uintptr_t size);
 protected:
   py::object InternalPreCompile(v8::Handle<v8::String> src);
   CScriptPtr InternalCompile(v8::Handle<v8::String> src, v8::Handle<v8::Value> name, int line, int col, py::object precompiled);
@@ -76,7 +76,7 @@ public:
 
   static const std::string GetVersion(void) { return v8::V8::GetVersion(); }
   static bool SetMemoryLimit(int max_young_space_size, int max_old_space_size, int max_executable_size);
-  static bool SetStackLimit(uint32_t stack_limit_size);
+  static void SetStackLimit(uintptr_t stack_limit_size);
 
   py::object ExecuteScript(v8::Handle<v8::Script> script);
 

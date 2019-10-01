@@ -321,7 +321,7 @@ class TestEngine(unittest.TestCase):
 
                 SoirV8.JSEngine.collect()
 
-    def _testStackLimit(self):
+    def testStackLimit(self):
         with SoirV8.JSIsolate():
             SoirV8.JSEngine.setStackLimit(256 * 1024)
 

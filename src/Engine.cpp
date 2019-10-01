@@ -220,7 +220,21 @@ bool CEngine::SetMemoryLimit(int max_young_space_size, int max_old_space_size, i
   return false;
 }
 
-bool CEngine::SetStackLimit(uint32_t stack_limit_size)
+uintptr_t CEngine::CalcStackLimitSize(uintptr_t size)
+{
+  uintptr_t answer = size - (size / sizeof(size));
+
+  // If the size is very large and the stack is very near the bottom of
+  // memory then the calculation above may wrap around and give an address
+  // that is above the (downwards-growing) stack.  In that case we return
+  // a very low address.
+  if (answer > size)
+    return reinterpret_cast<uintptr_t>(sizeof(size));
+
+  return answer;
+}
+
+void CEngine::SetStackLimit(uintptr_t stack_limit_size)
 {
   /*
   v8::ResourceConstraints limit;
@@ -229,7 +243,7 @@ bool CEngine::SetStackLimit(uint32_t stack_limit_size)
 
   return v8::SetResourceConstraints(v8::Isolate::GetCurrent(), &limit);
   */
-  return false;
+  v8::Isolate::GetCurrent()->SetStackLimit(CalcStackLimitSize(stack_limit_size));
 }
 
 py::object CEngine::InternalPreCompile(v8::Handle<v8::String> src)
