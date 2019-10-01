@@ -7,6 +7,7 @@ source_files = ["Exception.cpp",
                 "Context.cpp",
                 "Engine.cpp",
                 "Wrapper.cpp",
+                "Locker.cpp",
                 "Utils.cpp",
                 "Main.cpp"]
 

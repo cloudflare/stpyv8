@@ -38,8 +38,8 @@ __all__ = ["ReadOnly",
            "JSScript",
            # "profiler",
            # "JSExtension",
-           # "JSLocker",
-           # "JSUnlocker",
+           "JSLocker",
+           "JSUnlocker",
            "JSPlatform"]
 
 
@@ -324,20 +324,19 @@ JSStackFrame = _SoirV8.JSStackFrame
 class JSIsolate(_SoirV8.JSIsolate):
     def __enter__(self):
         self.enter()
-
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.leave()
-
         del self
 
 
 class JSContext(_SoirV8.JSContext):
     def __init__(self, obj = None, extensions = None, ctxt = None):
-        # if JSLocker.active:
-        #    self.lock = JSLocker()
-        #    self.lock.enter()
+        if JSLocker.active:
+            self.lock = JSLocker()
+            self.lock.enter()
+
         if ctxt:
             _SoirV8.JSContext.__init__(self, ctxt)
         else:
@@ -350,8 +349,8 @@ class JSContext(_SoirV8.JSContext):
     def __exit__(self, exc_type, exc_value, traceback):
         self.leave()
 
-        # if hasattr(JSLocker, 'lock'):
-        #    self.lock.leave()
-        #    self.lock = None
+        if hasattr(JSLocker, 'lock'):
+            self.lock.leave()
+            self.lock = None
 
         del self

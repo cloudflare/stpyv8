@@ -17,6 +17,8 @@
 #include "Context.h"
 #include "Utils.h"
 #include "Engine.h"
+#include "Locker.h"
+
 
 static v8::Isolate* GetNewIsolate()
 {
@@ -168,6 +170,7 @@ BOOST_PYTHON_MODULE(_SoirV8)
   CWrapper::Expose(); 
   CContext::Expose();
   CEngine::Expose();
+  CLocker::Expose();
 }
 
 
