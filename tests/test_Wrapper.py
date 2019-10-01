@@ -389,7 +389,7 @@ class TestWrapper(unittest.TestCase):
                 }""")
             self.assertEqual("catch Error: Hello;finally", str(ctxt.locals.msg))
 
-    def _testExceptionMapping(self):
+    def testExceptionMapping(self):
         class TestException(Exception):
             pass
 
@@ -407,7 +407,7 @@ class TestWrapper(unittest.TestCase):
                 int(sys)
 
             def raiseNotImplementedError(self):
-                raise NotImplementedError("Not support")
+                raise NotImplementedError("Not supported")
 
             def raiseExceptions(self):
                 raise TestException()
@@ -427,11 +427,11 @@ class TestWrapper(unittest.TestCase):
 
             ctxt.eval("try { this.raiseTypeError(); } catch (e) { msg = e; }")
 
-            self.assertEqual("TypeError: int() argument must be a string or a number, not 'module'", str(ctxt.locals.msg))
+            self.assertEqual("TypeError: int() argument must be a string, a bytes-like object or a number, not 'module'", str(ctxt.locals.msg))
 
             ctxt.eval("try { this.raiseNotImplementedError(); } catch (e) { msg = e; }")
 
-            self.assertEqual("Error: Not support", str(ctxt.locals.msg))
+            self.assertEqual("Error: Not supported", str(ctxt.locals.msg))
 
             self.assertRaises(TestException, ctxt.eval, "this.raiseExceptions();")
 
