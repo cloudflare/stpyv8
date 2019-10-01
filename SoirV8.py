@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from __future__ import with_statement
 from __future__ import print_function
 
 import sys, os, re
 import logging
-import collections
+import collections.abc
 import functools
 import json
 
@@ -204,7 +205,7 @@ class JSClass(object):
 
         prop = self.__dict__.setdefault('__properties__', {}).get(name, None)
 
-        if prop and isinstance(prop[0], collections.Callable):
+        if prop and isinstance(prop[0], collections.abc.Callable):
             return prop[0]()
 
         raise AttributeError(name)
@@ -212,7 +213,7 @@ class JSClass(object):
     def __setattr__(self, name, value):
         prop = self.__dict__.setdefault('__properties__', {}).get(name, None)
 
-        if prop and isinstance(prop[1], collections.Callable):
+        if prop and isinstance(prop[1], collections.abc.Callable):
             return prop[1](value)
 
         return object.__setattr__(self, name, value)
@@ -304,8 +305,8 @@ class JSEngine(_SoirV8.JSEngine):
     def __exit__(self, exc_type, exc_value, traceback):
         del self
 
-JSScript = _SoirV8.JSScript
 
+JSScript = _SoirV8.JSScript
 JSStackTrace = _SoirV8.JSStackTrace
 # JSStackTrace.Options = _SoirV8.JSStackTraceOptions
 JSStackTrace.GetCurrentStackTrace = staticmethod(lambda frame_limit, options: _SoirV8.JSIsolate.current.GetCurrentStackTrace(frame_limit, options))
