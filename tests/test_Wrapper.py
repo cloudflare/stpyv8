@@ -621,7 +621,7 @@ class TestWrapper(unittest.TestCase):
 
             delta = now2 - now1 if now2 > now1 else now1 - now2
 
-            self.assertTrue(delta < timedelta(seconds=1))
+            self.assertTrue(delta < timedelta(seconds = 1))
 
             func = ctxt.eval("(function (d) { return d.toString(); })")
 
@@ -630,8 +630,8 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue(str(func(now)).startswith(now.strftime("%a %b %d %Y %H:%M:%S")))
 
             ctxt.eval("function identity(x) { return x; }")
-            # SoirV8.JS only has millisecond resolution, so cut it off there
-            now3 = now2.replace(microsecond=123000)
+
+            now3 = now2.replace(microsecond = 123000)
             self.assertEqual(now3, ctxt.locals.identity(now3))
 
     def testUnicode(self):
