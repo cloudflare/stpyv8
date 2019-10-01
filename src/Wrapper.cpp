@@ -64,7 +64,7 @@ void CWrapper::Expose(void)
     .def(float_(py::self))
     .def(str(py::self))
 
-    .def("__nonzero__", &CJavascriptObject::operator bool)
+    .def("__bool__", &CJavascriptObject::operator bool)
     .def("__eq__", &CJavascriptObject::Equals)
     .def("__ne__", &CJavascriptObject::Unequals)
 
@@ -77,13 +77,11 @@ void CWrapper::Expose(void)
     ;
 
   py::class_<CJavascriptNull, py::bases<CJavascriptObject>, boost::noncopyable>("JSNull")
-    .def("__nonzero__", &CJavascriptNull::nonzero)
     .def("__bool__", &CJavascriptNull::nonzero)
     .def("__str__", &CJavascriptNull::str)
     ;
 
   py::class_<CJavascriptUndefined, py::bases<CJavascriptObject>, boost::noncopyable>("JSUndefined")
-    .def("__nonzero__", &CJavascriptUndefined::nonzero)
     .def("__bool__", &CJavascriptUndefined::nonzero)
     .def("__str__", &CJavascriptUndefined::str)
     ;

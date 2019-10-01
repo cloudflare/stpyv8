@@ -175,30 +175,21 @@ class JSLocker(_SoirV8.JSLocker):
 
         self.leave()
 
-    if is_py3k:
-        def __bool__(self):
-            return self.entered()
-    else:
-        def __nonzero__(self):
-            return self.entered()
+    def __bool__(self):
+        return self.entered()
 
 
 class JSUnlocker(_SoirV8.JSUnlocker):
     def __enter__(self):
         self.enter()
-
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.leave()
 
-    if is_py3k:
-        def __bool__(self):
-            return self.entered()
-    else:
-        def __nonzero__(self):
-            return self.entered()
-'''
+    def __bool__(self):
+        return self.entered()
+
 
 class JSClass(object):
     __properties__ = {}

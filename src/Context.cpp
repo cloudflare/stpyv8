@@ -119,7 +119,7 @@ void CContext::Expose(void)
          "Exiting the current context restores the context "
          "that was in place when entering the current context.")
 
-    .def("__nonzero__", &CContext::IsEntered, "the context has been entered.")
+    .def("__bool__", &CContext::IsEntered, "the context has been entered.")
     ;
 
   py::objects::class_value_wrapper<boost::shared_ptr<CPlatform>,

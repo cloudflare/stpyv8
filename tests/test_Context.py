@@ -30,9 +30,9 @@ class TestContext(unittest.TestCase):
 
         with SoirV8.JSIsolate() as isolate:
             with SoirV8.JSContext(g) as ctxt:
+                self.assertTrue(ctxt)
                 self.assertTrue(bool(SoirV8.JSContext.inContext))
                 self.assertEqual(g.name, str(SoirV8.JSContext.entered.locals.name))
-                self.assertEqual(g.name, str(SoirV8.JSContext.current.locals.name))
 
                 class Local(object):
                     name = "local"
