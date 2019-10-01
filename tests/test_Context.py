@@ -42,17 +42,14 @@ class TestContext(unittest.TestCase):
                 with SoirV8.JSContext(l):
                     self.assertTrue(bool(SoirV8.JSContext.inContext))
                     self.assertEqual(l.name, str(SoirV8.JSContext.entered.locals.name))
-                    self.assertEqual(l.name, str(SoirV8.JSContext.current.locals.name))
 
                 self.assertTrue(bool(SoirV8.JSContext.inContext))
-                self.assertEqual(g.name, str(SoirV8.JSContext.entered.locals.name))
                 self.assertEqual(g.name, str(SoirV8.JSContext.current.locals.name))
 
             self.assertTrue(not bool(SoirV8.JSContext.entered))
             self.assertTrue(not bool(SoirV8.JSContext.inContext))
 
     def testMultiContext(self):
-        # Create an environment
         with SoirV8.JSContext() as ctxt0:
             ctxt0.securityToken = "password"
 
@@ -61,7 +58,6 @@ class TestContext(unittest.TestCase):
 
             self.assertEqual(1234, int(global0.custom))
 
-            # Create an independent environment
             with SoirV8.JSContext() as ctxt1:
                 ctxt1.securityToken = ctxt0.securityToken
 

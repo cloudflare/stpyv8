@@ -18,9 +18,6 @@ class TestIsolate(unittest.TestCase):
 
     def testEnterLeave(self):
         with SoirV8.JSIsolate() as isolate:
-            isolate.enter()
-            self.assertIsNotNone(isolate.current)
-            isolate.leave()
             self.assertIsNotNone(isolate.current)
 
 if __name__ == '__main__':
