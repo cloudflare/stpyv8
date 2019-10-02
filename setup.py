@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+import sys
 import os
+
 from distutils.core import setup, Extension
 
 source_files = ["Exception.cpp", 
@@ -27,14 +29,18 @@ extra_link_args = []
  
 
 if os.name == "nt":
-  include_dirs += os.environ["INCLUDE"].split(';')
-  library_dirs += os.environ["LIB"].split(';')
-  libraries += ["winmm", "ws2_32"]
-  extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
-  extra_link_args += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
+    include_dirs += os.environ["INCLUDE"].split(';')
+    library_dirs += os.environ["LIB"].split(';')
+    libraries += ["winmm", "ws2_32"]
+    extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
+    extra_link_args += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
 elif os.name == "posix":
-  libraries = ["boost_python", "boost_system", "v8_monolith", "rt"]
+    libraries = ["boost_system", "v8_monolith", "rt"]
 
+    if sys.version_info.major in (3, ):
+        libraries.append("boost_python-py{}{}".format(sys.version_info.major, sys.version_info.minor))
+    else:
+        libraries.append("boost_python")
 
 soirv8 = Extension(name               = "_SoirV8",
                    sources            = [os.path.join("src", file) for file in source_files],                 
