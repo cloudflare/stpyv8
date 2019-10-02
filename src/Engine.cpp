@@ -79,15 +79,11 @@ void CEngine::Expose(void)
          "it cannot be reinitialized.")
     .staticmethod("dispose")
 
-    //.def("idle", &v8::V8::IdleNotification,
-    //     "Optional notification that the embedder is idle.")
-    //.staticmethod("idle")
-
-    /*
-    .def("lowMemory", &v8::V8::LowMemoryNotification,
+    .def("lowMemory", &v8::Isolate::LowMemoryNotification,
          "Optional notification that the system is running low on memory.")
     .staticmethod("lowMemory")
 
+	/*
     .def("setMemoryLimit", &CEngine::SetMemoryLimit, (py::arg("max_young_space_size") = 0,
                                                       py::arg("max_old_space_size") = 0,
                                                       py::arg("max_executable_size") = 0),
@@ -96,15 +92,13 @@ void CEngine::Expose(void)
          "the size cannot be adjusted after the VM is initialized.")
     .staticmethod("setMemoryLimit")
 
-    .def("ignoreOutOfMemoryException", &v8::V8::IgnoreOutOfMemoryException,
-         "Ignore out-of-memory exceptions.")
-    .staticmethod("ignoreOutOfMemoryException")
-
+	*/
     .def("setStackLimit", &CEngine::SetStackLimit, (py::arg("stack_limit_size") = 0),
          "Uses the address of a local variable to determine the stack top now."
          "Given a size, returns an address that is that far from the current top of stack.")
     .staticmethod("setStackLimit")
 
+	/*
     .def("setMemoryAllocationCallback", &MemoryAllocationManager::SetCallback,
                                         (py::arg("callback"),
                                          py::arg("space") = v8::kObjectSpaceAll,
