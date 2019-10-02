@@ -305,7 +305,7 @@ class TestWrapper(unittest.TestCase):
                         hello();""", "test", 10, 10).run()
                     self.fail()
                 except SoirV8.JSError as e:
-                    self.assertTrue(str(e).startswith('JSError: Error: hello world ( test @ 14 : 28 )  ->'))
+                    self.assertTrue("JSError: Error: hello world ( test @ 14 : 28 )  ->" in str(e))
                     self.assertEqual("Error", e.name)
                     self.assertEqual("hello world", e.message)
                     self.assertEqual("test", e.scriptName)
