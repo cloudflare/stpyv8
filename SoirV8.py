@@ -12,10 +12,6 @@ import collections.abc
 import functools
 import json
 
-import six
-from six.moves import input
-from six.moves import _thread as thread
-
 import _SoirV8
 
 __version__ = '1.0'
@@ -55,6 +51,7 @@ class JSAttribute(object):
 
         return func
 
+
 ReadOnly   = JSAttribute(name = 'readonly')
 DontEnum   = JSAttribute(name = 'dontenum')
 DontDelete = JSAttribute(name = 'dontdel')
@@ -64,14 +61,10 @@ Internal   = JSAttribute(name = 'internal')
 class JSError(Exception):
     def __init__(self, impl):
         Exception.__init__(self)
-
         self._impl = impl
 
     def __str__(self):
         return str(self._impl)
-
-    def __unicode__(self, *args, **kwargs):
-        return six.u(self._impl)
 
     def __getattribute__(self, attr):
         impl = super(JSError, self).__getattribute__("_impl")
@@ -129,36 +122,36 @@ JSFunction  = _SoirV8.JSFunction
 JSPlatform  = _SoirV8.JSPlatform
 
 
-JS_ESCAPABLE = re.compile(r'([^\x00-\x7f])')
-HAS_UTF8     = re.compile(r'[\x80-\xff]')
+# JS_ESCAPABLE = re.compile(r'([^\x00-\x7f])')
+# HAS_UTF8     = re.compile(r'[\x80-\xff]')
 
 
-def _js_escape_unicode_re_callack(match):
-    n = ord(match.group(0))
-    if n < 0x10000:
-        return '\\u%04x' % (n,)
-    else:
-        # surrogate pair
-        n -= 0x10000
-        s1 = 0xd800 | ((n >> 10) & 0x3ff)
-        s2 = 0xdc00 | (n & 0x3ff)
-        return '\\u%04x\\u%04x' % (s1, s2)
+# def _js_escape_unicode_re_callack(match):
+#    n = ord(match.group(0))
+#    if n < 0x10000:
+#        return '\\u%04x' % (n,)
+#    else:
+#        # surrogate pair
+#        n -= 0x10000
+#        s1 = 0xd800 | ((n >> 10) & 0x3ff)
+#        s2 = 0xdc00 | (n & 0x3ff)
+#        return '\\u%04x\\u%04x' % (s1, s2)
 
 
-def js_escape_unicode(text):
-    """Return an ASCII-only representation of a JavaScript string"""
-    if isinstance(text, str):
-        if HAS_UTF8.search(text) is None:
-            return text
+# def js_escape_unicode(text):
+#    """Return an ASCII-only representation of a JavaScript string"""
+#    if isinstance(text, str):
+#        if HAS_UTF8.search(text) is None:
+#            return text
+#
+#        text = text.decode('UTF-8')
+#
+#    return str(JS_ESCAPABLE.sub(_js_escape_unicode_re_callack, text))
 
-        text = text.decode('UTF-8')
 
-    return str(JS_ESCAPABLE.sub(_js_escape_unicode_re_callack, text))
-
-'''
-class JSExtension(_SoirV8.JSExtension):
-    def __init__(self, name, source, callback=None, dependencies=[], register=True):
-        _SoirV8.JSExtension.__init__(self, js_escape_unicode(name), js_escape_unicode(source), callback, dependencies, register)
+# class JSExtension(_SoirV8.JSExtension):
+#    def __init__(self, name, source, callback=None, dependencies=[], register=True):
+#        _SoirV8.JSExtension.__init__(self, js_escape_unicode(name), js_escape_unicode(source), callback, dependencies, register)
 
 
 class JSLocker(_SoirV8.JSLocker):
