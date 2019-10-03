@@ -6,11 +6,6 @@ import SoirV8
 
 
 class TestIsolate(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        self.platform = SoirV8.JSPlatform()
-        self.platform.init()
-
     def testBase(self):
         with SoirV8.JSIsolate() as isolate:
             self.assertIsNotNone(isolate.current)

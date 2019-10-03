@@ -36,14 +36,6 @@ def convert(obj):
 
 
 class TestWrapper(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        self.platform = SoirV8.JSPlatform()
-        self.platform.init()
-
-        self.isolate = SoirV8.JSIsolate()
-        self.isolate.enter()  #TODO remove?
-
     def testObject(self):
         with SoirV8.JSContext() as ctxt:
             o = ctxt.eval("new Object()")

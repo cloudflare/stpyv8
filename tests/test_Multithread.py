@@ -6,11 +6,6 @@ import SoirV8
 
 
 class TestMultithread(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        self.platform = SoirV8.JSPlatform()
-        self.platform.init()
-
     def testLocker(self):
         with SoirV8.JSIsolate() as isolate:
             self.assertFalse(SoirV8.JSLocker.active)

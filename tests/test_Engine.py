@@ -13,24 +13,7 @@ import SoirV8
 is_py3k = sys.version_info[0] > 2
 
 
-class TestContext(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        self.platform = SoirV8.JSPlatform()
-        self.platform.init()
-
-        self.isolate = SoirV8.JSIsolate()
-        self.isolate.enter()  #TODO remove?
-
 class TestEngine(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        self.platform = SoirV8.JSPlatform()
-        self.platform.init()
-
-        self.isolate = SoirV8.JSIsolate()
-        self.isolate.enter()  #TODO remove?
-
     def testClassProperties(self):
         with SoirV8.JSContext() as ctxt:
             self.assertTrue(str(SoirV8.JSEngine.version).startswith("7."))

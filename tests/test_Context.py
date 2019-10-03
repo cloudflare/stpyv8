@@ -6,14 +6,6 @@ import SoirV8
 
 
 class TestContext(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        self.platform = SoirV8.JSPlatform()
-        self.platform.init()
-
-        self.isolate = SoirV8.JSIsolate()
-        self.isolate.enter()  #TODO remove?
-
     def testEval(self):
         with SoirV8.JSContext() as context:
             self.assertEqual(2, context.eval("1+1"))
@@ -28,26 +20,25 @@ class TestContext(unittest.TestCase):
 
         g = Global()
 
-        with SoirV8.JSIsolate() as isolate:
-            with SoirV8.JSContext(g) as ctxt:
-                self.assertTrue(ctxt)
+        with SoirV8.JSContext(g) as ctxt:
+            self.assertTrue(ctxt)
+            self.assertTrue(bool(SoirV8.JSContext.inContext))
+            self.assertEqual(g.name, str(SoirV8.JSContext.entered.locals.name))
+
+            class Local(object):
+                name = "local"
+
+            l = Local()
+
+            with SoirV8.JSContext(l):
                 self.assertTrue(bool(SoirV8.JSContext.inContext))
-                self.assertEqual(g.name, str(SoirV8.JSContext.entered.locals.name))
+                self.assertEqual(l.name, str(SoirV8.JSContext.entered.locals.name))
 
-                class Local(object):
-                    name = "local"
+            self.assertTrue(bool(SoirV8.JSContext.inContext))
+            self.assertEqual(g.name, str(SoirV8.JSContext.current.locals.name))
 
-                l = Local()
-
-                with SoirV8.JSContext(l):
-                    self.assertTrue(bool(SoirV8.JSContext.inContext))
-                    self.assertEqual(l.name, str(SoirV8.JSContext.entered.locals.name))
-
-                self.assertTrue(bool(SoirV8.JSContext.inContext))
-                self.assertEqual(g.name, str(SoirV8.JSContext.current.locals.name))
-
-            self.assertTrue(not bool(SoirV8.JSContext.entered))
-            self.assertTrue(not bool(SoirV8.JSContext.inContext))
+        self.assertTrue(not bool(SoirV8.JSContext.entered))
+        self.assertTrue(not bool(SoirV8.JSContext.inContext))
 
     def testMultiContext(self):
         with SoirV8.JSContext() as ctxt0:
