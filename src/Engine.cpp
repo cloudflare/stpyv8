@@ -47,8 +47,8 @@ void CEngine::Expose(void)
     .add_static_property("version", &CEngine::GetVersion,
                          "Get the V8 engine version.")
 
-    //.add_static_property("dead", &v8::V8::IsDead,
-    //                     "Check if V8 is dead and therefore unusable.")
+    .add_static_property("dead", &CEngine::IsDead,
+	                     "Check if V8 is dead and therefore unusable.")
 
     .def("setFlags", &CEngine::SetFlags, "Sets V8 flags from a string.")
     .staticmethod("setFlags")
@@ -176,6 +176,11 @@ void CEngine::CollectAllGarbage(bool force_compaction)
     v8i::Isolate::Current()->heap()->CollectAllGarbage(v8i::Heap::kMakeHeapIterableMask);
   }
   */
+}
+
+bool CEngine::IsDead(void)
+{
+  return v8::Isolate::GetCurrent()->IsDead();
 }
 
 void CEngine::TerminateAllThreads(void)

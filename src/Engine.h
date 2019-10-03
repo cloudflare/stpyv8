@@ -87,6 +87,7 @@ public:
 
   static py::object Serialize(void);
   static void Deserialize(py::object snapshot);
+  static bool IsDead(void);
 };
 
 class CScript

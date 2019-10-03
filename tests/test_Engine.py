@@ -17,7 +17,6 @@ class TestEngine(unittest.TestCase):
     def testClassProperties(self):
         with SoirV8.JSContext() as ctxt:
             self.assertTrue(str(SoirV8.JSEngine.version).startswith("7."))
-            # self.assertFalse(SoirV8.JSEngine.dead)
 
     def testCompile(self):
         with SoirV8.JSContext() as ctxt:
