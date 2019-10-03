@@ -348,3 +348,10 @@ class JSContext(_SoirV8.JSContext):
             self.lock = None
 
         del self
+
+
+v8_default_platform = JSPlatform()
+v8_default_platform.init()
+
+v8_default_isolate = JSIsolate()
+v8_default_isolate.enter()
