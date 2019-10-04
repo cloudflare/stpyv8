@@ -10,30 +10,6 @@ from datetime import *
 
 import SoirV8
 
-is_py3k = sys.version_info[0] > 2
-
-if is_py3k:
-    def toNativeString(s):
-        return s
-    def toUnicodeString(s):
-        return s
-else:
-    def toNativeString(s, encoding = 'utf-8'):
-        return s.encode(encoding) if isinstance(s, unicode) else s
-
-    def toUnicodeString(s, encoding = 'utf-8'):
-        return s if isinstance(s, unicode) else unicode(s, encoding)
-
-
-def convert(obj):
-    if type(obj) == SoirV8.JSArray:
-        return [convert(v) for v in obj]
-
-    if type(obj) == SoirV8.JSObject:
-        return dict([[str(k), convert(obj.__getattr__(str(k)))] for k in (obj.__dir__() if is_py3k else obj.__members__)])
-
-    return obj
-
 
 class TestEngine(unittest.TestCase):
     def testClassProperties(self):
@@ -58,19 +34,7 @@ class TestEngine(unittest.TestCase):
             var = u'测试'
 
             def __getattr__(self, name):
-                if (name if is_py3k else name.decode('utf-8')) == u'变量':
-                    return self.var
-
-                return SoirV8.JSClass.__getattr__(self, name)
-
-        g = Global()
-
-    def testUnicodeSource(self):
-        class Global(SoirV8.JSClass):
-            var = u'测试'
-
-            def __getattr__(self, name):
-                if (name if is_py3k else name.decode('utf-8')) == u'变量':
+                if name:
                     return self.var
 
                 return SoirV8.JSClass.__getattr__(self, name)
@@ -91,10 +55,10 @@ class TestEngine(unittest.TestCase):
 
                 self.assertTrue(isinstance(s, SoirV8.JSScript))
 
-                self.assertEqual(toNativeString(src), s.source)
+                self.assertEqual(src, s.source)
                 self.assertEqual(2, s.run())
 
-                func_name = toNativeString(u'函数')
+                func_name = u'函数'
 
                 self.assertTrue(hasattr(ctxt.locals, func_name))
 
@@ -108,7 +72,7 @@ class TestEngine(unittest.TestCase):
                 self.assertEqual(0, func.lineoff)
                 self.assertEqual(0, func.coloff)
 
-                var_name = toNativeString(u'变量')
+                var_name = u'变量'
 
                 setattr(ctxt.locals, var_name, u'测试长字符串')
 
@@ -153,7 +117,7 @@ class TestEngine(unittest.TestCase):
 
         self.assertTrue(extUnicodeJs)
         self.assertEqual("helloW/javascript", extUnicodeJs.name)
-        self.assertEqual(toNativeString(extUnicodeSrc), extUnicodeJs.source)
+        self.assertEqual(extUnicodeSrc, extUnicodeJs.source)
         self.assertFalse(extUnicodeJs.autoEnable)
         self.assertTrue(extUnicodeJs.registered)
 
