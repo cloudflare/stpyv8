@@ -77,9 +77,9 @@ public:
   void Leave(void) { v8::HandleScope handle_scope(v8::Isolate::GetCurrent()); Handle()->Exit(); }
 
   py::object Evaluate(const std::string& src, const std::string name = std::string(),
-                      int line = -1, int col = -1, py::object precompiled = py::object());
+                      int line = -1, int col = -1);
   py::object EvaluateW(const std::wstring& src, const std::wstring name = std::wstring(),
-                       int line = -1, int col = -1, py::object precompiled = py::object());
+                       int line = -1, int col = -1);
 
   static py::object GetEntered(void);
   static py::object GetCurrent(void);

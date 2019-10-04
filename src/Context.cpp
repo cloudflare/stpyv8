@@ -104,13 +104,11 @@ void CContext::Expose(void)
     .def("eval", &CContext::Evaluate, (py::arg("source"),
                                        py::arg("name") = std::string(),
                                        py::arg("line") = -1,
-                                       py::arg("col") = -1,
-                                       py::arg("precompiled") = py::object()))
+                                       py::arg("col") = -1))
     .def("eval", &CContext::EvaluateW, (py::arg("source"),
                                         py::arg("name") = std::wstring(),
                                         py::arg("line") = -1,
-                                        py::arg("col") = -1,
-                                        py::arg("precompiled") = py::object()))
+                                        py::arg("col") = -1))
 
     .def("enter", &CContext::Enter, "Enter this context. "
          "After entering a context, all code compiled and "
@@ -282,24 +280,22 @@ py::object CContext::GetCalling(void)
 
 py::object CContext::Evaluate(const std::string& src,
                               const std::string name,
-                              int line, int col,
-                              py::object precompiled)
+                              int line, int col)
 {
   CEngine engine(v8::Isolate::GetCurrent());
 
-  CScriptPtr script = engine.Compile(src, name, line, col, precompiled);
+  CScriptPtr script = engine.Compile(src, name, line, col);
 
   return script->Run();
 }
 
 py::object CContext::EvaluateW(const std::wstring& src,
                                const std::wstring name,
-                               int line, int col,
-                               py::object precompiled)
+                               int line, int col)
 {
   CEngine engine(v8::Isolate::GetCurrent());
 
-  CScriptPtr script = engine.CompileW(src, name, line, col, precompiled);
+  CScriptPtr script = engine.CompileW(src, name, line, col);
 
   return script->Run();
 }

@@ -21,8 +21,7 @@ class CEngine
 
   static uintptr_t CalcStackLimitSize(uintptr_t size);
 protected:
-  py::object InternalPreCompile(v8::Handle<v8::String> src);
-  CScriptPtr InternalCompile(v8::Handle<v8::String> src, v8::Handle<v8::Value> name, int line, int col, py::object precompiled);
+  CScriptPtr InternalCompile(v8::Handle<v8::String> src, v8::Handle<v8::Value> name, int line, int col);
 
 /* TODO port me
 #ifdef SUPPORT_SERIALIZE
@@ -42,32 +41,20 @@ protected:
 public:
   CEngine(v8::Isolate *isolate = NULL) : m_isolate(isolate ? isolate : v8::Isolate::GetCurrent()) {}
 
-  py::object PreCompile(const std::string& src)
-  {
-    v8::HandleScope scope(m_isolate);
-
-    return InternalPreCompile(ToString(src));
-  }
-  py::object PreCompileW(const std::wstring& src)
-  {
-    v8::HandleScope scope(m_isolate);
-
-    return InternalPreCompile(ToString(src));
-  }
-
   CScriptPtr Compile(const std::string& src, const std::string name = std::string(),
-                     int line = -1, int col = -1, py::object precompiled = py::object())
+                     int line = -1, int col = -1)
   {
     v8::HandleScope scope(m_isolate);
 
-    return InternalCompile(ToString(src), ToString(name), line, col, precompiled);
+    return InternalCompile(ToString(src), ToString(name), line, col);
   }
+
   CScriptPtr CompileW(const std::wstring& src, const std::wstring name = std::wstring(),
-                      int line = -1, int col = -1, py::object precompiled = py::object())
+                      int line = -1, int col = -1)
   {
     v8::HandleScope scope(m_isolate);
 
-    return InternalCompile(ToString(src), ToString(name), line, col, precompiled);
+    return InternalCompile(ToString(src), ToString(name), line, col);
   }
 
   void RaiseError(v8::TryCatch& try_catch);

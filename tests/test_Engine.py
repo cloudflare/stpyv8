@@ -12,11 +12,34 @@ import SoirV8
 
 is_py3k = sys.version_info[0] > 2
 
+if is_py3k:
+    def toNativeString(s):
+        return s
+    def toUnicodeString(s):
+        return s
+else:
+    def toNativeString(s, encoding = 'utf-8'):
+        return s.encode(encoding) if isinstance(s, unicode) else s
+
+    def toUnicodeString(s, encoding = 'utf-8'):
+        return s if isinstance(s, unicode) else unicode(s, encoding)
+
+
+def convert(obj):
+    if type(obj) == SoirV8.JSArray:
+        return [convert(v) for v in obj]
+
+    if type(obj) == SoirV8.JSObject:
+        return dict([[str(k), convert(obj.__getattr__(str(k)))] for k in (obj.__dir__() if is_py3k else obj.__members__)])
+
+    return obj
+
 
 class TestEngine(unittest.TestCase):
     def testClassProperties(self):
         with SoirV8.JSContext() as ctxt:
             self.assertTrue(str(SoirV8.JSEngine.version).startswith("7."))
+            self.assertFalse(SoirV8.JSEngine.dead)
 
     def testCompile(self):
         with SoirV8.JSContext() as ctxt:
@@ -30,23 +53,6 @@ class TestEngine(unittest.TestCase):
 
                 self.assertRaises(SyntaxError, engine.compile, "1+")
 
-    def _testPrecompile(self):
-        with SoirV8.JSContext() as ctxt:
-            with SoirV8.JSEngine() as engine:
-                data = engine.precompile("1+2")
-
-                self.assertTrue(data)
-                self.assertEqual(28, len(data))
-
-                s = engine.compile("1+2", precompiled=data)
-
-                self.assertTrue(isinstance(s, _PyV8.SoirV8.JSScript))
-
-                self.assertEqual("1+2", s.source)
-                self.assertEqual(3, int(s.run()))
-
-                self.assertRaises(SyntaxError, engine.precompile, "1+")
-
     def testUnicodeSource(self):
         class Global(SoirV8.JSClass):
             var = u'测试'
@@ -59,7 +65,7 @@ class TestEngine(unittest.TestCase):
 
         g = Global()
 
-    def _testUnicodeSource(self):
+    def testUnicodeSource(self):
         class Global(SoirV8.JSClass):
             var = u'测试'
 
@@ -81,14 +87,9 @@ class TestEngine(unittest.TestCase):
                 var func = function () {};
                 """
 
-                data = engine.precompile(src)
+                s = engine.compile(src)
 
-                self.assertTrue(data)
-                self.assertEqual(68, len(data))
-
-                s = engine.compile(src, precompiled=data)
-
-                self.assertTrue(isinstance(s, _PyV8.SoirV8.JSScript))
+                self.assertTrue(isinstance(s, SoirV8.JSScript))
 
                 self.assertEqual(toNativeString(src), s.source)
                 self.assertEqual(2, s.run())
@@ -99,7 +100,7 @@ class TestEngine(unittest.TestCase):
 
                 func = getattr(ctxt.locals, func_name)
 
-                self.assertTrue(isinstance(func, _PyV8.SoirV8.JSFunction))
+                self.assertTrue(isinstance(func, SoirV8.JSFunction))
 
                 self.assertEqual(func_name, func.name)
                 self.assertEqual("", func.resname)
@@ -232,10 +233,9 @@ class TestEngine(unittest.TestCase):
 
         with SoirV8.JSContext(Global()) as ctxt:
             self.assertEqual("[object Global]", str(ctxt.eval("this")))
-
             self.assertEqual(1.0, float(ctxt.eval("this.version")))
 
-    def testObjectBuildInMethods(self):
+    def testObjectBuiltInMethods(self):
         class Global(SoirV8.JSClass):
             version = 1.0
 

@@ -42,11 +42,8 @@ class TestMultithread(unittest.TestCase):
 
         del locker
 
-    def _testMultiPythonThread(self):
+    def testMultiPythonThread(self):
         import time, threading
-
-        isolate = SoirV8.JSIsolate()
-        isolate.enter()
 
         class Global:
             count = 0
@@ -89,9 +86,6 @@ class TestMultithread(unittest.TestCase):
 
     def _testMultiJavascriptThread(self):
         import time, threading
-
-        isolate = SoirV8.JSIsolate()
-        isolate.enter()
 
         class Global:
             result = []

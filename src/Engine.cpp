@@ -107,20 +107,16 @@ void CEngine::Expose(void)
                                         "and perform custom logging when V8 Allocates Executable Memory.")
     .staticmethod("setMemoryAllocationCallback")
 
-    .def("precompile", &CEngine::PreCompile, (py::arg("source")))
-    .def("precompile", &CEngine::PreCompileW, (py::arg("source")))
     */
 
     .def("compile", &CEngine::Compile, (py::arg("source"),
                                         py::arg("name") = std::string(),
                                         py::arg("line") = -1,
-                                        py::arg("col") = -1,
-                                        py::arg("precompiled") = py::object()))
+                                        py::arg("col") = -1))
     .def("compile", &CEngine::CompileW, (py::arg("source"),
                                          py::arg("name") = std::wstring(),
                                          py::arg("line") = -1,
-                                         py::arg("col") = -1,
-                                         py::arg("precompiled") = py::object()))
+                                         py::arg("col") = -1))
     ;
 
   py::class_<CScript, boost::noncopyable>("JSScript", "JSScript is a compiled JavaScript script.", py::no_init)
@@ -254,35 +250,9 @@ void CEngine::SetStackLimit(uintptr_t stack_limit_size)
   v8::Isolate::GetCurrent()->SetStackLimit(stack_limit);
 }
 
-py::object CEngine::InternalPreCompile(v8::Handle<v8::String> src)
-{
-  /*
-   * Precompiling is no longer supported
-  v8::TryCatch try_catch;
-
-  std::auto_ptr<v8::ScriptData> precompiled;
-
-  Py_BEGIN_ALLOW_THREADS
-
-  precompiled.reset(v8::ScriptData::PreCompile(src));
-
-  Py_END_ALLOW_THREADS
-
-  if (!precompiled.get()) CJavascriptException::ThrowIf(m_isolate, try_catch);
-  if (precompiled->HasError()) throw CJavascriptException("fail to compile", ::PyExc_SyntaxError);
-
-  py::object obj(py::handle<>(::PyByteArray_FromStringAndSize(precompiled->Data(), precompiled->Length())));
-
-  return obj;
-  */
-  py::object obj;
-  return obj;
-}
-
 boost::shared_ptr<CScript> CEngine::InternalCompile(v8::Handle<v8::String> src,
                                                     v8::Handle<v8::Value> name,
-                                                    int line, int col,
-                                                    py::object precompiled)
+                                                    int line, int col)
 {
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
@@ -292,50 +262,19 @@ boost::shared_ptr<CScript> CEngine::InternalCompile(v8::Handle<v8::String> src,
 
   v8::Persistent<v8::String> script_source(m_isolate, src);
 
-  //v8::Handle<v8::Script> script;
   v8::MaybeLocal<v8::Script> script;
   v8::Handle<v8::String> source = v8::Local<v8::String>::New(m_isolate, script_source);
-  /*
-   * TODO -- looks like ScriptData as a class or concept no longer
-   * exists
-  std::shared_ptr<v8::ScriptData> script_data;
-
-  if (!precompiled.is_none())
-  {
-    if (PyObject_CheckBuffer(precompiled.ptr()))
-    {
-      Py_buffer buf;
-
-      if (-1 == ::PyObject_GetBuffer(precompiled.ptr(), &buf, PyBUF_WRITABLE))
-      {
-        throw CJavascriptException("fail to get data from the precompiled buffer");
-      }
-
-      script_data.reset(v8::ScriptData::New((const char *)buf.buf, (int) buf.len));
-
-      ::PyBuffer_Release(&buf);
-    }
-    else
-    {
-      throw CJavascriptException("need a precompiled buffer object");
-    }
-  }
-  */
 
   Py_BEGIN_ALLOW_THREADS
 
   if (line >= 0 && col >= 0)
   {
     v8::ScriptOrigin script_origin(name, v8::Integer::New(m_isolate, line), v8::Integer::New(m_isolate, col));
-
-    //script = v8::Script::Compile(source, &script_origin, script_data.get());
     script = v8::Script::Compile(context, source, &script_origin);
   }
   else
   {
     v8::ScriptOrigin script_origin(name);
-
-    //script = v8::Script::Compile(source, &script_origin, script_data.get());
     script = v8::Script::Compile(context, source, &script_origin);
   }
 
