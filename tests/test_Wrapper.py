@@ -6,31 +6,17 @@ import os
 import unittest
 import logging
 
-from datetime import *
+import datetime
 
 import SoirV8
 
-is_py3k = sys.version_info[0] > 2
-
-if is_py3k:
-    def toNativeString(s):
-        return s
-    def toUnicodeString(s):
-        return s
-else:
-    def toNativeString(s, encoding = 'utf-8'):
-        return s.encode(encoding) if isinstance(s, unicode) else s
-
-    def toUnicodeString(s, encoding = 'utf-8'):
-        return s if isinstance(s, unicode) else unicode(s, encoding)
-
 
 def convert(obj):
-    if type(obj) == SoirV8.JSArray:
+    if isinstance(obj, SoirV8.JSArray):
         return [convert(v) for v in obj]
 
-    if type(obj) == SoirV8.JSObject:
-        return dict([[str(k), convert(obj.__getattr__(str(k)))] for k in (obj.__dir__() if is_py3k else obj.__members__)])
+    if isinstance(obj, SoirV8.JSObject):
+        return dict([[str(k), convert(obj.__getattr__(str(k)))] for k in obj.__dir__()])
 
     return obj
 
@@ -61,29 +47,29 @@ class TestWrapper(unittest.TestCase):
                 var_f_obj = new Number(1.5);
             """)
 
-            vars = ctxt.locals
+            _vars = ctxt.locals
 
-            var_i = vars.var_i
+            var_i = _vars.var_i
 
             self.assertTrue(var_i)
             self.assertEqual(1, int(var_i))
 
-            var_f = vars.var_f
+            var_f = _vars.var_f
 
             self.assertTrue(var_f)
-            self.assertEqual(1.0, float(vars.var_f))
+            self.assertEqual(1.0, float(_vars.var_f))
 
-            var_s = vars.var_s
+            var_s = _vars.var_s
             self.assertTrue(var_s)
-            self.assertEqual("test", str(vars.var_s))
+            self.assertEqual("test", str(_vars.var_s))
 
-            var_b = vars.var_b
+            var_b = _vars.var_b
             self.assertTrue(var_b)
             self.assertTrue(bool(var_b))
 
-            self.assertEqual("test", vars.var_s_obj)
-            self.assertTrue(vars.var_b_obj)
-            self.assertEqual(1.5, vars.var_f_obj)
+            self.assertEqual("test", _vars.var_s_obj)
+            self.assertTrue(_vars.var_b_obj)
+            self.assertEqual(1.5, _vars.var_f_obj)
 
             attrs = dir(ctxt.locals)
 
@@ -106,7 +92,7 @@ class TestWrapper(unittest.TestCase):
         class MyUnicode(unicode, SoirV8.JSClass):
             pass
 
-        class MyDateTime(time, SoirV8.JSClass):
+        class MyDateTime(datetime.time, SoirV8.JSClass):
             pass
 
         class Global(SoirV8.JSClass):
@@ -115,9 +101,9 @@ class TestWrapper(unittest.TestCase):
             var_float = 1.0
             var_str = 'str'
             var_unicode = u'unicode'
-            var_datetime = datetime.now()
-            var_date = date.today()
-            var_time = time()
+            var_datetime = datetime.datetime.now()
+            var_date = datetime.date.today()
+            var_time = datetime.time()
 
             var_myint = MyInteger()
             var_mystr = MyString('mystr')
@@ -155,7 +141,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(str, type(ctxt.eval("'test'")))
             self.assertEqual(int, type(ctxt.eval("123")))
             self.assertEqual(float, type(ctxt.eval("3.14")))
-            self.assertEqual(datetime, type(ctxt.eval("new Date()")))
+            self.assertEqual(datetime.datetime, type(ctxt.eval("new Date()")))
             self.assertEqual(SoirV8.JSArray, type(ctxt.eval("[1, 2, 3]")))
             self.assertEqual(SoirV8.JSFunction, type(ctxt.eval("(function() {})")))
             self.assertEqual(SoirV8.JSObject, type(ctxt.eval("new Object()")))
@@ -172,9 +158,9 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual('string', typeof('test'))
             self.assertEqual('string', typeof(u'test'))
 
-            self.assertEqual('[object Date]', protoof(datetime.now()))
-            self.assertEqual('[object Date]', protoof(date.today()))
-            self.assertEqual('[object Date]', protoof(time()))
+            self.assertEqual('[object Date]', protoof(datetime.datetime.now()))
+            self.assertEqual('[object Date]', protoof(datetime.date.today()))
+            self.assertEqual('[object Date]', protoof(datetime.time()))
 
             def test():
                 pass
@@ -281,7 +267,7 @@ class TestWrapper(unittest.TestCase):
             try:
                 ctxt.eval('throw "test"')
                 self.fail()
-            except:
+            except Exception:
                 self.assertTrue(SoirV8.JSError, sys.exc_info()[0])
 
     def _testErrorInfo(self):
@@ -365,7 +351,7 @@ class TestWrapper(unittest.TestCase):
                 raise RuntimeError("Hello")
 
         with SoirV8.JSContext(Global()) as ctxt:
-            r = ctxt.eval("""
+            ctxt.eval("""
                 msg ="";
                 try
                 {
@@ -609,15 +595,15 @@ class TestWrapper(unittest.TestCase):
 
             self.assertTrue(now1)
 
-            now2 = datetime.now()
+            now2 = datetime.datetime.now()
 
             delta = now2 - now1 if now2 > now1 else now1 - now2
 
-            self.assertTrue(delta < timedelta(seconds = 1))
+            self.assertTrue(delta < datetime.timedelta(seconds = 1))
 
             func = ctxt.eval("(function (d) { return d.toString(); })")
 
-            now = datetime.now()
+            now = datetime.datetime.now()
 
             self.assertTrue(str(func(now)).startswith(now.strftime("%a %b %d %Y %H:%M:%S")))
 
@@ -628,8 +614,8 @@ class TestWrapper(unittest.TestCase):
 
     def testUnicode(self):
         with SoirV8.JSContext() as ctxt:
-            self.assertEqual(u"人", toUnicodeString(ctxt.eval(u"\"人\"")))
-            self.assertEqual(u"é", toUnicodeString(ctxt.eval(u"\"é\"")))
+            self.assertEqual(u"人", ctxt.eval(u"\"人\""))
+            self.assertEqual(u"é", ctxt.eval(u"\"é\""))
 
             func = ctxt.eval("(function (msg) { return msg.length; })")
 
