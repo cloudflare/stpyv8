@@ -726,12 +726,7 @@ class TestWrapper(unittest.TestCase):
 
            self.assertEqual("Test Value B",  ctxt.locals.test)
 
-    def _testDestructor(self):
-        import gc
-
-        owner = self
-        owner.deleted = False
-
+    def testReferenceCount(self):
         class Hello(object):
             def say(self):
                 pass
@@ -754,13 +749,6 @@ class TestWrapper(unittest.TestCase):
                 del obj
 
         test()
-
-        self.assertFalse(owner.deleted)
-
-        SoirV8.JSEngine.collect()
-        gc.collect()
-
-        self.assertTrue(owner.deleted)
 
     def testNullInString(self):
         with SoirV8.JSContext() as ctxt:
