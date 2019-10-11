@@ -33,7 +33,6 @@ protected:
 #endif
 */
 
-  static void CollectAllGarbage(bool force_compaction);
   static void TerminateAllThreads(void);
 
   static void ReportFatalError(const char* location, const char* message);

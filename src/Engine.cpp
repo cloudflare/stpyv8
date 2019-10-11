@@ -53,10 +53,6 @@ void CEngine::Expose(void)
     .def("setFlags", &CEngine::SetFlags, "Sets V8 flags from a string.")
     .staticmethod("setFlags")
 
-    .def("collect", &CEngine::CollectAllGarbage, (py::arg("force")=true),
-         "Performs a full garbage collection. Force compaction if the parameter is true.")
-    .staticmethod("collect")
-
     /*
   #ifdef SUPPORT_SERIALIZE
     .add_static_property("serializeEnabled", &CEngine::IsSerializeEnabled, &CEngine::SetSerializeEnable)
@@ -158,21 +154,6 @@ void CEngine::Expose(void)
 }
 
 //TODO - port serialization code
-
-
-void CEngine::CollectAllGarbage(bool force_compaction)
-{
-  //NOT PORTED ON PURPOSE
-  /*
-  v8i::HandleScope handle_scope(v8i::Isolate::Current());
-
-  if (force_compaction) {
-    v8i::Isolate::Current()->heap()->CollectAllAvailableGarbage();
-  } else {
-    v8i::Isolate::Current()->heap()->CollectAllGarbage(v8i::Heap::kMakeHeapIterableMask);
-  }
-  */
-}
 
 bool CEngine::IsDead(void)
 {
