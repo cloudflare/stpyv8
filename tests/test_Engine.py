@@ -6,19 +6,17 @@ import os
 import unittest
 import logging
 
-from datetime import *
-
 import SoirV8
 
 
 class TestEngine(unittest.TestCase):
     def testClassProperties(self):
-        with SoirV8.JSContext() as ctxt:
+        with SoirV8.JSContext():
             self.assertTrue(str(SoirV8.JSEngine.version).startswith("7."))
             self.assertFalse(SoirV8.JSEngine.dead)
 
     def testCompile(self):
-        with SoirV8.JSContext() as ctxt:
+        with SoirV8.JSContext():
             with SoirV8.JSEngine() as engine:
                 s = engine.compile("1+2")
 
@@ -178,10 +176,10 @@ class TestEngine(unittest.TestCase):
             version = "1.0"
 
         with SoirV8.JSContext(Global()) as ctxt:
-            vars = ctxt.locals
+            _vars = ctxt.locals
 
             # getter
-            self.assertEqual(Global.version, str(vars.version))
+            self.assertEqual(Global.version, str(_vars.version))
             self.assertEqual(Global.version, str(ctxt.eval("version")))
 
             self.assertRaises(ReferenceError, ctxt.eval, "nonexists")
@@ -189,7 +187,7 @@ class TestEngine(unittest.TestCase):
             # setter
             self.assertEqual(2.0, float(ctxt.eval("version = 2.0")))
 
-            self.assertEqual(2.0, float(vars.version))
+            self.assertEqual(2.0, float(_vars.version))
 
     def _testThis(self):
         class Global(SoirV8.JSClass):
@@ -281,7 +279,6 @@ class TestEngine(unittest.TestCase):
                 newStackSize = ctxt.eval("var maxStackSize = function(i){try{(function m(){++i&&m()}())}catch(e){return i}}(0); maxStackSize")
 
         self.assertTrue(newStackSize > oldStackSize * 2)
-
 
 
 if __name__ == '__main__':

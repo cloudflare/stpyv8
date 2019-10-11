@@ -508,8 +508,6 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SoirV8.JSArray((1, 2, 3))))
             self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SoirV8.JSArray(list(range(3)))))
 
-            [x for x in SoirV8.JSArray([1,2,3])]
-
     def testMultiDimArray(self):
         with SoirV8.JSContext() as ctxt:
             ret = ctxt.eval("""
