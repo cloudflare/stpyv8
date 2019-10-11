@@ -7,7 +7,7 @@ import SoirV8
 
 class TestMultithread(unittest.TestCase):
     def testLocker(self):
-        with SoirV8.JSIsolate() as isolate:
+        with SoirV8.JSIsolate():
             self.assertFalse(SoirV8.JSLocker.active)
             self.assertFalse(SoirV8.JSLocker.locked)
 
@@ -23,7 +23,7 @@ class TestMultithread(unittest.TestCase):
                     self.assertTrue(outter_locker)
                     self.assertTrue(inner_locker)
 
-                    with SoirV8.JSUnlocker() as unlocker:
+                    with SoirV8.JSUnlocker():
                         self.assertFalse(SoirV8.JSLocker.locked)
 
                         self.assertTrue(outter_locker)
@@ -58,7 +58,7 @@ class TestMultithread(unittest.TestCase):
         g = Global()
 
         def run():
-            with SoirV8.JSIsolate() as isolate:
+            with SoirV8.JSIsolate():
                 with SoirV8.JSContext(g) as ctxt:
                     ctxt.eval("""
                         started.wait();
