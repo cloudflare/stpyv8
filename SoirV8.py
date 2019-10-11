@@ -303,7 +303,7 @@ class JSEngine(_SoirV8.JSEngine):
 
 JSScript = _SoirV8.JSScript
 JSStackTrace = _SoirV8.JSStackTrace
-# JSStackTrace.Options = _SoirV8.JSStackTraceOptions
+JSStackTrace.Options = _SoirV8.JSStackTraceOptions
 JSStackTrace.GetCurrentStackTrace = staticmethod(lambda frame_limit, options: _SoirV8.JSIsolate.current.GetCurrentStackTrace(frame_limit, options))
 JSStackFrame = _SoirV8.JSStackFrame
 

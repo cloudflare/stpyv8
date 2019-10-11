@@ -330,7 +330,7 @@ class TestWrapper(unittest.TestCase):
             at test3:1
             at test3:1:1"""))
 
-    def _testStackTrace(self):
+    def testStackTrace(self):
         class Global(SoirV8.JSClass):
             def GetCurrentStackTrace(self, limit):
                 return SoirV8.JSStackTrace.GetCurrentStackTrace(4, SoirV8.JSStackTrace.Options.Detailed)
@@ -352,8 +352,8 @@ class TestWrapper(unittest.TestCase):
             c();""", "test")
 
             self.assertEqual(4, len(st))
-            self.assertEqual("\tat a (test:4:28)\n\tat (eval)\n\tat b (test:8:28)\n\tat c (test:12:28)\n", str(st))
-            self.assertEqual("test.a (4:28)\n. (1:1) eval\ntest.b (8:28) constructor\ntest.c (12:28)",
+            self.assertEqual("\tat a (test:4:28)\n\tat eval ((eval))\n\tat b (test:8:28)\n\tat c (test:12:28)\n", str(st))
+            self.assertEqual("test.a (4:28)\n.eval (1:1) eval\ntest.b (8:28) constructor\ntest.c (12:28)",
                               "\n".join(["%s.%s (%d:%d)%s%s" % (
                                 f.scriptName, f.funcName, f.lineNum, f.column,
                                 ' eval' if f.isEval else '',
