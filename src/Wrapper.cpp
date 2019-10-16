@@ -1138,8 +1138,6 @@ py::list CJavascriptObject::GetAttrList(void)
 
 int CJavascriptObject::GetIdentityHash(void)
 {
-  // CHECK_V8_CONTEXT();
-
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
   CHECK_V8_CONTEXT();
 
@@ -1148,8 +1146,6 @@ int CJavascriptObject::GetIdentityHash(void)
 
 CJavascriptObjectPtr CJavascriptObject::Clone(void)
 {
-  // CHECK_V8_CONTEXT();
-
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
   CHECK_V8_CONTEXT();
 
@@ -1158,8 +1154,6 @@ CJavascriptObjectPtr CJavascriptObject::Clone(void)
 
 bool CJavascriptObject::Contains(const std::string& name)
 {
-  // CHECK_V8_CONTEXT();
-
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
 
@@ -1178,8 +1172,6 @@ bool CJavascriptObject::Contains(const std::string& name)
 
 bool CJavascriptObject::Equals(CJavascriptObjectPtr other) const
 {
-  // CHECK_V8_CONTEXT();
-
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
 
@@ -1192,8 +1184,6 @@ bool CJavascriptObject::Equals(CJavascriptObjectPtr other) const
 
 void CJavascriptObject::Dump(std::ostream& os) const
 {
-  // CHECK_V8_CONTEXT();
-
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
 
@@ -1217,6 +1207,7 @@ void CJavascriptObject::Dump(std::ostream& os) const
     os << *v8::String::Utf8Value(isolate, v8::Handle<v8::String>::Cast(Object()));
   else
   {
+    /*
     v8::Handle<v8::String> s = Object()->ToString(context).ToLocalChecked();
 
     if (s.IsEmpty())
@@ -1225,6 +1216,7 @@ void CJavascriptObject::Dump(std::ostream& os) const
     if (!s.IsEmpty())
       os << *v8::String::Utf8Value(isolate, s);
     */
+
 	v8::MaybeLocal<v8::String> s = Object()->ToString(context);
 	if(s.IsEmpty())
 		s = Object()->ObjectProtoToString(context);
@@ -1298,7 +1290,6 @@ py::object CJavascriptObject::Wrap(v8::Handle<v8::Value> value, v8::Handle<v8::O
   {
     return py::object(py::handle<>(py::borrowed(Py_False)));
   }
-
   if (value->IsInt32())
   { 
     return py::object(value->Int32Value(v8::Isolate::GetCurrent()->GetCurrentContext()).ToChecked());
