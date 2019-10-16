@@ -12,7 +12,7 @@ source_files = ["Exception.cpp",
                 "Wrapper.cpp",
                 "Locker.cpp",
                 "Utils.cpp",
-                "Main.cpp"]
+                "SoirV8.cpp"]
 
 macros = [("BOOST_PYTHON_STATIC_LIB", None)]
 third_party_libraries = ["python", "boost", "v8"]
