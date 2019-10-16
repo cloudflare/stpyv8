@@ -56,15 +56,11 @@ $ ninja -C out.gn/x64.release.sample v8_monolith
 
 ### Building soirv8
 
-1. Right now we are using a standard CMake build process.
-
 ```
-$ cd ..
-$ cd soriv8
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
+$ cd soirv8
+$ python3 setup.py build
+$ sudo python3 setup.py install
+$ pytest (optional)
 ```
 
 
