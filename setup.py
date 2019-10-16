@@ -2,6 +2,7 @@
 
 import sys
 import os
+import platform
 
 from distutils.core import setup, Extension
 
@@ -41,6 +42,10 @@ elif os.name == "posix":
         libraries.append("boost_python-py{}{}".format(sys.version_info.major, sys.version_info.minor))
     else:
         libraries.append("boost_python")
+
+    if platform.system() in ('Darwin', ):
+        extra_compile_args.append('-std=c++11')
+
 
 soirv8 = Extension(name               = "_SoirV8",
                    sources            = [os.path.join("src", file) for file in source_files],                 
