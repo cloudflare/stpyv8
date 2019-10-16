@@ -33,13 +33,26 @@ void CPlatform::Init()
   inited = true;
 }
 
-CIsolate::CIsolate(bool owner=false, std::string argv=std::string()) : m_owner(owner)
+void CIsolate::Init(bool owner)
 {
+  m_owner = owner;
+
   v8::Isolate::CreateParams create_params;
   create_params.array_buffer_allocator =
     v8::ArrayBuffer::Allocator::NewDefaultAllocator();
   m_isolate = v8::Isolate::New(create_params);
 }
+
+CIsolate::CIsolate(bool owner)
+{
+  CIsolate::Init(owner);
+}
+
+CIsolate::CIsolate()
+{
+  CIsolate::Init(false);
+}
+
 CIsolate::CIsolate(v8::Isolate *isolate) : m_isolate(isolate), m_owner(false) 
 {
 }
@@ -68,7 +81,7 @@ void CContext::Expose(void)
     ;
 
   py::class_<CIsolate, boost::noncopyable>("JSIsolate", "JSIsolate is an isolated instance of the V8 engine.", py::no_init)
-    .def(py::init<bool, std::string>((py::arg("owner") = false, py::arg("argv") = std::string())))
+    .def(py::init<bool>((py::arg("owner") = false)))
 
     .add_static_property("current", &CIsolate::GetCurrent,
                          "Returns the entered isolate for the current thread or NULL in case there is no current isolate.")

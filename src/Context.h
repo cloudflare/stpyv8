@@ -32,8 +32,10 @@ class CIsolate
 {
   v8::Isolate *m_isolate;
   bool m_owner;
+  void Init(bool owner);
 public:
-  CIsolate(bool owner, std::string argv);
+  CIsolate();
+  CIsolate(bool owner);
   CIsolate(v8::Isolate *isolate);
   ~CIsolate(void);
 
