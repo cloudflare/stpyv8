@@ -22,11 +22,11 @@ class CPlatform
   std::string argv;
 
   public:
+  CPlatform();
   CPlatform(std::string argv0);
   ~CPlatform();
   void Init();
 };
-
 
 class CIsolate
 {

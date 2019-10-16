@@ -8,7 +8,12 @@
 std::unique_ptr<v8::Platform> CPlatform::platform;
 bool CPlatform::inited = false;
 
-CPlatform::CPlatform(std::string argv0=std::string()) : argv(argv0)
+CPlatform::CPlatform()
+{
+  argv = std::string();
+}
+
+CPlatform::CPlatform(std::string argv0) : argv(argv0)
 {
 }
 
