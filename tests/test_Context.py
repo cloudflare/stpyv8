@@ -57,14 +57,8 @@ class TestContext(unittest.TestCase):
 
                 with ctxt0:
                     self.assertEqual(1234, int(global0.custom))
+
                 self.assertEqual(1234, int(global1.custom))
-
-                # Now create a new context with the old global
-                with SoirV8.JSContext(global1) as ctxt2:
-                    ctxt2.securityToken = ctxt1.securityToken
-
-                    with ctxt1:
-                        self.assertEqual(1234, int(global1.custom))
 
     def _testSecurityChecks(self):
         with SoirV8.JSContext() as env1:
