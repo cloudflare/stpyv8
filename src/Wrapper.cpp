@@ -1511,7 +1511,7 @@ py::object CJavascriptArray::GetItem(py::object key)
         slice.append(CJavascriptObject::Wrap(value, Object()));
       }
 
-      return slice;
+      return std::move(slice);
     }
   }
   else if (PyInt_Check(key.ptr()) || PyLong_Check(key.ptr()))
