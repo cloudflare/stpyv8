@@ -736,7 +736,7 @@ class TestWrapper(unittest.TestCase):
 
             self.assertEqual("hello \0 world", fn("hello \0 world"))
 
-    def _testLivingObjectCache(self):
+    def testLivingObjectCache(self):
         class Global(SoirV8.JSClass):
             i = 1
             b = True
