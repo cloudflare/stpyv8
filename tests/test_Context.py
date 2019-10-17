@@ -60,19 +60,19 @@ class TestContext(unittest.TestCase):
 
                 self.assertEqual(1234, int(global1.custom))
 
-    def _testSecurityChecks(self):
+    def testSecurityChecks(self):
         with SoirV8.JSContext() as env1:
             env1.securityToken = "foo"
 
             # Create a function in env1.
-            env1.eval("spy=function(){return spy;}")
+            env1.eval("spy = function(){return spy;}")
 
             spy = env1.locals.spy
 
             self.assertTrue(isinstance(spy, SoirV8.JSFunction))
 
             # Create another function accessing global objects.
-            env1.eval("spy2=function(){return 123;}")
+            env1.eval("spy2 = function(){return 123;}")
 
             spy2 = env1.locals.spy2
 
@@ -80,43 +80,18 @@ class TestContext(unittest.TestCase):
 
             # Switch to env2 in the same domain and invoke spy on env2.
             env2 = SoirV8.JSContext()
-
             env2.securityToken = "foo"
 
             with env2:
                 result = spy.apply(env2.locals)
-
                 self.assertTrue(isinstance(result, SoirV8.JSFunction))
 
             env2.securityToken = "bar"
 
+            # FIXME
             # Call cross_domain_call, it should throw an exception
-            with env2:
-                self.assertRaises(SoirV8.JSError, spy2.apply, env2.locals)
-
-    def _testCrossDomainDelete(self):
-        with SoirV8.JSContext() as env1:
-            env2 = SoirV8.JSContext()
-
-            # Set to the same domain.
-            env1.securityToken = "foo"
-            env2.securityToken = "foo"
-
-            env1.locals.prop = 3
-
-            env2.locals.env1 = env1.locals
-
-            # Change env2 to a different domain and delete env1.prop.
-            #env2.securityToken = "bar"
-
-            self.assertEqual(3, int(env1.eval("prop")))
-
-            with env2:
-                self.assertEqual(3, int(env2.eval("this.env1.prop")))
-                self.assertEqual("false", str(env2.eval("delete env1.prop")))
-
-            # Check that env1.prop still exists.
-            self.assertEqual(3, int(env1.locals.prop))
+            # with env2:
+            #    self.assertRaises(SoirV8.JSError, spy2.apply, env2.locals)
 
 
 if __name__ == '__main__':
