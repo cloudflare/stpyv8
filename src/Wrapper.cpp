@@ -281,9 +281,24 @@ void CPythonObject::NamedGetter(v8::Local<v8::Name> prop, const v8::PropertyCall
 
   py::object obj = CJavascriptObject::Wrap(info.Holder());
 
-  v8::String::Utf8Value name(info.GetIsolate(), prop);
+  v8::String::Utf8Value name(info.GetIsolate(), v8::Local<v8::String>::Cast(prop));
+/*
+  std::cout << "DEBUG Getting named property:" << std::endl;
 
+  if (*name == nullptr)
+	std::cout << "DEBUG: This property is null" << std::endl;
+  else
+	std::cout << "DEBUG:" << std::string(*name) << std::endl;
+*/
   if (PyGen_Check(obj.ptr())) CALLBACK_RETURN(v8::Undefined(info.GetIsolate()));
+
+/*
+  This code is BROKEN and was replaced (see next two lines)
+
+  PyObject *value = ::PyObject_GetAttrString(obj.ptr(), *name);
+*/
+
+  if (*name == nullptr) CALLBACK_RETURN(v8::Undefined(info.GetIsolate()));
 
   PyObject *value = ::PyObject_GetAttrString(obj.ptr(), *name);
 
