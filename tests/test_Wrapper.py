@@ -82,14 +82,11 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue("var_b_obj" in attrs)
             self.assertTrue("var_f_obj" in attrs)
 
-    def _testExactConverter(self):
+    def testExactConverter(self):
         class MyInteger(int, SoirV8.JSClass):
             pass
 
         class MyString(str, SoirV8.JSClass):
-            pass
-
-        class MyUnicode(unicode, SoirV8.JSClass):
             pass
 
         class MyDateTime(datetime.time, SoirV8.JSClass):
@@ -100,14 +97,12 @@ class TestWrapper(unittest.TestCase):
             var_int = 1
             var_float = 1.0
             var_str = 'str'
-            var_unicode = u'unicode'
             var_datetime = datetime.datetime.now()
             var_date = datetime.date.today()
             var_time = datetime.time()
 
             var_myint = MyInteger()
             var_mystr = MyString('mystr')
-            var_myunicode = MyUnicode('myunicode')
             var_mytime = MyDateTime()
 
         with SoirV8.JSContext(Global()) as ctxt:
@@ -118,19 +113,16 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual('Number', typename('var_int'))
             self.assertEqual('Number', typename('var_float'))
             self.assertEqual('String', typename('var_str'))
-            self.assertEqual('String', typename('var_unicode'))
             self.assertEqual('Date', typename('var_datetime'))
             self.assertEqual('Date', typename('var_date'))
             self.assertEqual('Date', typename('var_time'))
 
             self.assertEqual('MyInteger', typename('var_myint'))
             self.assertEqual('MyString', typename('var_mystr'))
-            self.assertEqual('MyUnicode', typename('var_myunicode'))
             self.assertEqual('MyDateTime', typename('var_mytime'))
 
             self.assertEqual('object', typeof('var_myint'))
             self.assertEqual('object', typeof('var_mystr'))
-            self.assertEqual('object', typeof('var_myunicode'))
             self.assertEqual('object', typeof('var_mytime'))
 
     def testJavascriptWrapper(self):
