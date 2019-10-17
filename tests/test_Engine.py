@@ -189,7 +189,7 @@ class TestEngine(unittest.TestCase):
 
             self.assertEqual(2.0, float(_vars.version))
 
-    def _testThis(self):
+    def testThis(self):
         class Global(SoirV8.JSClass):
             version = 1.0
 
