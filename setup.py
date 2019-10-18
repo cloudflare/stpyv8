@@ -15,19 +15,20 @@ source_files = ["Exception.cpp",
                 "SoirV8.cpp"]
 
 macros = [("BOOST_PYTHON_STATIC_LIB", None)]
-third_party_libraries = ["python", "boost", "v8"]
+# third_party_libraries = ["python", "boost", "v8"]
 
-include_dirs = [os.path.join("lib", lib, "inc") for lib in third_party_libraries]
-library_dirs = [os.path.join("lib", lib, "lib") for lib in third_party_libraries]
+# include_dirs = [os.path.join("lib", lib, "inc") for lib in third_party_libraries]
+# library_dirs = [os.path.join("lib", lib, "lib") for lib in third_party_libraries]
+include_dirs = []
+library_dirs = []
 
-V8_HOME = os.getenv('V8_HOME', os.getenv('HOME'))
-include_dirs.append(os.path.join(V8_HOME, 'v8/include'))
-library_dirs.append(os.path.join(V8_HOME, 'v8/out.gn/x64.release.sample/obj/'))
+V8_HOME = os.getenv('V8_HOME', os.path.join(os.getenv('HOME'), 'v8'))
+include_dirs.append(os.path.join(V8_HOME, 'include'))
+library_dirs.append(os.path.join(V8_HOME, 'out.gn/x64.release.sample/obj/'))
 
 libraries = []
 extra_compile_args = []
 extra_link_args = []
- 
 
 if os.name == "nt":
     include_dirs += os.environ["INCLUDE"].split(';')
@@ -36,19 +37,19 @@ if os.name == "nt":
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
     extra_link_args += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
 elif os.name == "posix":
-    libraries = ["boost_system", "v8_monolith", "rt"]
-
-    if sys.version_info.major in (3, ):
-        libraries.append("boost_python-py{}{}".format(sys.version_info.major, sys.version_info.minor))
-    else:
-        libraries.append("boost_python")
+    libraries = ["boost_system", "v8_monolith"]
 
     if platform.system() in ('Darwin', ):
+        libraries.append("boost_python{}{}".format(sys.version_info.major, sys.version_info.minor))
         extra_compile_args.append('-std=c++11')
+
+    if platform.system() in ('Linux', ):
+        libraries.append("boost_python-py{}{}".format(sys.version_info.major, sys.version_info.minor))
+        libraries.append("rt")
 
 
 soirv8 = Extension(name               = "_SoirV8",
-                   sources            = [os.path.join("src", file) for file in source_files],                 
+                   sources            = [os.path.join("src", source) for source in source_files],
                    define_macros      = macros,
                    include_dirs       = include_dirs,
                    library_dirs       = library_dirs,
