@@ -799,7 +799,9 @@ py::object CPythonObject::Unwrap(v8::Handle<v8::Object> obj)
 {
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
 
+  std::cout << "CPythonObject::Unwrap 1" << std::endl;
   v8::Handle<v8::External> payload = v8::Handle<v8::External>::Cast(obj->GetInternalField(0));
+  std::cout << "CPythonObject::Unwrap 2" << std::endl;
 
   return *static_cast<py::object *>(payload->Value());
 }
@@ -832,12 +834,11 @@ v8::Handle<v8::Value> CPythonObject::Wrap(py::object obj)
 
   v8::Local<v8::Value> value;
 
-  //TODO port me
-  //#ifdef SUPPORT_TRACE_LIFECYCLE
-  //value = ObjectTracer::FindCache(obj);
-  //
-  //if (value.IsEmpty())
-  //#endif
+  #ifdef SUPPORT_TRACE_LIFECYCLE
+  value = ObjectTracer::FindCache(obj);
+
+  if (value.IsEmpty())
+  #endif
 
   value = WrapInternal(obj);
 
@@ -862,6 +863,8 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
 
   py::extract<CJavascriptObject&> extractor(obj);
 
+  std::cout << "CPythonObject::WrapInternal" << std::endl;
+
   if (extractor.check())
   {
     CJavascriptObject& jsobj = extractor();
@@ -881,122 +884,121 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
       throw CJavascriptException("Refer to a null object", ::PyExc_AttributeError);
     }
 
-    //TODO port me
-    //#ifdef SUPPORT_TRACE_LIFECYCLE
-    //py::object *object = new py::object(obj);
-    //
-    //ObjectTracer::Trace(jsobj.Object(), object);
-    //#endif 
+    #ifdef SUPPORT_TRACE_LIFECYCLE
+    py::object *object = new py::object(obj);
+
+    ObjectTracer::Trace(jsobj.Object(), object);
+    #endif
 
     return handle_scope.Escape(jsobj.Object());
   }
 
   v8::Local<v8::Value> result;
 
-#if PY_MAJOR_VERSION < 3
-  if (PyInt_CheckExact(obj.ptr()))
+  std::cout << "CPythonObject::WrapInternal checks" << std::endl;
+  if (PyLong_CheckExact(obj.ptr()))
   {
-    result = v8::Integer::New(v8::Isolate::GetCurrent(), ::PyInt_AsLong(obj.ptr()));
+    std::cout << "CPythonObject::WrapInternal PyLong_CheckExact" << std::endl;
+    result = v8::Integer::New(v8::Isolate::GetCurrent(), ::PyLong_AsLong(obj.ptr()));
+  }
+  else if (PyBool_Check(obj.ptr()))
+  {
+    std::cout << "CPythonObject::WrapInternal PyBool_Check" << std::endl;
+    result = v8::Boolean::New(v8::Isolate::GetCurrent(), py::extract<bool>(obj));
+  }
+  else if (PyBytes_CheckExact(obj.ptr()) || PyUnicode_CheckExact(obj.ptr()))
+  {
+	std::cout << "CPythonObject::WrapInternal PyBytes_CheckExact" << std::endl;
+    result = ToString(obj);
+  }
+  else if (PyFloat_CheckExact(obj.ptr()))
+  {
+	std::cout << "CPythonObject::WrapInternal PyFloat_CheckExact" << std::endl;
+    result = v8::Number::New(v8::Isolate::GetCurrent(), py::extract<double>(obj));
+  }
+  else if (PyDateTime_CheckExact(obj.ptr()) || PyDate_CheckExact(obj.ptr()))
+  {
+	std::cout << "CPythonObject::WrapInternal PyDateTime_CheckExact" << std::endl;
+    tm ts = { 0 };
+
+    ts.tm_year = PyDateTime_GET_YEAR(obj.ptr()) - 1900;
+    ts.tm_mon = PyDateTime_GET_MONTH(obj.ptr()) - 1;
+    ts.tm_mday = PyDateTime_GET_DAY(obj.ptr());
+    ts.tm_hour = PyDateTime_DATE_GET_HOUR(obj.ptr());
+    ts.tm_min = PyDateTime_DATE_GET_MINUTE(obj.ptr());
+    ts.tm_sec = PyDateTime_DATE_GET_SECOND(obj.ptr());
+    ts.tm_isdst = -1;
+
+    int ms = PyDateTime_DATE_GET_MICROSECOND(obj.ptr());
+
+    result = v8::Date::New(v8::Isolate::GetCurrent()->GetCurrentContext(), ((double) mktime(&ts)) * 1000 + ms / 1000).ToLocalChecked();
+  }
+  else if (PyTime_CheckExact(obj.ptr()))
+  {
+    std::cout << "CPythonObject::WrapInternal PyTime_CheckExact" << std::endl;
+    tm ts = { 0 };
+
+    ts.tm_hour = PyDateTime_TIME_GET_HOUR(obj.ptr()) - 1;
+    ts.tm_min = PyDateTime_TIME_GET_MINUTE(obj.ptr());
+    ts.tm_sec = PyDateTime_TIME_GET_SECOND(obj.ptr());
+
+    int ms = PyDateTime_TIME_GET_MICROSECOND(obj.ptr());
+
+    result = v8::Date::New(v8::Isolate::GetCurrent()->GetCurrentContext(), ((double) mktime(&ts)) * 1000 + ms / 1000).ToLocalChecked();
+  }
+  else if (PyCFunction_Check(obj.ptr()) || PyFunction_Check(obj.ptr()) || PyMethod_Check(obj.ptr()) || PyType_CheckExact(obj.ptr()))
+  {
+    std::cout << "CPythonObject::WrapInternal PyFunction_Check" << std::endl;
+    v8::Handle<v8::FunctionTemplate> func_tmpl = v8::FunctionTemplate::New(v8::Isolate::GetCurrent());
+    py::object *object = new py::object(obj);
+
+    func_tmpl->SetCallHandler(Caller, v8::External::New(v8::Isolate::GetCurrent(), object));
+
+    if (PyType_Check(obj.ptr()))
+    {
+      std::cout << "CPythonObject::WrapInternal PyType_Check" << std::endl;
+      v8::Handle<v8::String> cls_name = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), py::extract<const char *>(obj.attr("__name__"))()).ToLocalChecked();
+
+      func_tmpl->SetClassName(cls_name);
+    }
+
+    result = func_tmpl->GetFunction(v8::Isolate::GetCurrent()->GetCurrentContext()).ToLocalChecked();
+      
+    #ifdef SUPPORT_TRACE_LIFECYCLE
+    if (!result.IsEmpty()) ObjectTracer::Trace(result, object);
+    #endif
   }
   else
-#endif
-    if (PyLong_CheckExact(obj.ptr()))
-    {
-      result = v8::Integer::New(v8::Isolate::GetCurrent(), ::PyLong_AsLong(obj.ptr()));
-    }
-    else if (PyBool_Check(obj.ptr()))
-    {
-      result = v8::Boolean::New(v8::Isolate::GetCurrent(), py::extract<bool>(obj));
-    }
-    else if (PyBytes_CheckExact(obj.ptr()) ||
-        PyUnicode_CheckExact(obj.ptr()))
-    {
-      result = ToString(obj);
-    }
-    else if (PyFloat_CheckExact(obj.ptr()))
-    {
-      result = v8::Number::New(v8::Isolate::GetCurrent(), py::extract<double>(obj));
-    }
-    else if (PyDateTime_CheckExact(obj.ptr()) || PyDate_CheckExact(obj.ptr()))
-    {
-      tm ts = { 0 };
+  {
+    std::cout << "CPythonObject::WrapInternal PyType_Check 2" << std::endl;
+    std::cout << Py_TYPE(obj.ptr()) << std::endl;
+    static v8::Persistent<v8::ObjectTemplate> s_template(v8::Isolate::GetCurrent(), CreateObjectTemplate(v8::Isolate::GetCurrent()));
 
-      ts.tm_year = PyDateTime_GET_YEAR(obj.ptr()) - 1900;
-      ts.tm_mon = PyDateTime_GET_MONTH(obj.ptr()) - 1;
-      ts.tm_mday = PyDateTime_GET_DAY(obj.ptr());
-      ts.tm_hour = PyDateTime_DATE_GET_HOUR(obj.ptr());
-      ts.tm_min = PyDateTime_DATE_GET_MINUTE(obj.ptr());
-      ts.tm_sec = PyDateTime_DATE_GET_SECOND(obj.ptr());
-      ts.tm_isdst = -1;
+    v8::MaybeLocal<v8::Object> instance = v8::Local<v8::ObjectTemplate>::New(
+        v8::Isolate::GetCurrent(), s_template)->NewInstance(
+        v8::Isolate::GetCurrent()->GetCurrentContext());
 
-      int ms = PyDateTime_DATE_GET_MICROSECOND(obj.ptr());
-
-      result = v8::Date::New(v8::Isolate::GetCurrent()->GetCurrentContext(), ((double) mktime(&ts)) * 1000 + ms / 1000).ToLocalChecked();
-    }
-    else if (PyTime_CheckExact(obj.ptr()))
+    if (!instance.IsEmpty())
     {
-      tm ts = { 0 };
-
-      ts.tm_hour = PyDateTime_TIME_GET_HOUR(obj.ptr()) - 1;
-      ts.tm_min = PyDateTime_TIME_GET_MINUTE(obj.ptr());
-      ts.tm_sec = PyDateTime_TIME_GET_SECOND(obj.ptr());
-
-      int ms = PyDateTime_TIME_GET_MICROSECOND(obj.ptr());
-
-      result = v8::Date::New(v8::Isolate::GetCurrent()->GetCurrentContext(), ((double) mktime(&ts)) * 1000 + ms / 1000).ToLocalChecked();
-    }
-    else if (PyCFunction_Check(obj.ptr()) || PyFunction_Check(obj.ptr()) ||
-        PyMethod_Check(obj.ptr()) || PyType_Check(obj.ptr()))
-    {
-      v8::Handle<v8::FunctionTemplate> func_tmpl = v8::FunctionTemplate::New(v8::Isolate::GetCurrent());
       py::object *object = new py::object(obj);
 
-      func_tmpl->SetCallHandler(Caller, v8::External::New(v8::Isolate::GetCurrent(), object));
+      v8::Handle<v8::Object> realInstance = instance.ToLocalChecked();
+      realInstance->SetInternalField(0, v8::External::New(v8::Isolate::GetCurrent(), object));
 
-      if (PyType_Check(obj.ptr()))
-      {
-        v8::Handle<v8::String> cls_name = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), py::extract<const char *>(obj.attr("__name__"))()).ToLocalChecked();
-
-        func_tmpl->SetClassName(cls_name);
-      }
-
-      result = func_tmpl->GetFunction(v8::Isolate::GetCurrent()->GetCurrentContext()).ToLocalChecked();
-      
-      /* TODO port me
       #ifdef SUPPORT_TRACE_LIFECYCLE
-      if (!result.IsEmpty()) ObjectTracer::Trace(result, object);
+      ObjectTracer::Trace(instance.ToLocalChecked(), object);
       #endif
-      */
-    }
-    else
-    {
-      static v8::Persistent<v8::ObjectTemplate> s_template(v8::Isolate::GetCurrent(), CreateObjectTemplate(v8::Isolate::GetCurrent()));
 
-      v8::MaybeLocal<v8::Object> instance = v8::Local<v8::ObjectTemplate>::New(
-          v8::Isolate::GetCurrent(), s_template)->NewInstance(
-          v8::Isolate::GetCurrent()->GetCurrentContext());
-
-      if (!instance.IsEmpty())
-      {
-        py::object *object = new py::object(obj);
-
-        v8::Handle<v8::Object> realInstance = instance.ToLocalChecked();
-        realInstance->SetInternalField(0, v8::External::New(v8::Isolate::GetCurrent(), object));
-
-        //TODO port me
-        //#ifdef SUPPORT_TRACE_LIFECYCLE
-        //  ObjectTracer::Trace(instance, object);
-        //#endif
-        result = realInstance;
+      result = realInstance;
 //TODO add test
-//std::cout << "Is is wrapped? " << CPythonObject::IsWrapped(realInstance) << std::endl;
-//py::object un = CPythonObject::Unwrap(realInstance);
-//std::cout << "Unwrapped python object is this many bytes: " << sizeof(un) << std::endl;
+      std::cout << "Is this wrapped? " << CPythonObject::IsWrapped(realInstance) << std::endl;
+      py::object un = CPythonObject::Unwrap(realInstance);
+      std::cout << "Unwrapped Python object - bytes: " << sizeof(un) << std::endl;
       }
 
     }
 
-  if (result.IsEmpty()) CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
+ //  if (result.IsEmpty()) CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
 
   return handle_scope.Escape(result);
 }
@@ -1327,24 +1329,30 @@ py::object CJavascriptObject::Wrap(v8::Handle<v8::Value> value, v8::Handle<v8::O
 
 py::object CJavascriptObject::Wrap(v8::Handle<v8::Object> obj, v8::Handle<v8::Object> self)
 {
+  std::cout << "CJavascriptObject::Wrap 1" << std::endl;
+
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
 
   if (obj.IsEmpty())
   {
+	std::cout << "CJavascriptObject::Wrap 1 (IsEmpty)" << std::endl;
     return py::object();
   }
   else if (obj->IsArray())
   {
+	std::cout << "CJavascriptObject::Wrap 1 (IsArray)" << std::endl;
     v8::Handle<v8::Array> array = v8::Handle<v8::Array>::Cast(obj);
 
     return Wrap(new CJavascriptArray(array));
   }
   else if (CPythonObject::IsWrapped(obj))
   {
+    std::cout << "CJavascriptObject::Wrap 1 (IsWrapped)" << std::endl;
     return CPythonObject::Unwrap(obj);
   }
   else if (obj->IsFunction())
   {
+    std::cout << "CJavascriptObject::Wrap 1 (IsFunction)" << std::endl;
     return Wrap(new CJavascriptFunction(self, v8::Handle<v8::Function>::Cast(obj)));
   }
 
@@ -1353,6 +1361,7 @@ py::object CJavascriptObject::Wrap(v8::Handle<v8::Object> obj, v8::Handle<v8::Ob
 
 py::object CJavascriptObject::Wrap(CJavascriptObject *obj)
 {
+  std::cout << "CJavascriptObject::Wrap 2" << std::endl;
   CPythonGIL python_gil;
 
   TERMINATE_EXECUTION_CHECK(py::object())
@@ -1911,3 +1920,138 @@ py::object CJavascriptFunction::GetOwner(void) const
 
   return CJavascriptObject::Wrap(Self());
 }
+
+#ifdef SUPPORT_TRACE_LIFECYCLE
+
+ObjectTracer::ObjectTracer(v8::Handle<v8::Value> handle, py::object *object)
+  : m_handle(v8::Isolate::GetCurrent(), handle),
+    m_object(object), m_living(GetLivingMapping())
+{
+}
+
+ObjectTracer::~ObjectTracer()
+{
+  if (!m_handle.IsEmpty())
+  {
+    assert(m_handle.IsNearDeath());
+
+    Dispose();
+
+    m_living->erase(m_object->ptr());
+  }
+}
+
+void ObjectTracer::Dispose(void)
+{
+  m_handle.ClearWeak();
+  m_handle.Reset();
+}
+
+ObjectTracer& ObjectTracer::Trace(v8::Handle<v8::Value> handle, py::object *object)
+{
+  std::unique_ptr<ObjectTracer> tracer(new ObjectTracer(handle, object));
+
+  tracer->Trace();
+
+  return *tracer.release();
+}
+
+void ObjectTracer::Trace(void)
+{
+  m_handle.SetWeak(this, WeakCallback, v8::WeakCallbackType::kParameter);
+
+  m_living->insert(std::make_pair(m_object->ptr(), this));
+}
+
+void ObjectTracer::WeakCallback(const v8::WeakCallbackInfo<ObjectTracer>& info)
+{
+  std::unique_ptr<ObjectTracer> tracer(info.GetParameter());
+
+  assert(info.GetValue() == tracer->m_handle);
+}
+
+LivingMap * ObjectTracer::GetLivingMapping(void)
+{
+  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+
+  v8::Handle<v8::Context> ctxt = v8::Isolate::GetCurrent()->GetCurrentContext();
+
+  v8::Local<v8::String> key = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "__living__").ToLocalChecked();
+  v8::Local<v8::Private> privateKey = v8::Private::ForApi(v8::Isolate::GetCurrent(), key);
+
+  v8::MaybeLocal<v8::Value> value = ctxt->Global()->GetPrivate(ctxt, privateKey);
+
+  if (!value.IsEmpty())
+  {
+    LivingMap *living = (LivingMap *) v8::External::Cast(*value.ToLocalChecked())->Value();
+
+    if (living) return living;
+  }
+
+  std::unique_ptr<LivingMap> living(new LivingMap());
+
+  ctxt->Global()->SetPrivate(ctxt, privateKey, v8::External::New(v8::Isolate::GetCurrent(), living.get()));
+
+  ContextTracer::Trace(ctxt, living.get());
+
+  return living.release();
+}
+
+v8::Handle<v8::Value> ObjectTracer::FindCache(py::object obj)
+{
+  LivingMap *living = GetLivingMapping();
+
+  if (living)
+  {
+    LivingMap::const_iterator it = living->find(obj.ptr());
+
+    if (it != living->end())
+    {
+      return v8::Local<v8::Value>::New(v8::Isolate::GetCurrent(), it->second->m_handle);
+    }
+  }
+
+  return v8::Handle<v8::Value>();
+}
+
+ContextTracer::ContextTracer(v8::Handle<v8::Context> ctxt, LivingMap *living)
+  : m_ctxt(v8::Isolate::GetCurrent(), ctxt), m_living(living)
+{
+}
+
+ContextTracer::~ContextTracer(void)
+{
+  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+
+  v8::Handle<v8::Context> ctxt = v8::Isolate::GetCurrent()->GetCurrentContext();
+  v8::Local<v8::String> key = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "__living__").ToLocalChecked();
+  v8::Local<v8::Private> privateKey = v8::Private::ForApi(v8::Isolate::GetCurrent(), key);
+
+  Context()->Global()->DeletePrivate(ctxt, privateKey);
+
+  for (LivingMap::const_iterator it = m_living->begin(); it != m_living->end(); it++)
+  {
+    std::unique_ptr<ObjectTracer> tracer(it->second);
+
+    tracer->Dispose();
+  }
+}
+
+void ContextTracer::WeakCallback(const v8::WeakCallbackInfo<ContextTracer>& info)
+{
+  delete info.GetParameter();
+}
+
+void ContextTracer::Trace(v8::Handle<v8::Context> ctxt, LivingMap *living)
+{
+  ContextTracer *tracer = new ContextTracer(ctxt, living);
+
+  tracer->Trace();
+}
+
+void ContextTracer::Trace(void)
+{
+  m_ctxt.SetWeak(this, WeakCallback, v8::WeakCallbackType::kParameter);
+}
+
+#endif // SUPPORT_TRACE_LIFECYCLE
