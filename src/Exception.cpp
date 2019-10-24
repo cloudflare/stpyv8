@@ -179,6 +179,7 @@ const std::string CJavascriptException::GetMessage(void)
 
   return std::string(*msg, msg.length());
 }
+
 const std::string CJavascriptException::GetScriptName(void)
 {
   assert(m_isolate->InContext());
@@ -195,6 +196,7 @@ const std::string CJavascriptException::GetScriptName(void)
 
   return std::string();
 }
+
 int CJavascriptException::GetLineNumber(void)
 {
   assert(m_isolate->InContext());
@@ -203,6 +205,7 @@ int CJavascriptException::GetLineNumber(void)
 
   return m_msg.IsEmpty() ? 1 : Message()->GetLineNumber(m_isolate->GetCurrentContext()).ToChecked();
 }
+
 int CJavascriptException::GetStartPosition(void)
 {
   assert(m_isolate->InContext());
@@ -211,6 +214,7 @@ int CJavascriptException::GetStartPosition(void)
 
   return m_msg.IsEmpty() ? 1 : Message()->GetStartPosition();
 }
+
 int CJavascriptException::GetEndPosition(void)
 {
   assert(m_isolate->InContext());
@@ -219,6 +223,7 @@ int CJavascriptException::GetEndPosition(void)
 
   return m_msg.IsEmpty() ? 1 : Message()->GetEndPosition();
 }
+
 int CJavascriptException::GetStartColumn(void)
 {
   assert(m_isolate->InContext());
@@ -227,6 +232,7 @@ int CJavascriptException::GetStartColumn(void)
 
   return m_msg.IsEmpty() ? 1 : Message()->GetStartColumn();
 }
+
 int CJavascriptException::GetEndColumn(void)
 {
   assert(m_isolate->InContext());
@@ -235,6 +241,7 @@ int CJavascriptException::GetEndColumn(void)
 
   return m_msg.IsEmpty() ? 1 : Message()->GetEndColumn();
 }
+
 const std::string CJavascriptException::GetSourceLine(void)
 {
   assert(m_isolate->InContext());
@@ -250,6 +257,7 @@ const std::string CJavascriptException::GetSourceLine(void)
 
   return std::string();
 }
+
 const std::string CJavascriptException::GetStackTrace(void)
 {
   assert(m_isolate->InContext());
@@ -265,6 +273,7 @@ const std::string CJavascriptException::GetStackTrace(void)
 
   return std::string();
 }
+
 const std::string CJavascriptException::Extract(v8::Isolate *isolate, v8::TryCatch& try_catch)
 {
   assert(isolate->InContext());
