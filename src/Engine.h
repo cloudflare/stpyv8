@@ -9,8 +9,6 @@
 //#include "Context.h"
 #include "Utils.h"
 
-//#include "V8Internal.h"
-
 class CScript;
 
 typedef boost::shared_ptr<CScript> CScriptPtr;
@@ -107,11 +105,6 @@ public:
 
   v8::Handle<v8::String> Source() const { return v8::Local<v8::String>::New(m_isolate, m_source); }
   v8::Handle<v8::Script> Script() const { return v8::Local<v8::Script>::New(m_isolate, m_script); }
-
-#ifdef SUPPORT_AST
-  //TODO port / remove me
-  //void visit(py::object handler, v8i::LanguageMode mode=v8i::CLASSIC_MODE) const;
-#endif
 
   const std::string GetSource(void) const;
 
