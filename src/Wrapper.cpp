@@ -226,21 +226,21 @@ void CPythonObject::ThrowIf(v8::Isolate* isolate)
 
   if (error->IsObject())
   {
-    // FIXME How to trace the lifecycle of exception? and when to delete those object in the hidden value?
+    v8::Handle<v8::Context> ctxt = v8::Isolate::GetCurrent()->GetCurrentContext();
 
-  /* TODO port me
+    v8::Local<v8::String> key_type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "exc_type").ToLocalChecked();
+    v8::Local<v8::Private> privateKey_type = v8::Private::ForApi(v8::Isolate::GetCurrent(), key_type);
+
+    v8::Local<v8::String> key_value = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "exc_value").ToLocalChecked();
+    v8::Local<v8::Private> privateKey_value = v8::Private::ForApi(v8::Isolate::GetCurrent(), key_value);
+
   #ifdef SUPPORT_TRACE_EXCEPTION_LIFECYCLE
-    error->ToObject()->SetHiddenValue(v8::String::NewFromUtf8(isolate, "exc_type"),
-                                      v8::External::New(isolate, ObjectTracer::Trace(error, new py::object(type)).Object()));
-    error->ToObject()->SetHiddenValue(v8::String::NewFromUtf8(isolate, "exc_value"),
-                                      v8::External::New(isolate, ObjectTracer::Trace(error, new py::object(value)).Object()));
+    error->ToObject(ctxt).ToLocalChecked()->SetPrivate(ctxt, privateKey_type, v8::External::New(isolate, ObjectTracer::Trace(error, new py::object(type)).Object()));
+    error->ToObject(ctxt).ToLocalChecked()->SetPrivate(ctxt, privateKey_value,v8::External::New(isolate, ObjectTracer::Trace(error, new py::object(value)).Object()));
   #else
-    error->ToObject()->SetHiddenValue(v8::String::NewFromUtf8(isolate, "exc_type"),
-                                      v8::External::New(isolate, new py::object(type)));
-    error->ToObject()->SetHiddenValue(v8::String::NewFromUtf8(isolate, "exc_value"),
-                                      v8::External::New(isolate, new py::object(value)));
+    error->ToObject(ctxt).ToLocalChecked()->SetPrivate(ctxt, privateKey_type, v8::External::New(isolate, new py::object(type)));
+    error->ToObject(ctxt).ToLocalChecked()->SetPrivate(ctxt, privateKey_value, v8::External::New(isolate, new py::object(value)));
   #endif
-  */
   }
 
   isolate->ThrowException(error);
@@ -1000,7 +1000,7 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
 
     }
 
- //  if (result.IsEmpty()) CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
+  if (result.IsEmpty()) CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
 
   return handle_scope.Escape(result);
 }

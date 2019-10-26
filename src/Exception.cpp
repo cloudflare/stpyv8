@@ -371,26 +371,25 @@ void ExceptionTranslator::Translate(CJavascriptException const& ex)
 
     if (!ex.Exception().IsEmpty() && ex.Exception()->IsObject())
     {
-      std::cout << "TODO: Not clear how to translate exceptions" << std::endl;
-      //v8::Handle<v8::Object> obj = ex.Exception()->ToObject(v8::Isolate::GetCurrent()->GetCurrentContext()).ToLocalChecked();
+      std::cout << "HERE" << std::endl;
+      v8::Handle<v8::Object> obj = ex.Exception()->ToObject(v8::Isolate::GetCurrent()->GetCurrentContext()).ToLocalChecked();
 
-      /*
-      Looking here: https://chromium.googlesource.com/v8/v8/+/refs/heads/lkgr/test/cctest/test-api-stack-traces.cc
-      doesn't appear to be any equivalent to "GetHiddenValue" going forward
+      v8::Local<v8::String> key_type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "exc_type").ToLocalChecked();
+      v8::Local<v8::Private> privateKey_type = v8::Private::ForApi(v8::Isolate::GetCurrent(), key_type);
+      v8::MaybeLocal<v8::Value> exc_type = obj->GetPrivate(v8::Isolate::GetCurrent()->GetCurrentContext(), privateKey_type);
 
-      v8::Handle<v8::Value> exc_type = obj->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "exc_type"));
-      v8::Handle<v8::Value> exc_value = obj->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "exc_value"));
+      v8::Local<v8::String> key_value = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "exc_value").ToLocalChecked();
+      v8::Local<v8::Private> privateKey_value = v8::Private::ForApi(v8::Isolate::GetCurrent(), key_value);
+      v8::MaybeLocal<v8::Value> exc_value = obj->GetPrivate(v8::Isolate::GetCurrent()->GetCurrentContext(), privateKey_value);
 
       if (!exc_type.IsEmpty() && !exc_value.IsEmpty())
       {
-        std::auto_ptr<py::object> type(static_cast<py::object *>(v8::Handle<v8::External>::Cast(exc_type)->Value())),
-                                  value(static_cast<py::object *>(v8::Handle<v8::External>::Cast(exc_value)->Value()));
+        std::unique_ptr<py::object> type(static_cast<py::object *>(v8::External::Cast(*exc_type.ToLocalChecked())->Value())),
+                                    value(static_cast<py::object *>(v8::External::Cast(*exc_value.ToLocalChecked())->Value()));
 
         ::PyErr_SetObject(type->ptr(), value->ptr());
-
         return;
       }
-    */
     }
 
     // Boost::Python doesn't support inherite from Python class,
