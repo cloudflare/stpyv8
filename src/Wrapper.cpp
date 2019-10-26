@@ -698,9 +698,11 @@ void CPythonObject::IndexedEnumerator(const v8::PropertyCallbackInfo<v8::Array>&
 
   v8::Handle<v8::Array> result = v8::Array::New(info.GetIsolate(), len);
 
+  v8::Local<v8::Context> context = info.GetIsolate()->GetCurrentContext();
+
   for (Py_ssize_t i=0; i<len; i++)
   {
-    result->Set(v8::Isolate::GetCurrent()->GetCurrentContext(), v8::Uint32::New(info.GetIsolate(), i), v8::Int32::New(info.GetIsolate(), i)->ToString(v8::Isolate::GetCurrent()->GetCurrentContext()).ToLocalChecked());
+    result->Set(context, v8::Integer::New(info.GetIsolate(), i), v8::Integer::New(info.GetIsolate(), i));
   }
 
   CALLBACK_RETURN(result);
