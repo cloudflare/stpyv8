@@ -11,12 +11,12 @@
 #define SUPPORT_EXTENSION 1
 
 //
-// Enable the build-in python property supports
+// Enable the built-in python property support
 //
 #define SUPPORT_PROPERTY 1
 
 //
-// Enable the Javascript debugger supports
+// Enable the Javascript debugger support
 //
 #define SUPPORT_DEBUGGER 1
 
