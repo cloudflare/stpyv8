@@ -147,6 +147,7 @@ const std::string CJavascriptStackFrame::GetScriptName() const
 
   return std::string(*name, name.length());
 }
+
 const std::string CJavascriptStackFrame::GetFunctionName() const
 {
   v8::HandleScope handle_scope(m_isolate);
@@ -155,6 +156,7 @@ const std::string CJavascriptStackFrame::GetFunctionName() const
 
   return std::string(*name, name.length());
 }
+
 const std::string CJavascriptException::GetName(void)
 {
   if (m_exc.IsEmpty()) return std::string();
@@ -167,6 +169,7 @@ const std::string CJavascriptException::GetName(void)
 
   return std::string(*msg, msg.length());
 }
+
 const std::string CJavascriptException::GetMessage(void)
 {
   if (m_exc.IsEmpty()) return std::string();
