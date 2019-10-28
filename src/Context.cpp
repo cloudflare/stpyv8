@@ -8,31 +8,6 @@
 std::unique_ptr<v8::Platform> CPlatform::platform;
 bool CPlatform::inited = false;
 
-CPlatform::CPlatform()
-{
-  argv = std::string();
-}
-
-CPlatform::CPlatform(std::string argv0) : argv(argv0)
-{
-}
-
-CPlatform::~CPlatform()
-{
-}
-
-void CPlatform::Init()
-{
-  if(inited) return;
-
-  v8::V8::InitializeICUDefaultLocation(argv.c_str());
-  v8::V8::InitializeExternalStartupData(argv.c_str());
-  platform = v8::platform::NewDefaultPlatform();
-  v8::V8::InitializePlatform(platform.get());
-  v8::V8::Initialize();
-  inited = true;
-}
-
 void CIsolate::Init(bool owner)
 {
   m_owner = owner;

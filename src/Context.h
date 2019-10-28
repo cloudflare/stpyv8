@@ -4,29 +4,16 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "Platform.h"
 #include "Wrapper.h"
 #include "Utils.h"
+
 
 class CContext;
 class CIsolate;
 
 typedef boost::shared_ptr<CContext> CContextPtr;
 typedef boost::shared_ptr<CIsolate> CIsolatePtr;
-
-class CPlatform
-{
-  private:
-  static bool inited;
-  static std::unique_ptr<v8::Platform> platform;
-
-  std::string argv;
-
-  public:
-  CPlatform();
-  CPlatform(std::string argv0);
-  ~CPlatform();
-  void Init();
-};
 
 class CIsolate
 {
