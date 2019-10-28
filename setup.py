@@ -7,6 +7,8 @@ import platform
 from distutils.core import setup, Extension
 
 source_files = ["Exception.cpp", 
+                "Platform.cpp",
+                "Isolate.cpp",
                 "Context.cpp",
                 "Engine.cpp",
                 "Wrapper.cpp",

@@ -527,7 +527,7 @@ class TestWrapper(unittest.TestCase):
         with SoirV8.JSContext(Globals()) as ctxt:
             self.assertEqual(2, ctxt.eval("""array[1]"""))
 
-    def _testForEach(self):
+    def testForEach(self):
         class NamedClass(object):
             foo = 1
 
@@ -554,9 +554,9 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue(set(["bar", "foo", "foobar"]).issubset(set(func(NamedClass()))))
             self.assertEqual(["0", "1", "2"], list(func([1, 2, 3])))
             self.assertEqual(["0", "1", "2"], list(func((1, 2, 3))))
-            self.assertEqual(["1", "2", "3"], list(func({1:1, 2:2, 3:3})))
+            self.assertEqual(["1", "2", "3"], list(func({'1' : 1, '2' : 2, '3' : 3})))
 
-            self.assertEqual(["0", "1", "2"], list(func(gen(3))))
+            self.assertEqual(["0", "1", "2"], list(func(list(gen(3)))))
 
     def testDict(self):
         with SoirV8.JSContext() as ctxt:

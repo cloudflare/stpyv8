@@ -44,12 +44,7 @@ void CWrapper::Expose(void)
 
     .def("__hash__", &CJavascriptObject::GetIdentityHash)
     .def("clone", &CJavascriptObject::Clone, "Clone the object.")
-
-  #if PY_MAJOR_VERSION < 3
-    .add_property("__members__", &CJavascriptObject::GetAttrList)
-  #else
     .def("__dir__", &CJavascriptObject::GetAttrList)
-  #endif
 
     // Emulating dict object
     .def("keys", &CJavascriptObject::GetAttrList, "Get a list of an object's attributes.")
@@ -234,13 +229,13 @@ void CPythonObject::ThrowIf(v8::Isolate* isolate)
     v8::Local<v8::String> key_value = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "exc_value").ToLocalChecked();
     v8::Local<v8::Private> privateKey_value = v8::Private::ForApi(v8::Isolate::GetCurrent(), key_value);
 
-  #ifdef SUPPORT_TRACE_EXCEPTION_LIFECYCLE
+#ifdef SUPPORT_TRACE_EXCEPTION_LIFECYCLE
     error->ToObject(ctxt).ToLocalChecked()->SetPrivate(ctxt, privateKey_type, v8::External::New(isolate, ObjectTracer::Trace(error, new py::object(type)).Object()));
     error->ToObject(ctxt).ToLocalChecked()->SetPrivate(ctxt, privateKey_value,v8::External::New(isolate, ObjectTracer::Trace(error, new py::object(value)).Object()));
-  #else
+#else
     error->ToObject(ctxt).ToLocalChecked()->SetPrivate(ctxt, privateKey_type, v8::External::New(isolate, new py::object(type)));
     error->ToObject(ctxt).ToLocalChecked()->SetPrivate(ctxt, privateKey_value, v8::External::New(isolate, new py::object(value)));
-  #endif
+#endif
   }
 
   isolate->ThrowException(error);
@@ -836,11 +831,11 @@ v8::Handle<v8::Value> CPythonObject::Wrap(py::object obj)
 
   v8::Local<v8::Value> value;
 
-  #ifdef SUPPORT_TRACE_LIFECYCLE
+#ifdef SUPPORT_TRACE_LIFECYCLE
   value = ObjectTracer::FindCache(obj);
 
   if (value.IsEmpty())
-  #endif
+#endif
 
   value = WrapInternal(obj);
 
@@ -886,11 +881,11 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
       throw CJavascriptException("Refer to a null object", ::PyExc_AttributeError);
     }
 
-    #ifdef SUPPORT_TRACE_LIFECYCLE
+#ifdef SUPPORT_TRACE_LIFECYCLE
     py::object *object = new py::object(obj);
 
     ObjectTracer::Trace(jsobj.Object(), object);
-    #endif
+#endif
 
     return handle_scope.Escape(jsobj.Object());
   }
@@ -966,9 +961,9 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
 
     result = func_tmpl->GetFunction(v8::Isolate::GetCurrent()->GetCurrentContext()).ToLocalChecked();
       
-    #ifdef SUPPORT_TRACE_LIFECYCLE
+#ifdef SUPPORT_TRACE_LIFECYCLE
     if (!result.IsEmpty()) ObjectTracer::Trace(result, object);
-    #endif
+#endif
   }
   else
   {
@@ -987,9 +982,9 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
       v8::Handle<v8::Object> realInstance = instance.ToLocalChecked();
       realInstance->SetInternalField(0, v8::External::New(v8::Isolate::GetCurrent(), object));
 
-      #ifdef SUPPORT_TRACE_LIFECYCLE
+#ifdef SUPPORT_TRACE_LIFECYCLE
       ObjectTracer::Trace(instance.ToLocalChecked(), object);
-      #endif
+#endif
 
       result = realInstance;
 //TODO add test
@@ -1389,13 +1384,6 @@ void CJavascriptArray::LazyConstructor(void)
   {
     array = v8::Array::New(isolate, m_size);
   }
-#if PY_MAJOR_VERSION < 3
-  else if (PyInt_CheckExact(m_items.ptr()))
-  {
-    m_size = PyInt_AS_LONG(m_items.ptr());
-    array = v8::Array::New(isolate, m_size);
-  }
-#endif
   else if (PyLong_CheckExact(m_items.ptr()))
   {
     m_size = PyLong_AsLong(m_items.ptr());
