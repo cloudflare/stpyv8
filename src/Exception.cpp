@@ -371,16 +371,18 @@ void ExceptionTranslator::Translate(CJavascriptException const& ex)
 
     if (!ex.Exception().IsEmpty() && ex.Exception()->IsObject())
     {
+      v8::Isolate *isolate = v8::Isolate::GetCurrent();
+
       std::cout << "HERE" << std::endl;
-      v8::Handle<v8::Object> obj = ex.Exception()->ToObject(v8::Isolate::GetCurrent()->GetCurrentContext()).ToLocalChecked();
+      v8::Handle<v8::Object> obj = ex.Exception()->ToObject(isolate->GetCurrentContext()).ToLocalChecked();
 
-      v8::Local<v8::String> key_type = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "exc_type").ToLocalChecked();
-      v8::Local<v8::Private> privateKey_type = v8::Private::ForApi(v8::Isolate::GetCurrent(), key_type);
-      v8::MaybeLocal<v8::Value> exc_type = obj->GetPrivate(v8::Isolate::GetCurrent()->GetCurrentContext(), privateKey_type);
+      v8::Local<v8::String> key_type = v8::String::NewFromUtf8(isolate, "exc_type").ToLocalChecked();
+      v8::Local<v8::Private> privateKey_type = v8::Private::ForApi(isolate, key_type);
+      v8::MaybeLocal<v8::Value> exc_type = obj->GetPrivate(isolate->GetCurrentContext(), privateKey_type);
 
-      v8::Local<v8::String> key_value = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "exc_value").ToLocalChecked();
-      v8::Local<v8::Private> privateKey_value = v8::Private::ForApi(v8::Isolate::GetCurrent(), key_value);
-      v8::MaybeLocal<v8::Value> exc_value = obj->GetPrivate(v8::Isolate::GetCurrent()->GetCurrentContext(), privateKey_value);
+      v8::Local<v8::String> key_value = v8::String::NewFromUtf8(isolate, "exc_value").ToLocalChecked();
+      v8::Local<v8::Private> privateKey_value = v8::Private::ForApi(isolate, key_value);
+      v8::MaybeLocal<v8::Value> exc_value = obj->GetPrivate(isolate->GetCurrentContext(), privateKey_value);
 
       if (!exc_type.IsEmpty() && !exc_value.IsEmpty())
       {
