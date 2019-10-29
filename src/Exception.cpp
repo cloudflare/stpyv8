@@ -372,12 +372,10 @@ void ExceptionTranslator::Translate(CJavascriptException const& ex)
   {
     v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
 
-    /* Uncomment once we can write a unit test to unlock our achievement
     if (!ex.Exception().IsEmpty() && ex.Exception()->IsObject())
     {
       v8::Isolate *isolate = v8::Isolate::GetCurrent();
 
-      std::cout << "HERE" << std::endl;
       v8::Handle<v8::Object> obj = ex.Exception()->ToObject(isolate->GetCurrentContext()).ToLocalChecked();
 
       v8::Local<v8::String> key_type = v8::String::NewFromUtf8(isolate, "exc_type").ToLocalChecked();
@@ -390,14 +388,15 @@ void ExceptionTranslator::Translate(CJavascriptException const& ex)
 
       if (!exc_type.IsEmpty() && !exc_value.IsEmpty())
       {
-        std::unique_ptr<py::object> type(static_cast<py::object *>(v8::External::Cast(*exc_type.ToLocalChecked())->Value())),
-                                    value(static_cast<py::object *>(v8::External::Cast(*exc_value.ToLocalChecked())->Value()));
-
-        ::PyErr_SetObject(type->ptr(), value->ptr());
-        return;
+        std::unique_ptr<py::object> type(static_cast<py::object *>(v8::Handle<v8::External>::Cast(exc_type.ToLocalChecked())->Value()));
+        std::unique_ptr<py::object> value(static_cast<py::object *>(v8::Handle<v8::External>::Cast(exc_value.ToLocalChecked())->Value()));
+       
+        if(type != nullptr && value != nullptr) {
+          ::PyErr_SetObject(type->ptr(), value->ptr());
+          return;
+        }
       }
     }
-    */
 
     // Boost::Python doesn't support inherite from Python class,
     // so, just use some workaround to throw our custom exception
