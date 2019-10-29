@@ -137,6 +137,7 @@ void CWrapper::Expose(void)
 
 void CPythonObject::ThrowIf(v8::Isolate* isolate)
 {
+  std::cout << "DEBUGTRACE: Achievement Unlocked.  We got CPythonObject to trigger ThrowIf()\n";
   CPythonGIL python_gil;
 
   assert(PyErr_OCCURRED());

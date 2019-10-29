@@ -372,6 +372,7 @@ void ExceptionTranslator::Translate(CJavascriptException const& ex)
   {
     v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
 
+    /* Uncomment once we can write a unit test to unlock our achievement
     if (!ex.Exception().IsEmpty() && ex.Exception()->IsObject())
     {
       v8::Isolate *isolate = v8::Isolate::GetCurrent();
@@ -396,6 +397,7 @@ void ExceptionTranslator::Translate(CJavascriptException const& ex)
         return;
       }
     }
+    */
 
     // Boost::Python doesn't support inherite from Python class,
     // so, just use some workaround to throw our custom exception
