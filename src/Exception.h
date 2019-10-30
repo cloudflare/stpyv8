@@ -129,7 +129,12 @@ protected:
     v8::HandleScope handle_scope(m_isolate);
 
     m_exc.Reset(m_isolate, try_catch.Exception());
-    //m_stack.Reset(m_isolate, try_catch.StackTrace()); TODO BUGBUG port me
+
+    v8::MaybeLocal<v8::Value> stack_trace = try_catch.StackTrace(v8::Isolate::GetCurrent()->GetCurrentContext());
+    if (!stack_trace.IsEmpty()) {
+      m_stack.Reset(m_isolate, stack_trace.ToLocalChecked());
+    }
+
     m_msg.Reset(m_isolate, try_catch.Message());
   }
 public:
