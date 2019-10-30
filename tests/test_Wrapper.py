@@ -288,11 +288,9 @@ class TestWrapper(unittest.TestCase):
                     self.assertEqual(29, e.endCol)
                     self.assertEqual('throw Error("hello world");', e.sourceLine.strip())
 
-                    # FIXME
-                    # self.assertEqual('Error: hello world\n' +
-                    #                 '    at Error (native)\n' +
-                    #                 '    at hello (test:14:35)\n' +
-                    #                 '    at test:17:25', e.stackTrace)
+                    self.assertEqual('Error: hello world\n' +
+                                      '    at hello (test:14:35)\n' +
+                                      '    at test:17:25', e.stackTrace)
 
     def testParseStack(self):
         self.assertEqual([
