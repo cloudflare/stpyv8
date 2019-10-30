@@ -47,7 +47,7 @@ void CWrapper::Expose(void)
     .def("__dir__", &CJavascriptObject::GetAttrList)
 
     // Emulating dict object
-    .def("keys", &CJavascriptObject::GetAttrList, "Get a list of an object's attributes.")
+    .def("keys", &CJavascriptObject::GetAttrList, "Get a list of the object attributes.")
 
     .def("__getitem__", &CJavascriptObject::GetAttr)
     .def("__setitem__", &CJavascriptObject::SetAttr)
@@ -2041,7 +2041,7 @@ void ContextTracer::Trace(v8::Handle<v8::Context> ctxt, LivingMap *living)
 
 void ContextTracer::Trace(void)
 {
-  m_ctxt.SetWeak(this, WeakCallback, v8::WeakCallbackType::kParameter);
+  m_ctxt.SetWeak(this, WeakCallback, v8::WeakCallbackType::kFinalizer);
 }
 
 #endif // SUPPORT_TRACE_LIFECYCLE

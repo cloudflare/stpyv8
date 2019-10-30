@@ -1,12 +1,13 @@
 #include "Context.h"
-
 #include "Wrapper.h"
 #include "Engine.h"
 
 #include "libplatform/libplatform.h"
 
+
 std::unique_ptr<v8::Platform> CPlatform::platform;
 bool CPlatform::inited = false;
+
 
 void CContext::Expose(void)
 {
@@ -36,10 +37,10 @@ void CContext::Expose(void)
     ;
 
   py::class_<CContext, boost::noncopyable>("JSContext", "JSContext is an execution context.", py::no_init)
-    .def(py::init<const CContext&>("create a new context base on a exists context"))
+    .def(py::init<const CContext&>("Create a new context based on a existing context"))
     .def(py::init<py::object, py::list>((py::arg("global") = py::object(),
                                          py::arg("extensions") = py::list()),
-                                        "create a new context base on global object"))
+                                        "Create a new context based on global object"))
 
     .add_property("securityToken", &CContext::GetSecurityToken, &CContext::SetSecurityToken)
 
