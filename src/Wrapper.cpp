@@ -277,21 +277,7 @@ void CPythonObject::NamedGetter(v8::Local<v8::Name> prop, const v8::PropertyCall
   py::object obj = CJavascriptObject::Wrap(info.Holder());
 
   v8::String::Utf8Value name(info.GetIsolate(), v8::Local<v8::String>::Cast(prop));
-/*
-  std::cout << "DEBUG Getting named property:" << std::endl;
-
-  if (*name == nullptr)
-	std::cout << "DEBUG: This property is null" << std::endl;
-  else
-	std::cout << "DEBUG:" << std::string(*name) << std::endl;
-*/
   if (PyGen_Check(obj.ptr())) CALLBACK_RETURN(v8::Undefined(info.GetIsolate()));
-
-/*
-  This code is BROKEN and was replaced (see next two lines)
-
-  PyObject *value = ::PyObject_GetAttrString(obj.ptr(), *name);
-*/
 
   if (*name == nullptr) CALLBACK_RETURN(v8::Undefined(info.GetIsolate()));
 
@@ -796,9 +782,7 @@ py::object CPythonObject::Unwrap(v8::Handle<v8::Object> obj)
 {
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
 
-  std::cout << "CPythonObject::Unwrap 1" << std::endl;
   v8::Handle<v8::External> payload = v8::Handle<v8::External>::Cast(obj->GetInternalField(0));
-  std::cout << "CPythonObject::Unwrap 2" << std::endl;
 
   return *static_cast<py::object *>(payload->Value());
 }
@@ -860,8 +844,6 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
 
   py::extract<CJavascriptObject&> extractor(obj);
 
-  std::cout << "CPythonObject::WrapInternal" << std::endl;
-
   if (extractor.check())
   {
     CJavascriptObject& jsobj = extractor();
@@ -892,30 +874,24 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
 
   v8::Local<v8::Value> result;
 
-  std::cout << "CPythonObject::WrapInternal checks" << std::endl;
   if (PyLong_CheckExact(obj.ptr()))
   {
-    std::cout << "CPythonObject::WrapInternal PyLong_CheckExact" << std::endl;
     result = v8::Integer::New(v8::Isolate::GetCurrent(), ::PyLong_AsLong(obj.ptr()));
   }
   else if (PyBool_Check(obj.ptr()))
   {
-    std::cout << "CPythonObject::WrapInternal PyBool_Check" << std::endl;
     result = v8::Boolean::New(v8::Isolate::GetCurrent(), py::extract<bool>(obj));
   }
   else if (PyBytes_CheckExact(obj.ptr()) || PyUnicode_CheckExact(obj.ptr()))
   {
-	std::cout << "CPythonObject::WrapInternal PyBytes_CheckExact" << std::endl;
     result = ToString(obj);
   }
   else if (PyFloat_CheckExact(obj.ptr()))
   {
-	std::cout << "CPythonObject::WrapInternal PyFloat_CheckExact" << std::endl;
     result = v8::Number::New(v8::Isolate::GetCurrent(), py::extract<double>(obj));
   }
   else if (PyDateTime_CheckExact(obj.ptr()) || PyDate_CheckExact(obj.ptr()))
   {
-	std::cout << "CPythonObject::WrapInternal PyDateTime_CheckExact" << std::endl;
     tm ts = { 0 };
 
     ts.tm_year = PyDateTime_GET_YEAR(obj.ptr()) - 1900;
@@ -932,7 +908,6 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
   }
   else if (PyTime_CheckExact(obj.ptr()))
   {
-    std::cout << "CPythonObject::WrapInternal PyTime_CheckExact" << std::endl;
     tm ts = { 0 };
 
     ts.tm_hour = PyDateTime_TIME_GET_HOUR(obj.ptr()) - 1;
@@ -945,7 +920,6 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
   }
   else if (PyCFunction_Check(obj.ptr()) || PyFunction_Check(obj.ptr()) || PyMethod_Check(obj.ptr()) || PyType_CheckExact(obj.ptr()))
   {
-    std::cout << "CPythonObject::WrapInternal PyFunction_Check" << std::endl;
     v8::Handle<v8::FunctionTemplate> func_tmpl = v8::FunctionTemplate::New(v8::Isolate::GetCurrent());
     py::object *object = new py::object(obj);
 
@@ -953,7 +927,6 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
 
     if (PyType_Check(obj.ptr()))
     {
-      std::cout << "CPythonObject::WrapInternal PyType_Check" << std::endl;
       v8::Handle<v8::String> cls_name = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), py::extract<const char *>(obj.attr("__name__"))()).ToLocalChecked();
 
       func_tmpl->SetClassName(cls_name);
@@ -967,8 +940,6 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
   }
   else
   {
-    std::cout << "CPythonObject::WrapInternal PyType_Check 2" << std::endl;
-    std::cout << Py_TYPE(obj.ptr()) << std::endl;
     static v8::Persistent<v8::ObjectTemplate> s_template(v8::Isolate::GetCurrent(), CreateObjectTemplate(v8::Isolate::GetCurrent()));
 
     v8::MaybeLocal<v8::Object> instance = v8::Local<v8::ObjectTemplate>::New(
@@ -987,10 +958,6 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
 #endif
 
       result = realInstance;
-//TODO add test
-      std::cout << "Is this wrapped? " << CPythonObject::IsWrapped(realInstance) << std::endl;
-      py::object un = CPythonObject::Unwrap(realInstance);
-      std::cout << "Unwrapped Python object - bytes: " << sizeof(un) << std::endl;
       }
 
     }
@@ -1326,30 +1293,24 @@ py::object CJavascriptObject::Wrap(v8::Handle<v8::Value> value, v8::Handle<v8::O
 
 py::object CJavascriptObject::Wrap(v8::Handle<v8::Object> obj, v8::Handle<v8::Object> self)
 {
-  std::cout << "CJavascriptObject::Wrap 1" << std::endl;
-
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
 
   if (obj.IsEmpty())
   {
-	std::cout << "CJavascriptObject::Wrap 1 (IsEmpty)" << std::endl;
     return py::object();
   }
   else if (obj->IsArray())
   {
-	std::cout << "CJavascriptObject::Wrap 1 (IsArray)" << std::endl;
     v8::Handle<v8::Array> array = v8::Handle<v8::Array>::Cast(obj);
 
     return Wrap(new CJavascriptArray(array));
   }
   else if (CPythonObject::IsWrapped(obj))
   {
-    std::cout << "CJavascriptObject::Wrap 1 (IsWrapped)" << std::endl;
     return CPythonObject::Unwrap(obj);
   }
   else if (obj->IsFunction())
   {
-    std::cout << "CJavascriptObject::Wrap 1 (IsFunction)" << std::endl;
     return Wrap(new CJavascriptFunction(self, v8::Handle<v8::Function>::Cast(obj)));
   }
 
@@ -1358,7 +1319,6 @@ py::object CJavascriptObject::Wrap(v8::Handle<v8::Object> obj, v8::Handle<v8::Ob
 
 py::object CJavascriptObject::Wrap(CJavascriptObject *obj)
 {
-  std::cout << "CJavascriptObject::Wrap 2" << std::endl;
   CPythonGIL python_gil;
 
   TERMINATE_EXECUTION_CHECK(py::object())

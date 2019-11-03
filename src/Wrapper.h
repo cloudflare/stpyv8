@@ -164,7 +164,6 @@ public:
   CJavascriptArray(v8::Handle<v8::Array> array)
     : CJavascriptObject(array), m_size(array->Length())
   {
-     std::cout << "Ctor body" << std::endl;
   }
 
   CJavascriptArray(py::object items)
