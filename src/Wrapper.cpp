@@ -1883,8 +1883,6 @@ ObjectTracer::~ObjectTracer()
 {
   if (!m_handle.IsEmpty())
   {
-    assert(m_handle.IsNearDeath());
-
     Dispose();
 
     m_living->erase(m_object->ptr());
