@@ -201,7 +201,6 @@ void CEngine::SetStackLimit(uintptr_t stack_limit_size)
   // This function uses a local stack variable to determine the isolate's
   // stack limit
   uint32_t here;
-  std::cout << stack_limit_size << std::endl;
   uintptr_t stack_limit = reinterpret_cast<uintptr_t>(&here) - stack_limit_size;
 
   // If the size is very large and the stack is near the bottom of memory
