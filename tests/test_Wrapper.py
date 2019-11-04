@@ -121,9 +121,9 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual('MyString', typename('var_mystr'))
             self.assertEqual('MyDateTime', typename('var_mytime'))
 
-            self.assertEqual('object', typeof('var_myint'))
-            self.assertEqual('object', typeof('var_mystr'))
-            self.assertEqual('object', typeof('var_mytime'))
+            self.assertEqual('function', typeof('var_myint'))
+            self.assertEqual('function', typeof('var_mystr'))
+            self.assertEqual('function', typeof('var_mytime'))
 
     def testJavascriptWrapper(self):
         with SoirV8.JSContext() as ctxt:
