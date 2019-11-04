@@ -1677,19 +1677,19 @@ py::object CJavascriptFunction::Call(v8::Handle<v8::Object> self, py::list args,
     params[args_count+i] = CPythonObject::Wrap(values[i]);
   }
 
-  v8::Handle<v8::Value> result;
+  v8::MaybeLocal<v8::Value> result;
 
   Py_BEGIN_ALLOW_THREADS
 
   result = func->Call(context, 
     self.IsEmpty() ? v8::Isolate::GetCurrent()->GetCurrentContext()->Global() : self,
-    params.size(), params.empty() ? NULL : &params[0]).ToLocalChecked();
+    params.size(), params.empty() ? NULL : &params[0]);
 
   Py_END_ALLOW_THREADS
 
   if (result.IsEmpty()) CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
 
-  return CJavascriptObject::Wrap(result);
+  return CJavascriptObject::Wrap(result.ToLocalChecked());
 }
 
 py::object CJavascriptFunction::CreateWithArgs(CJavascriptFunctionPtr proto, py::tuple args, py::dict kwds)
