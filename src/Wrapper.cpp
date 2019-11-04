@@ -1891,7 +1891,7 @@ ObjectTracer::~ObjectTracer()
 
 void ObjectTracer::Dispose(void)
 {
-  m_handle.ClearWeak();
+  // m_handle.ClearWeak();
   m_handle.Reset();
 }
 
@@ -1906,7 +1906,7 @@ ObjectTracer& ObjectTracer::Trace(v8::Handle<v8::Value> handle, py::object *obje
 
 void ObjectTracer::Trace(void)
 {
-  m_handle.SetWeak(this, WeakCallback, v8::WeakCallbackType::kParameter);
+  // m_handle.SetWeak(this, WeakCallback, v8::WeakCallbackType::kParameter);
 
   m_living->insert(std::make_pair(m_object->ptr(), this));
 }
