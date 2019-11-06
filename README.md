@@ -1,7 +1,6 @@
 # soirv8 - Son of IRV8 
 
-A project for upgrading irv8 to work witht the
-latest v8 build.
+A project for upgrading irv8 to work witht the latest v8 build.
 
 irv8 is Angelo's project that takes the good parts of pyv8 and uses them
 in Thug.  irv8 tracks an old version of v8, so this project is being
@@ -15,11 +14,8 @@ part of the upgrade effort.
 This code links with v8 built as a static library.  So v8 must be cloned
 and built from source, with options to output a static lib.
 
-Once that is done, this code uses CMake for the moment for developemnt.
-This will change once it begins to take shape as a python library, then
-the native python build toolchain will be used.
-
-Currently this only builds on Ubuntu 18.04.
+Currently the library builds on Linux (Ubuntu 18.04 and Gentoo) and
+MacOS Catalina and has been tested on Python 3.6.9 and 3.7.5.
 
 ### Building V8
 
@@ -47,12 +43,14 @@ instructions](https://v8.dev/docs/build)
    to follow similar steps to those given in the [embedding
 guide](https://v8.dev/docs/embed)
 
+
 ```
 $ tools/dev/v8gen.py x64.release.sample
 $ ninja -C out.gn/x64.release.sample v8_monolith
 ```
 
    This will take some time.
+
 
 ### Building soirv8
 
@@ -62,6 +60,3 @@ $ python3 setup.py build
 $ sudo python3 setup.py install
 $ pytest (optional)
 ```
-
-
-
