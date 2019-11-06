@@ -18,7 +18,7 @@
 //
 // Enable the Javascript debugger support
 //
-#define SUPPORT_DEBUGGER 1
+// #define SUPPORT_DEBUGGER 1
 
 //
 // Trace the object lifecycle

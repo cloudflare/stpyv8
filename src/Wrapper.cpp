@@ -310,7 +310,6 @@ void CPythonObject::NamedGetter(v8::Local<v8::Name> prop, const v8::PropertyCall
 
   py::object attr = py::object(py::handle<>(value));
 
-/* TODO port me
 #ifdef SUPPORT_PROPERTY
   if (PyObject_TypeCheck(attr.ptr(), &::PyProperty_Type))
   {
@@ -322,7 +321,6 @@ void CPythonObject::NamedGetter(v8::Local<v8::Name> prop, const v8::PropertyCall
     attr = getter();
   }
 #endif
-*/
 
   CALLBACK_RETURN(Wrap(attr));
 
@@ -364,7 +362,6 @@ void CPythonObject::NamedSetter(v8::Local<v8::Name> prop, v8::Local<v8::Value> v
   }
   else
   {
-    /* TODO port me
   #ifdef SUPPORT_PROPERTY
     if (found)
     {
@@ -383,7 +380,6 @@ void CPythonObject::NamedSetter(v8::Local<v8::Name> prop, v8::Local<v8::Value> v
       }
     }
   #endif
-  */
     obj.attr(*name) = newval;
   }
 
@@ -432,7 +428,6 @@ void CPythonObject::NamedDeleter(v8::Local<v8::Name> prop, const v8::PropertyCal
   }
   else
   {
-    /* TODO port me
   #ifdef SUPPORT_PROPERTY
     py::object attr = obj.attr(*name);
 
@@ -451,11 +446,8 @@ void CPythonObject::NamedDeleter(v8::Local<v8::Name> prop, const v8::PropertyCal
       CALLBACK_RETURN(-1 != ::PyObject_DelAttrString(obj.ptr(), *name));
     }
   #else
-  */
     CALLBACK_RETURN(-1 != ::PyObject_DelAttrString(obj.ptr(), *name));
-    /* TODO port me
   #endif
-  */
   }
 
   END_HANDLE_EXCEPTION(v8::Handle<v8::Boolean>())
