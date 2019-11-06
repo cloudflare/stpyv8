@@ -209,7 +209,6 @@ py::object CContext::GetCalling(void)
 {
   v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
 
-  //v8::Handle<v8::Context> calling = v8::Isolate::GetCurrent()->GetCallingContext();
   v8::Handle<v8::Context> calling = v8::Isolate::GetCurrent()->GetCurrentContext();
 
   return (!v8::Isolate::GetCurrent()->InContext() || calling.IsEmpty()) ? py::object() :

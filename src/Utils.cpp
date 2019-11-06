@@ -9,7 +9,6 @@
 
 #include "utf8.h"
 //#include "Locker.h" //TODO port me
-//#include "V8Internal.h"
 
 v8::Handle<v8::String> ToString(const std::string& str)
 {
