@@ -51,9 +51,6 @@ library_dirs.append(os.path.join(V8_HOME, 'out.gn/x64.release.sample/obj/'))
 
 
 def get_libboost_python_name():
-    if "gentoo" in platform.platform().lower():
-        return "boost_python-{}.{}".format(sys.version_info.major, sys.version_info.minor)
-
     return "boost_python{}{}".format(sys.version_info.major, sys.version_info.minor)
 
 

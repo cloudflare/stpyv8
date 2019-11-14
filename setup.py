@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 import os
-
 import subprocess
-import traceback
 import logging
 
 from distutils.command.build import build
@@ -36,7 +34,7 @@ def exec_cmd(cmdline, *args, **kwargs):
     succeeded = proc.returncode == 0
 
     if not succeeded:
-        log.error("%s failed: code=%d", msg or "Execute command", proc.returncode)
+        log.error("%s failed: code = %d", msg or "Execute command", proc.returncode)
 
         if output:
             log.debug(stderr)
@@ -55,9 +53,8 @@ def install_depot():
     if os.path.isfile(os.path.join(DEPOT_HOME, 'gclient')):
         _, stdout, _ = exec_cmd("./gclient --version",
                                 cwd    = DEPOT_HOME,
-                                output = True)
-
-        print("Found depot tools with {}".format(stdout.strip().decode()))
+                                output = True,
+                                msg    = "Found depot tools with {}".format(stdout.strip().decode()))
 
     if os.path.isdir(os.path.join(DEPOT_HOME, '.git')):
         exec_cmd("git pull", DEPOT_HOME,
@@ -80,15 +77,9 @@ def checkout_v8():
                  cwd = V8_HOME,
                  msg = "Fetching the release tag information")
 
-    print(V8_GIT_TAG)
-
     exec_cmd('git checkout', V8_GIT_TAG,
              cwd = V8_HOME,
              msg = "Checkout Google V8 v{}".format(V8_GIT_TAG))
-
-    exec_cmd("git pull origin", V8_HOME,
-             cwd = V8_HOME,
-             msg = "Updating Google V8 code")
 
     exec_cmd(os.path.join(DEPOT_HOME, 'gclient'), 'sync',
              cwd = os.path.dirname(V8_HOME),
@@ -96,31 +87,25 @@ def checkout_v8():
 
 
 def build_v8():
-    # encoder = json.JSONEncoder()
+    exec_cmd(os.path.join(DEPOT_HOME, 'gn'),
+             "gen out.gn/x64.release.sample --args='{}'".format(GN_ARGS),
+             cwd = V8_HOME,
+             msg = "Generate build scripts for V8 (v{})".format(V8_GIT_TAG))
 
-    # args = ['%s=%s' % (k, encoder.encode(v)) for k, v in options.items()]
-
-    # exec_cmd(os.path.join(V8_HOME, 'tools/dev/v8gen.py'), 'x64.release.sample',
-    #        cwd = V8_HOME, msg = "generate build scripts for V8 (v%s)" % V8_GIT_TAG)
-    exec_cmd("gn gen out.gn/x64.release.sample --args='{}'".format(GN_ARGS),
-             cwd = V8_HOME, msg = "Generate build scripts for V8 (v{})".format(V8_GIT_TAG))
-
-    exec_cmd("ninja -C out.gn/x64.release.sample v8_monolith",
-                 cwd = V8_HOME, msg = "Build V8 with ninja")
+    exec_cmd(os.path.join(DEPOT_HOME, 'ninja'),
+             "-C out.gn/x64.release.sample v8_monolith",
+             cwd = V8_HOME,
+             msg = "Build V8 with ninja")
 
 
 def prepare_v8():
     try:
-        print("Preparing V8")
-
         install_depot()
         sync_v8()
         checkout_v8()
-
         build_v8()
     except Exception as e:
-        log.error("Fail to checkout and build v8, %s", e)
-        log.debug(traceback.format_exc())
+        log.error("Fail to checkout and build v8, %s", str(e))
 
 
 class soirv8_build(build):
