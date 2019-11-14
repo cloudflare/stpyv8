@@ -44,20 +44,24 @@ def exec_cmd(cmdline, *args, **kwargs):
 
 def install_depot():
     if not os.path.exists(DEPOT_HOME):
-        exec_cmd("git clone", DEPOT_GIT_URL, DEPOT_HOME,
+        exec_cmd("git clone",
+                 DEPOT_GIT_URL,
+                 DEPOT_HOME,
                  cwd = os.path.dirname(DEPOT_HOME),
                  msg = "Cloning depot tools")
 
         return
 
     if os.path.isfile(os.path.join(DEPOT_HOME, 'gclient')):
-        _, stdout, _ = exec_cmd("./gclient --version",
+        _, stdout, _ = exec_cmd(os.path.join(DEPOT_HOME, 'gclient'),
+                                "--version",
                                 cwd    = DEPOT_HOME,
                                 output = True,
                                 msg    = "Found depot tools with {}".format(stdout.strip().decode()))
 
     if os.path.isdir(os.path.join(DEPOT_HOME, '.git')):
-        exec_cmd("git pull", DEPOT_HOME,
+        exec_cmd("git pull",
+                 DEPOT_HOME,
                  cwd = DEPOT_HOME,
                  msg = "Updating depot tools")
 
@@ -74,8 +78,8 @@ def sync_v8():
 
 def checkout_v8():
     exec_cmd('git fetch --tags',
-                 cwd = V8_HOME,
-                 msg = "Fetching the release tag information")
+             cwd = V8_HOME,
+             msg = "Fetching the release tag information")
 
     exec_cmd('git checkout', V8_GIT_TAG,
              cwd = V8_HOME,
