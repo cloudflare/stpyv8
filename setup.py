@@ -41,7 +41,6 @@ def exec_cmd(cmdline, *args, **kwargs):
 
     return succeeded, stdout, stderr if output else succeeded
 
-
 def install_depot():
     if not os.path.exists(DEPOT_HOME):
         exec_cmd("git clone",
@@ -64,7 +63,6 @@ def install_depot():
                  DEPOT_HOME,
                  cwd = DEPOT_HOME,
                  msg = "Updating depot tools")
-
 
 def sync_v8():
     if not os.path.exists(V8_HOME):
@@ -89,7 +87,6 @@ def checkout_v8():
              cwd = os.path.dirname(V8_HOME),
              msg = "Syncing Google V8 code")
 
-
 def build_v8():
     exec_cmd(os.path.join(DEPOT_HOME, 'gn'),
              "gen out.gn/x64.release.sample --args='{}'".format(GN_ARGS),
@@ -101,7 +98,6 @@ def build_v8():
              cwd = V8_HOME,
              msg = "Build V8 with ninja")
 
-
 def prepare_v8():
     try:
         install_depot()
@@ -110,7 +106,6 @@ def prepare_v8():
         build_v8()
     except Exception as e:
         log.error("Fail to checkout and build v8, %s", str(e))
-
 
 class soirv8_build(build):
     def run(self):
@@ -156,7 +151,7 @@ setup(name         = 'soirv8',
       py_modules   = ['SoirV8'],
       ext_modules  = [soirv8],
       classifiers  = [
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Plugins',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
