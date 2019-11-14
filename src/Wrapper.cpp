@@ -1903,12 +1903,14 @@ void ObjectTracer::Trace(void)
   m_living->insert(std::make_pair(m_object->ptr(), this));
 }
 
+/*
 void ObjectTracer::WeakCallback(const v8::WeakCallbackInfo<ObjectTracer>& info)
 {
   std::unique_ptr<ObjectTracer> tracer(info.GetParameter());
 
   // assert(info.GetValue() == tracer->m_handle);
 }
+*/
 
 LivingMap * ObjectTracer::GetLivingMapping(void)
 {
