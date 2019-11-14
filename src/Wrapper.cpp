@@ -1907,7 +1907,7 @@ void ObjectTracer::WeakCallback(const v8::WeakCallbackInfo<ObjectTracer>& info)
 {
   std::unique_ptr<ObjectTracer> tracer(info.GetParameter());
 
-  assert(info.GetValue() == tracer->m_handle);
+  // assert(info.GetValue() == tracer->m_handle);
 }
 
 LivingMap * ObjectTracer::GetLivingMapping(void)
