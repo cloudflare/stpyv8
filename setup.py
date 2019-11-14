@@ -1,53 +1,148 @@
 #!/usr/bin/env python
 
-import sys
 import os
-import platform
 
+import subprocess
+import traceback
+import logging
+
+from distutils.command.build import build
 from distutils.core import setup, Extension
 
-source_files = ["Exception.cpp", 
-                "Platform.cpp",
-                "Isolate.cpp",
-                "Context.cpp",
-                "Engine.cpp",
-                "Wrapper.cpp",
-                "Locker.cpp",
-                "Utils.cpp",
-                "SoirV8.cpp"]
+from settings import *
 
-macros = [("BOOST_PYTHON_STATIC_LIB", None)]
-# third_party_libraries = ["python", "boost", "v8"]
+log = logging.getLogger()
 
-# include_dirs = [os.path.join("lib", lib, "inc") for lib in third_party_libraries]
-# library_dirs = [os.path.join("lib", lib, "lib") for lib in third_party_libraries]
-include_dirs = []
-library_dirs = []
 
-V8_HOME = os.getenv('V8_HOME', os.path.join(os.getenv('HOME'), 'v8'))
-include_dirs.append(os.path.join(V8_HOME, 'include'))
-library_dirs.append(os.path.join(V8_HOME, 'out.gn/x64.release.sample/obj/'))
+def exec_cmd(cmdline, *args, **kwargs):
+    msg    = kwargs.get('msg')
+    cwd    = kwargs.get('cwd', '.')
+    output = kwargs.get('output')
 
-libraries = []
-extra_compile_args = []
-extra_link_args = []
+    if msg:
+        print(msg)
 
-if os.name == "nt":
-    include_dirs += os.environ["INCLUDE"].split(';')
-    library_dirs += os.environ["LIB"].split(';')
-    libraries += ["winmm", "ws2_32"]
-    extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
-    extra_link_args += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
-elif os.name == "posix":
-    libraries = ["boost_system", "v8_monolith"]
+    cmdline = ' '.join([cmdline] + list(args))
 
-    if platform.system() in ('Darwin', ):
-        libraries.append("boost_python{}{}".format(sys.version_info.major, sys.version_info.minor))
-        extra_compile_args.append('-std=c++11')
+    proc = subprocess.Popen(cmdline,
+                            shell  = kwargs.get('shell', True),
+                            cwd    = cwd,
+                            env    = kwargs.get('env'),
+                            stdout = subprocess.PIPE if output else None,
+                            stderr = subprocess.PIPE if output else None)
 
-    if platform.system() in ('Linux', ):
-        libraries.append("boost_python-py{}{}".format(sys.version_info.major, sys.version_info.minor))
-        libraries.append("rt")
+    stdout, stderr = proc.communicate()
+
+    succeeded = proc.returncode == 0
+
+    if not succeeded:
+        log.error("%s failed: code=%d", msg or "Execute command", proc.returncode)
+
+        if output:
+            log.debug(stderr)
+
+    return succeeded, stdout, stderr if output else succeeded
+
+
+def install_depot():
+    if not os.path.exists(DEPOT_HOME):
+        exec_cmd("git clone", DEPOT_GIT_URL, DEPOT_HOME,
+                 cwd = os.path.dirname(DEPOT_HOME),
+                 msg = "Cloning depot tools")
+
+        return
+
+    if os.path.isfile(os.path.join(DEPOT_HOME, 'gclient')):
+        _, stdout, _ = exec_cmd("./gclient --version",
+                                cwd    = DEPOT_HOME,
+                                output = True)
+
+        print("Found depot tools with {}".format(stdout.strip().decode()))
+
+    if os.path.isdir(os.path.join(DEPOT_HOME, '.git')):
+        exec_cmd("git pull", DEPOT_HOME,
+                 cwd = DEPOT_HOME,
+                 msg = "Updating depot tools")
+
+
+def sync_v8():
+    if not os.path.exists(V8_HOME):
+        exec_cmd(os.path.join(DEPOT_HOME, 'fetch'), 'v8',
+                 cwd = os.path.dirname(V8_HOME),
+                 msg = "Fetching Google V8 code")
+    elif os.path.exists(os.path.join(SOIRV8_HOME, '.gclient')):
+        exec_cmd(os.path.join(DEPOT_HOME, 'gclient'), 'sync',
+                cwd = os.path.dirname(V8_HOME),
+                msg = "Syncing Google V8 code")
+
+def checkout_v8():
+    exec_cmd('git fetch --tags',
+                 cwd = V8_HOME,
+                 msg = "Fetching the release tag information")
+
+    print(V8_GIT_TAG)
+
+    exec_cmd('git checkout', V8_GIT_TAG,
+             cwd = V8_HOME,
+             msg = "Checkout Google V8 v{}".format(V8_GIT_TAG))
+
+    exec_cmd("git pull origin", V8_HOME,
+             cwd = V8_HOME,
+             msg = "Updating Google V8 code")
+
+    exec_cmd(os.path.join(DEPOT_HOME, 'gclient'), 'sync',
+             cwd = os.path.dirname(V8_HOME),
+             msg = "Syncing Google V8 code")
+
+
+def build_v8():
+    # encoder = json.JSONEncoder()
+
+    # args = ['%s=%s' % (k, encoder.encode(v)) for k, v in options.items()]
+
+    # exec_cmd(os.path.join(V8_HOME, 'tools/dev/v8gen.py'), 'x64.release.sample',
+    #        cwd = V8_HOME, msg = "generate build scripts for V8 (v%s)" % V8_GIT_TAG)
+    exec_cmd("gn gen out.gn/x64.release.sample --args='{}'".format(GN_ARGS),
+             cwd = V8_HOME, msg = "Generate build scripts for V8 (v{})".format(V8_GIT_TAG))
+
+    exec_cmd("ninja -C out.gn/x64.release.sample v8_monolith",
+                 cwd = V8_HOME, msg = "Build V8 with ninja")
+
+
+def prepare_v8():
+    try:
+        print("Preparing V8")
+
+        install_depot()
+        sync_v8()
+        checkout_v8()
+
+        build_v8()
+    except Exception as e:
+        log.error("Fail to checkout and build v8, %s", e)
+        log.debug(traceback.format_exc())
+
+
+class soirv8_build(build):
+    def run(self):
+        V8_GIT_TAG = V8_GIT_TAG_STABLE
+        prepare_v8()
+        build.run(self)
+
+class soirv8_develop(build):
+    def run(self):
+        V8_GIT_TAG = V8_GIT_TAG_MASTER
+        prepare_v8()
+        build.run(self)
+
+class soirv8_install_v8(build):
+    def run(self):
+        V8_GIT_TAG = V8_GIT_TAG_MASTER
+        prepare_v8()
+
+class soirv8_build_no_v8(build):
+    def run(self):
+        build.run(self)
 
 
 soirv8 = Extension(name               = "_SoirV8",
@@ -79,13 +174,18 @@ setup(name         = 'soirv8',
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
         'Operating System :: Microsoft :: Windows',
-        'Operating System :: POSIX', 
+        'Operating System :: POSIX',
         'Programming Language :: C++',
         'Programming Language :: Python',
         'Topic :: Internet',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Utilities', 
-      ]
+        'Topic :: Utilities',
+      ],
+      cmdclass = dict(
+          build   = soirv8_build,
+          develop = soirv8_develop,
+          v8      = soirv8_install_v8,
+          soirv8  = soirv8_build_no_v8),
 )
