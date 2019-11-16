@@ -67,4 +67,5 @@ elif os.name == "posix":
         extra_compile_args.append('-std=c++11')
 
     if platform.system() in ('Linux', ):
+        extra_compile_args.append('-std=c++11')
         libraries.append("rt")
