@@ -54,18 +54,15 @@ def get_libboost_python_name():
     return "boost_python{}{}".format(sys.version_info.major, sys.version_info.minor)
 
 
-if os.name == "nt":
+if os.name in ("nt", ):
     include_dirs       += os.environ["INCLUDE"].split(';')
     library_dirs       += os.environ["LIB"].split(';')
     libraries          += ["winmm", "ws2_32"]
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
-elif os.name == "posix":
+elif os.name in ("posix", ):
     libraries = ["boost_system", "v8_monolith", get_libboost_python_name()]
-
-    if platform.system() in ('Darwin', ):
-        extra_compile_args.append('-std=c++11')
+    extra_compile_args.append('-std=c++11')
 
     if platform.system() in ('Linux', ):
-        extra_compile_args.append('-std=c++11')
         libraries.append("rt")
