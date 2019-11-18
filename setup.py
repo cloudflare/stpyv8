@@ -56,7 +56,7 @@ def install_depot():
                                 "--version",
                                 cwd    = DEPOT_HOME,
                                 output = True,
-                                msg    = "Found depot tools with {}".format(stdout.strip().decode()))
+                                msg    = "Found depot tools")
 
     if os.path.isdir(os.path.join(DEPOT_HOME, '.git')):
         exec_cmd("git pull",
