@@ -2,9 +2,11 @@
 
 import os
 import subprocess
+import shutil
 import logging
 
 from distutils.command.build import build
+from distutils.command.install import install
 from distutils.core import setup, Extension
 
 from settings import *
@@ -98,12 +100,19 @@ def build_v8():
              cwd = V8_HOME,
              msg = "Build V8 with ninja")
 
+def clean_soirv8():
+    build_folder = os.path.join(SOIRV8_HOME, 'build')
+
+    if os.path.exists(os.path.join(build_folder)):
+        shutil.rmtree(build_folder)
+
 def prepare_v8():
     try:
         install_depot()
         sync_v8()
         checkout_v8()
         build_v8()
+        clean_soirv8()
     except Exception as e:
         log.error("Fail to checkout and build v8, %s", str(e))
 
@@ -126,7 +135,13 @@ class soirv8_install_v8(build):
 
 class soirv8_build_no_v8(build):
     def run(self):
+        clean_soirv8()
         build.run(self)
+
+class soirv8_install(install):
+    def run(self):
+        self.skip_build = True
+        install.run(self)
 
 
 soirv8 = Extension(name               = "_SoirV8",
@@ -171,5 +186,6 @@ setup(name         = 'soirv8',
           build   = soirv8_build,
           develop = soirv8_develop,
           v8      = soirv8_install_v8,
-          soirv8  = soirv8_build_no_v8),
+          soirv8  = soirv8_build_no_v8,
+          install = soirv8_install),
 )
