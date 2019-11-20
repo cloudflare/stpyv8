@@ -49,10 +49,14 @@ extra_link_args    = []
 include_dirs.append(os.path.join(V8_HOME, 'include'))
 library_dirs.append(os.path.join(V8_HOME, 'out.gn/x64.release.sample/obj/'))
 
-
 def get_libboost_python_name():
-    return "boost_python{}{}".format(sys.version_info.major, sys.version_info.minor)
+    ubuntu_platforms = ('ubuntu', )
+    current_platform = platform.platform().lower()
 
+    if any(p in current_platform for p in ubuntu_platforms):
+        return "boost_python{}".format(sys.version_info.major)
+
+    return "boost_python{}{}".format(sys.version_info.major, sys.version_info.minor)
 
 if os.name in ("nt", ):
     include_dirs       += os.environ["INCLUDE"].split(';')
