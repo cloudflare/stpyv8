@@ -1,4 +1,3 @@
-#include <iostream> //TODO remove me for cout
 #include <sstream>
 #include "Exception.h"
 

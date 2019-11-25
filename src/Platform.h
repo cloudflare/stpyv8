@@ -5,13 +5,13 @@
 
 class CPlatform
 {
-  private:
+private:
   static bool inited;
   static std::unique_ptr<v8::Platform> platform;
 
   std::string argv;
 
-  public:
+public:
   CPlatform() : argv(std::string()) {};
   CPlatform(std::string argv0) : argv(argv0) {};
   ~CPlatform() {};
