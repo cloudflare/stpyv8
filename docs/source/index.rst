@@ -34,11 +34,9 @@ You also could invoke Javascript functions from Python, or viceversa.
 .. toctree::
    :maxdepth: 2
 
-   intro
    build
    samples
    api/api
-   faq
 
 Indices and tables
 ==================
