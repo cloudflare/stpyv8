@@ -43,6 +43,7 @@ def exec_cmd(cmdline, *args, **kwargs):
 
     return succeeded, stdout, stderr if output else succeeded
 
+
 def install_depot():
     if not os.path.exists(DEPOT_HOME):
         exec_cmd("git clone",
@@ -53,6 +54,7 @@ def install_depot():
 
         return
 
+    # depot_tools updates itself automatically when running gclient tool
     if os.path.isfile(os.path.join(DEPOT_HOME, 'gclient')):
         _, stdout, _ = exec_cmd(os.path.join(DEPOT_HOME, 'gclient'),
                                 "--version",
@@ -60,34 +62,29 @@ def install_depot():
                                 output = True,
                                 msg    = "Found depot tools")
 
-    if os.path.isdir(os.path.join(DEPOT_HOME, '.git')):
-        exec_cmd("git pull",
-                 DEPOT_HOME,
-                 cwd = DEPOT_HOME,
-                 msg = "Updating depot tools")
-
-def sync_v8():
-    if not os.path.exists(V8_HOME):
-        exec_cmd(os.path.join(DEPOT_HOME, 'fetch'), 'v8',
-                 cwd = os.path.dirname(V8_HOME),
-                 msg = "Fetching Google V8 code")
-    elif os.path.exists(os.path.join(SOIRV8_HOME, '.gclient')):
-        exec_cmd(os.path.join(DEPOT_HOME, 'gclient'), 'sync',
-                cwd = os.path.dirname(V8_HOME),
-                msg = "Syncing Google V8 code")
 
 def checkout_v8():
+    if not os.path.exists(V8_HOME):
+        exec_cmd(os.path.join(DEPOT_HOME, 'fetch'),
+                 'v8',
+                 cwd = os.path.dirname(V8_HOME),
+                 msg = "Fetching Google V8 code")
+
     exec_cmd('git fetch --tags',
              cwd = V8_HOME,
              msg = "Fetching the release tag information")
 
-    exec_cmd('git checkout', V8_GIT_TAG,
+    exec_cmd('git checkout',
+             V8_GIT_TAG,
              cwd = V8_HOME,
              msg = "Checkout Google V8 v{}".format(V8_GIT_TAG))
 
-    exec_cmd(os.path.join(DEPOT_HOME, 'gclient'), 'sync',
+    exec_cmd(os.path.join(DEPOT_HOME, 'gclient'),
+             'sync',
+             '-D',
              cwd = os.path.dirname(V8_HOME),
              msg = "Syncing Google V8 code")
+
 
 def build_v8():
     exec_cmd(os.path.join(DEPOT_HOME, 'gn'),
@@ -100,21 +97,23 @@ def build_v8():
              cwd = V8_HOME,
              msg = "Build V8 with ninja")
 
+
 def clean_soirv8():
     build_folder = os.path.join(SOIRV8_HOME, 'build')
 
     if os.path.exists(os.path.join(build_folder)):
         shutil.rmtree(build_folder)
 
+
 def prepare_v8():
     try:
         install_depot()
-        sync_v8()
         checkout_v8()
         build_v8()
         clean_soirv8()
     except Exception as e:
         log.error("Fail to checkout and build v8, %s", str(e))
+
 
 class soirv8_build(build):
     def run(self):
@@ -122,21 +121,25 @@ class soirv8_build(build):
         prepare_v8()
         build.run(self)
 
+
 class soirv8_develop(build):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_MASTER
         prepare_v8()
         build.run(self)
 
+
 class soirv8_install_v8(build):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_MASTER
         prepare_v8()
 
+
 class soirv8_build_no_v8(build):
     def run(self):
         clean_soirv8()
         build.run(self)
+
 
 class soirv8_install(install):
     def run(self):

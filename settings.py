@@ -12,6 +12,7 @@ V8_GIT_TAG_MASTER = "master"
 V8_GIT_TAG        = V8_GIT_TAG_STABLE
 DEPOT_GIT_URL     = "https://chromium.googlesource.com/chromium/tools/depot_tools.git"
 
+os.environ['PATH'] = "{}:{}".format(os.environ['PATH'], DEPOT_HOME)
 
 gn_args = {
   "v8_use_snapshot"              : "true",
