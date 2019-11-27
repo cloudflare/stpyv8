@@ -2,9 +2,6 @@
 
 .. _index:
 .. py:module:: SoirV8
-.. testsetup:: *
-
-   from SoirV8 import *
 
 Welcome to SoirV8's documentation!
 ==================================
@@ -14,16 +11,16 @@ objects and supporting the embedding of the Google V8 engine in a Python script.
 
 Creating and entering a context to evaluate Javascript code can be done in a few lines of code.
 
-.. doctest::
+.. code-block:: python
 
-   >>> ctxt = JSContext()               # create a context with an implicit global object
-   >>> ctxt.enter()                     # enter the context (Python with statement is also supported)
-   >>> ctxt.eval("1+2")                 # evalute the Javascript expression and return a native Python integer
+   >>> ctxt = JSContext()   # create a context with an implicit global object
+   >>> ctxt.enter()         # enter the context (Python with statement is also supported)
+   >>> ctxt.eval("1+2")     # evalute the Javascript expression and return a native Python integer
    3
 
 You also could invoke Javascript functions from Python, or viceversa.
 
-.. doctest::
+.. code-block:: python
 
     >>> class Global(JSClass):           # define a compatible Javascript class
     ...   def hello(self):               # define a method
@@ -31,7 +28,7 @@ You also could invoke Javascript functions from Python, or viceversa.
     ...
     >>> ctxt2 = JSContext(Global())      # create another context with the global object
     >>> ctxt2.enter()
-    >>> ctxt2.eval("hello()")            # call the global object from javascript
+    >>> ctxt2.eval("hello()")            # call the global object from Javascript
     Hello World                          
 
 .. toctree::
