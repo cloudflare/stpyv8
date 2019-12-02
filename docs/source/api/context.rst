@@ -38,7 +38,7 @@ execute code with the :py:meth:`JSContext.eval` method. The best practice is to 
     .. testcode::
 
         with JSContext() as ctxt:
-            print ctxt.eval("1+2") # 3
+            print(ctxt.eval("1+2")) # 3
 
     .. testoutput::
        :hide:
@@ -73,17 +73,17 @@ Global Object
         -- ECMA-262 3rd Chapter 10.1.5
 
 The execution context has a global object, which could be accessed from the Python side with the :py:attr:`JSContext.locals`
-attribute or from the Javascript side using the global namespace. The Python and Javascript code could use it to do seamless
-interoperable logic, SoirV8 will automatic do the :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
+attribute or from the Javascript side using the global namespace. The Python and Javascript code could use such object to 
+perform seamless interoperable logic while SoirV8 will take care of :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
 
 .. testcode::
 
     with JSContext() as ctxt:
         ctxt.eval("a = 1")
-        print ctxt.locals.a     # 1
+        print(ctxt.locals.a)     # 1
 
         ctxt.locals.a = 2
-        print ctxt.eval("a")    # 2
+        print(ctxt.eval("a"))    # 2
 
 .. testoutput::
    :hide:
@@ -103,9 +103,9 @@ instance when the :py:class:`JSContext` instance is created.
             return "Hello " + name
 
     with JSContext(Global()) as ctxt:
-        print ctxt.eval("version")          # 1.0
-        print ctxt.eval("hello('World')")   # Hello World
-        print ctxt.eval("hello.toString()") # function () { [native code] }
+        print(ctxt.eval("version")))          # 1.0
+        print(ctxt.eval("hello('World')"))   # Hello World
+        print(ctxt.eval("hello.toString()")) # function () { [native code] }
 
 .. testoutput::
    :hide:
@@ -131,7 +131,7 @@ JSContext - the execution context.
 
    JSContext is an execution context.
 
-   .. automethod:: __init__(global=None, extensions=[]) -> JSContext object
+   .. automethod:: __init__(global = None, extensions = []) -> JSContext object
 
       :param object global: the global object
       :param list extensions: the name of extensions
@@ -139,19 +139,18 @@ JSContext - the execution context.
 
    .. automethod:: __init__(ctxt) -> JSContext object
 
-      :param JSContext ctxt: an exists :py:class:`JSContext` instance
+      :param JSContext ctxt: an existing :py:class:`JSContext` instance
       :rtype: a cloned :py:class:`JSContext` instance
 
-   .. automethod:: eval(source, name='', line=-1, col=-1, precompiled=None) -> object:
+   .. automethod:: eval(source, name = '', line = -1, col = -1) -> object:
 
-      Execute the Javascript code in source and return the result
+      Execute the Javascript code and return the result
 
-      :param source: the Javascript code
+      :param source: the Javascript code to be executed
       :type source: str or unicode
       :param str name: the name of the Javascript code
       :param integer line: the start line number of the Javascript code
       :param integer col: the start column number of the Javascript code
-      :param buffer precompiled: the precompiled buffer of Javascript code
       :rtype: the result
 
    .. automethod:: __enter__() -> JSContext object
