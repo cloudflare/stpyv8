@@ -407,12 +407,6 @@ JSObject
 
         .. seealso:: :py:meth:`object.__hash__`
 
-   .. autoattribute:: __members__
-
-        Deprecated, use the :py:meth:`JSObject.keys` to get a list of an object’s attributes.
-
-        .. seealso:: :py:attr:`object.__members__`
-
    .. automethod:: __getitem__(key) -> object
 
         Called to implement evaluation of self[key]. For sequence types, the accepted keys should be integers and slice objects. Note that the special interpretation of negative indexes (if the class wishes to emulate a sequence type) is up to the __getitem__() method. If key is of an inappropriate type, TypeError may be raised; if of a value outside the set of indexes for the sequence (after any special interpretation of negative values), IndexError should be raised. For mapping types, if key is missing (not in the container), KeyError should be raised.
@@ -437,11 +431,11 @@ JSObject
 
         .. seealso:: :py:meth:`object.__contains__`
 
-   .. automethod:: __nonzero__() -> bool
+   .. automethod:: __bool__() -> bool
 
-        Called to implement truth value testing and the built-in operation bool(); should return False or True, or their integer equivalents 0 or 1. When this method is not defined, __len__() is called, if it is defined, and the object is considered true if its result is nonzero. If a class defines neither __len__() nor __nonzero__(), all its instances are considered true.
+        Called to implement truth value testing and the built-in operation bool(); should return False or True, or their integer equivalents 0 or 1. When this method is not defined, __len__() is called, if it is defined, and the object is considered true if its result is nonzero. If a class defines neither __len__() nor __bool__(), all its instances are considered true.
 
-        .. seealso:: :py:meth:`object.__nonzero__`
+        .. seealso:: :py:meth:`object.__bool__`
 
    .. automethod:: __eq__(other) -> bool
 
@@ -478,7 +472,7 @@ JSArray
 
    .. automethod:: __len__() -> int
 
-       Called to implement the built-in function len(). Should return the length of the object, an integer >= 0. Also, an object that doesn’t define a __nonzero__() method and whose __len__() method returns zero is considered to be false in a Boolean context.
+       Called to implement the built-in function len(). Should return the length of the object, an integer >= 0. Also, an object that doesn’t define a __bool__() method and whose __len__() method returns zero is considered to be false in a Boolean context.
 
        .. seealso:: :py:meth:`object.__len__`
 
@@ -536,6 +530,7 @@ JSFunction
       :type self: :py:class:`JSObject`
       :param list args: the argument list
       :param dict kwds: the argument dictionary whose keys are strings
+
 JSError
 -------
 
@@ -546,10 +541,6 @@ JSError
    .. automethod:: __str__() -> str
 
       .. seealso:: :py:meth:`object.__str__`
-
-   .. automethod:: __unicode__() -> unicode
-
-      .. seealso:: :py:meth:`object.__unicode__`
 
    .. automethod:: __getattribute__(attr) -> object
 
