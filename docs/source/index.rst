@@ -11,16 +11,17 @@ objects and supporting the embedding of the Google V8 engine in a Python script.
 
 Creating and entering a context to evaluate Javascript code can be done in a few lines of code.
 
-.. code-block:: python
+.. doctest::
 
-   >>> ctxt = JSContext()   # create a context with an implicit global object
-   >>> ctxt.enter()         # enter the context (Python with statement is also supported)
-   >>> ctxt.eval("1+2")     # evalute the Javascript expression and return a native Python integer
+   >>> ctxt = JSContext()               # create a context with an implicit global object
+   >>> ctxt.enter()                     # enter the context (also support with statement)
+   >>> ctxt.eval("1+2")                 # evalute the Javascript expression and return a native Python integer
    3
+   >>> ctxt.leave()                     # leave the context and release the related resources
 
 You also could invoke Javascript functions from Python, or viceversa.
 
-.. code-block:: python
+.. doctest::
 
     >>> class Global(JSClass):           # define a compatible Javascript class
     ...   def hello(self):               # define a method

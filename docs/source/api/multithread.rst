@@ -1,8 +1,8 @@
-.. py:module:: PyV8
+.. py:module:: SoirV8
 
 .. testsetup:: *
 
-   from PyV8 import *
+   from SoirV8 import *
 
 .. _multithread:
 

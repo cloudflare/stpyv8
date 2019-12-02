@@ -1,8 +1,8 @@
-.. py:module:: PyV8
+.. py:module:: SoirV8
 
 .. testsetup:: *
 
-   from PyV8 import *
+   from SoirV8 import *
 
 .. _context:
 
@@ -15,11 +15,13 @@ Javascript Context
 
         -- ECMA-262 3rd Chapter 10
 
-According to the ECMAScript [#f1]_ standard, we need enter an execution context before execute any script code.
+According to the ECMAScript [#f1]_ standard, an execution context has to be entered before executing any script code.
 
 :py:class:`JSContext` is a sandboxed execution context with its own set of built-in objects and functions.
 
-You could create a :py:class:`JSContext` instance, enter it with :py:meth:`JSContext.enter`, and use it to execute code with :py:meth:`JSContext.eval`. The best practice is to leave the context with :py:meth:`JSContext.leave` if you never need it.
+You could create a :py:class:`JSContext` instance, enter it with the :py:meth:`JSContext.enter` method, and use it to
+execute code with the :py:meth:`JSContext.eval` method. The best practice is to leave the context with the 
+:py:meth:`JSContext.leave` if you do not need it anymore.
 
 .. doctest::
 
@@ -43,7 +45,7 @@ You could create a :py:class:`JSContext` instance, enter it with :py:meth:`JSCon
 
        3
 
-You could also check the current or calling context with the static properties.
+You could also check the current context using the :py:class:`JSContext` static properties.
 
 ==============================  =============================================
 Property                        Description
@@ -70,7 +72,9 @@ Global Object
 
         -- ECMA-262 3rd Chapter 10.1.5
 
-The execution context has a global object, which could be access from the Python side with :py:attr:`JSContext.locals`, or access from the Javascript side with the global namespace. The Python and Javascript code could use it to do seamless interoperable logic, PyV8 will automatic do the :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
+The execution context has a global object, which could be accessed from the Python side with the :py:attr:`JSContext.locals`
+attribute or from the Javascript side using the global namespace. The Python and Javascript code could use it to do seamless
+interoperable logic, SoirV8 will automatic do the :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
 
 .. testcode::
 
@@ -87,7 +91,8 @@ The execution context has a global object, which could be access from the Python
    1
    2
 
-If you want to provide more complicated properties and methods to the Javascript code, you could pass a customized global object instance when create the :py:class:`JSContext`.
+If you want to provide more complicated properties and methods to the Javascript code, you could pass a customized global object
+instance when the :py:class:`JSContext` instance is created.
 
 .. testcode::
 
@@ -111,43 +116,10 @@ If you want to provide more complicated properties and methods to the Javascript
 
 .. note::
 
-    If you want your global object more like a real Javascript object, you should inherit from the :py:class:`JSClass` which provides a lot of helper methods such as :py:meth:`JSClass.toString`, :py:meth:`JSClass.watch` etc.
+    If you want your global object to behave like a real Javascript object, you should inherit from the :py:class:`JSClass` class
+    which provides a lot of helper methods such as :py:meth:`JSClass.toString`, :py:meth:`JSClass.watch` etc.
 
 .. _jsext:
-
-Reuseable Extension
--------------------
-Besides the customized :ref:`gobj`, there is a more powerful mechanism :py:class:`JSExtension` which could encapsulate the related Javascript or Python script in a reusable module, and define it when create a :py:class:`JSContext` instance.
-
-.. testcode::
-
-    src = 'function hello(name) { return "Hello " + name + " from Javascript"; }'
-    ext = JSExtension("hello/javascript", src)
-
-    with JSContext(extensions=['hello/javascript']) as ctxt:
-        print ctxt.eval("hello('World')") # Hello World from Javascript
-
-.. testoutput::
-   :hide:
-
-   Hello World from Javascript
-
-The extension also could be implement with the Python code, just like the JNI [#f3]_ for the Java.
-
-.. testcode::
-
-    src = "native function hello();"
-    ext = JSExtension("hello/python", src, lambda func: lambda name: "Hello " + name + " from Python")
-
-    with JSContext(extensions=['hello/python']) as ctxt:
-        print ctxt.eval("hello('World')") # Hello World from Python
-
-.. testoutput::
-   :hide:
-
-   Hello World from Python
-
-If your extensions has dependencies extensions, you could define it in :py:meth:`JSExtension.__init__`, and check it later with the  :py:attr:`JSExtension.dependencies` property. The v8 engine will load the extensions one by one base on its dependencies.
 
 JSContext - the execution context.
 ----------------------------------
@@ -202,21 +174,6 @@ JSContext - the execution context.
 
        Returns true if V8 has a current context.
 
-JSExtension - reusable script module
-------------------------------------
-.. autoclass:: JSExtension
-   :members:
-   :inherited-members:
-
-   .. automethod:: __init__(name, source, callback=None, dependencies=[], register=True) -> JSExtension object
-   
-      :param str name: the extension name
-      :param str source: the Javascript code
-      :param func callback: the native Python code
-      :param list dependencies: the dependencies extensions
-      :param bool register: register the extension
-      :rtype: A reusable :py:class:`JSExtension` module
-   
 .. toctree::
    :maxdepth: 2
 
