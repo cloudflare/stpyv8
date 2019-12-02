@@ -8,40 +8,8 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
 
-#ifdef SUPPORT_SERIALIZE
-  CEngine::CounterTable CEngine::m_counters;
-#endif
-
 void CEngine::Expose(void)
 {
-#ifndef SUPPORT_SERIALIZE
-// TODO port me
-//  v8::V8::SetFatalErrorHandler(ReportFatalError);
-//  v8::V8::AddMessageListener(ReportMessage);
-#endif
-  /*
-  py::enum_<v8::ObjectSpace>("JSObjectSpace")
-    .value("New", v8::kObjectSpaceNewSpace)
-
-    .value("OldPointer", v8::kObjectSpaceOldPointerSpace)
-    .value("OldData", v8::kObjectSpaceOldDataSpace)
-    .value("Code", v8::kObjectSpaceCodeSpace)
-    .value("Map", v8::kObjectSpaceMapSpace)
-    .value("Lo", v8::kObjectSpaceLoSpace)
-
-    .value("All", v8::kObjectSpaceAll);
-
-  py::enum_<v8::AllocationAction>("JSAllocationAction")
-    .value("alloc", v8::kAllocationActionAllocate)
-    .value("free", v8::kAllocationActionFree)
-    .value("all", v8::kAllocationActionAll);
-
-  py::enum_<v8i::LanguageMode>("JSLanguageMode")
-    .value("CLASSIC", v8i::CLASSIC_MODE)
-    .value("STRICT", v8i::STRICT_MODE)
-    .value("EXTENDED", v8i::EXTENDED_MODE);
-  */
-
   py::class_<CEngine, boost::noncopyable>("JSEngine", "JSEngine is a backend Javascript engine.")
     .def(py::init<>("Create a new script engine instance."))
     .add_static_property("version", &CEngine::GetVersion,
@@ -52,18 +20,6 @@ void CEngine::Expose(void)
 
     .def("setFlags", &CEngine::SetFlags, "Sets V8 flags from a string.")
     .staticmethod("setFlags")
-
-    /*
-  #ifdef SUPPORT_SERIALIZE
-    .add_static_property("serializeEnabled", &CEngine::IsSerializeEnabled, &CEngine::SetSerializeEnable)
-
-    .def("serialize", &CEngine::Serialize)
-    .staticmethod("serialize")
-
-    .def("deserialize", &CEngine::Deserialize)
-    .staticmethod("deserialize")
-  #endif
-    */
 
     .def("terminateAllThreads", &CEngine::TerminateAllThreads,
          "Forcefully terminate the current thread of JavaScript execution.")
@@ -79,7 +35,7 @@ void CEngine::Expose(void)
          "Optional notification that the system is running low on memory.")
     .staticmethod("lowMemory")
 
-	/*
+/*
     .def("setMemoryLimit", &CEngine::SetMemoryLimit, (py::arg("max_young_space_size") = 0,
                                                       py::arg("max_old_space_size") = 0,
                                                       py::arg("max_executable_size") = 0),
@@ -87,14 +43,14 @@ void CEngine::Expose(void)
          "You must set the heap size before initializing the VM"
          "the size cannot be adjusted after the VM is initialized.")
     .staticmethod("setMemoryLimit")
+*/
 
-	*/
     .def("setStackLimit", &CEngine::SetStackLimit, (py::arg("stack_limit_size") = 0),
          "Uses the address of a local variable to determine the stack top now."
          "Given a size, returns an address that is that far from the current top of stack.")
     .staticmethod("setStackLimit")
 
-	/*
+/*
     .def("setMemoryAllocationCallback", &MemoryAllocationManager::SetCallback,
                                         (py::arg("callback"),
                                          py::arg("space") = v8::kObjectSpaceAll,
@@ -102,8 +58,7 @@ void CEngine::Expose(void)
                                         "Enables the host application to provide a mechanism to be notified "
                                         "and perform custom logging when V8 Allocates Executable Memory.")
     .staticmethod("setMemoryAllocationCallback")
-
-    */
+*/
 
     .def("compile", &CEngine::Compile, (py::arg("source"),
                                         py::arg("name") = std::string(),
@@ -119,9 +74,6 @@ void CEngine::Expose(void)
     .add_property("source", &CScript::GetSource, "the source code")
 
     .def("run", &CScript::Run, "Execute the compiled code.")
-
-    /*
-  */
     ;
 
   py::objects::class_value_wrapper<boost::shared_ptr<CScript>,
@@ -152,8 +104,6 @@ void CEngine::Expose(void)
 #endif
 */
 }
-
-//TODO - port serialization code
 
 bool CEngine::IsDead(void)
 {

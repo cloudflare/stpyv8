@@ -6,7 +6,6 @@
 
 #include <boost/shared_ptr.hpp>
 
-//#include "Context.h"
 #include "Utils.h"
 
 class CScript;
@@ -20,16 +19,6 @@ class CEngine
   static uintptr_t CalcStackLimitSize(uintptr_t size);
 protected:
   CScriptPtr InternalCompile(v8::Handle<v8::String> src, v8::Handle<v8::Value> name, int line, int col);
-
-/* TODO port me
-#ifdef SUPPORT_SERIALIZE
-
-  typedef std::map<std::string, int> CounterTable;
-  static CounterTable m_counters;
-
-  static int *CounterLookup(const char* name);
-#endif
-*/
 
   static void TerminateAllThreads(void);
 
