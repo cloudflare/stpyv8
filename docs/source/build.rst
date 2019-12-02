@@ -9,7 +9,7 @@ Requirements
 Boost
 ^^^^^
 
-SoirV8 makes use of `boost.python <http://www.boost.org/doc/libs/release/libs/python/doc/>`_ [#f2]_ for interoperability.
+SoirV8 makes use of `boost.python <http://www.boost.org/doc/libs/release/libs/python/doc/>`_ for interoperability.
 
 Please download or install `the latest version <http://www.boost.org/users/download/>`_ of Boost and follow `the getting
 started guide <http://www.boost.org/doc/libs/release/more/getting_started/>`_ to build the library. Most Linux distributions
