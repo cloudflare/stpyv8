@@ -145,13 +145,13 @@ Sequences and Arrays
 
     An iterable which supports efficient element access using integer indices via the :py:meth:`object.__getitem__` special method and defines a :py:func:`len` method that returns the length of the sequence. Some built-in sequence types are :py:func:`list`, :py:func:`str`, :py:func:`tuple`, and :py:func:`unicode`. 
 
-Since Python haven't build-in Array, it defined a sequence concept, you could access a object as a sequence if it implement the sequence interface.
+Since Python haven't built-in Array type but defines a sequence concept, you could access a object as a sequence if it implement the sequence interface.
 
-SoirV8 provide the :py:class:`JSArray` class which wrap the Javascript Array object, and act as a Python sequence. You could access and modify it just like a normal Python list.
+SoirV8 provides the :py:class:`JSArray` class which wraps the Javascript Array object acting as a Python sequence. You could access and modify it just like a normal Python list.
 
 .. note::
 
-    The Javascript Array object support the Sparse Array [#f7]_, because it was implemented as a Associative Array [#f8]_, just like the :py:class:`dict` class in the Python. So, if we add a new item in :py:class:`JSArray` with a index value larger than the length, the padding item will always be None.
+    The Javascript Array object supports the Sparse Array [#f7]_ because it was implemented as an Associative Array [#f8]_, just like the :py:class:`dict` class in the Python. So adding a new item in the :py:class:`JSArray` with an index value larger than the length guarantees the padding item will always be None.
 
 .. doctest::
 
@@ -175,7 +175,7 @@ SoirV8 provide the :py:class:`JSArray` class which wrap the Javascript Array obj
     >>> [i for i in array]  # via :py:meth:`JSArray.__iter__`
     [1, None, 3, None, None, 3]
 
-On the other hand, your Javascript code could access all the Python sequence types as a array like object. 
+On the other hand, Javascript code could access all the Python sequence types as a array like object. 
 
 .. doctest::
 
@@ -200,7 +200,7 @@ On the other hand, your Javascript code could access all the Python sequence typ
     >>> ctxt.eval('var sum=0; for (i in array) sum+= array[i]; sum')
     7
 
-    >>> ctxt.eval('0 in array') # check whether the index is exists
+    >>> ctxt.eval('0 in array') # check whether the index exists
     True
     >>> ctxt.eval('3 in array') # array contains the value 3 but not the index 3
     False
@@ -213,7 +213,7 @@ On the other hand, your Javascript code could access all the Python sequence typ
 
     The Python sequence doesn't support the Javascript Array properties or methods, such as *length* etc. You could directly use the Python :py:func:`len` function in the Javascript code.
 
-If you want to pass a real Javascript Array, you could directly create a :py:class:`JSArray` instance, pass a Python :py:func:`list` as the parameter to the :py:meth:`JSArray.__init__` constructor.
+If you want to pass a real Javascript Array, you could directly create a :py:class:`JSArray` instance passing a Python :py:func:`list` as the parameter to the :py:meth:`JSArray.__init__` constructor.
 
 .. doctest::
 
@@ -234,9 +234,9 @@ Mapping and Property
 
     A container object (such as dict) which supports arbitrary key lookups using the special method :py:meth:`object.__getitem__`.
 
-Like the sequence types, Python also defined the mapping types, such as :py:class:`dict` etc.
+Like the sequence types, Python also defines mapping types, such as :py:class:`dict` etc.
 
-You could access the Python mapping with a named index or as a property, SoirV8 will access the value base on its type.
+You could access the Python mapping with a named index or as a property and SoirV8 will access the value based on its type.
 
 .. doctest::
 
@@ -258,7 +258,7 @@ You could access the Python mapping with a named index or as a property, SoirV8 
     >>> ctxt.locals.dict
     {'a': 1, 'c': 3, 'b': 2}
 
-From the Python side, all the Javascript object could be access as a mapping. You could get the keys with :py:meth:`JSObject.keys`, or check whether a key is exists with :py:meth:`JSObject.__contains__`.
+All the Javascript objects could be accessed from the Python side as a mapping. You could get the keys with :py:meth:`JSObject.keys`, or check whether a key is exists with :py:meth:`JSObject.__contains__`.
 
 .. doctest::
 
@@ -279,7 +279,7 @@ From the Python side, all the Javascript object could be access as a mapping. Yo
     >>> dict([(k, ctxt.locals.obj[k]) for k in ctxt.locals.obj.keys()])
     {'a': 1, 'c': 3, 'b': 2}
 
-The Python new-style object [#f9]_ support to define a property with getter, setter and deleter. SoirV8 will handle it if you build with SUPPORT_PROPERTY enabled (by default) in the Config.h file. The getter, setter or deleter will be call when the Javascript code access the property
+The Python new-style object [#f9]_ allows to define a property with a getter, a setter and a deleter. SoirV8 will propertly handle the property if built with the SUPPORT_PROPERTY enabled in the Config.h file (enabled by default). In such case the getter, the setter and/or the deleter will be called when the Javascript code access the property
 
 .. testcode::
 
@@ -295,10 +295,10 @@ The Python new-style object [#f9]_ support to define a property with getter, set
         name = property(getname, setname, delname)
 
     with JSContext(Global('test')) as ctxt:
-        print ctxt.eval("name")                 # test
-        print ctxt.eval("this.name = 'flier';") # flier
-        print ctxt.eval("name")                 # flier
-        print ctxt.eval("delete name")          # True
+        print(ctxt.eval("name"))                 # test
+        print(ctxt.eval("this.name = 'flier';")) # flier
+        print(ctxt.eval("name"))                 # flier
+        print(ctxt.eval("delete name"))          # True
 
 .. testoutput::
    :hide:
@@ -313,24 +313,22 @@ The Python new-style object [#f9]_ support to define a property with getter, set
 Function and Constructor
 ------------------------
 
-
-
 .. _exctrans:
 
 Exception Translation
 ---------------------
 
-Base on the mentioned design principle, SoirV8 will translate the exception between Python and Javascript, you could directly use **try...except** statement to handle the Javascript exception in the Python code, and vice versa.
+Based on the aforementioned design principles, SoirV8 will take care of converting the exceptions between Python and Javascript so that direct use of **try...except** statements allows to handle the Javascript exception in the Python code, and vice versa.
 
 .. testcode::
 
     with JSContext() as ctxt:
         try:
             ctxt.eval("throw Error('test');")
-        except JSError, e:
-            print e             # JSError: Error: test (  @ 1 : 6 )  -> throw Error('test');
-            print e.name
-            print e.message
+        except JSError as e:
+            print(e)            # JSError: Error: test (  @ 1 : 6 )  -> throw Error('test');
+            print(e.name)
+            print(e.message)
 
 .. testoutput::
    :hide:
@@ -339,7 +337,9 @@ Base on the mentioned design principle, SoirV8 will translate the exception betw
    Error
    test
 
-If the Javascript code throw a well known exception, it will be translate to an equivalent Python exception. Other Javascript exceptions will be wrapped as a :py:class:`JSError` instance. You could access the :py:class:`JSError` properties for more detail.
+If the Javascript code throws a well known exception, it will be translated to an equivalent Python exception. Other
+Javascript exceptions will be wrapped as a :py:class:`JSError` instance. You could access the :py:class:`JSError`
+properties for more detail.
 
 ====================    ========================
 Javascript Exception    Python Exception
@@ -351,7 +351,7 @@ TypeError               :py:exc:`TypeError`
 Error                   :py:class:`JSError`
 ====================    ========================
 
-From the Javascript side, you could also use **try...catch** statement to catch the Python exception.
+From the Javascript side, you could also use **try...catch** statements to catch Python exceptions.
 
 .. testcode::
 
@@ -362,7 +362,7 @@ From the Javascript side, you could also use **try...catch** statement to catch 
     with JSContext(Global()) as ctxt:
         ctxt.eval("try { this.raiseIndexError(); } catch (e) { msg = e; }")
 
-        print ctxt.locals.msg   # RangeError: list index out of range
+        print(ctxt.locals.msg)   # RangeError: list index out of range
 
 .. testoutput::
    :hide:
