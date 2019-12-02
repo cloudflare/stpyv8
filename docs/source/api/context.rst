@@ -9,19 +9,19 @@
 Javascript Context
 ==================
 
-.. sidebar:: execution context
+.. sidebar:: Execution context
 
     When control is transferred to ECMAScript executable code [#f2]_, control is entering an execution context.
 
         -- ECMA-262 3rd Chapter 10
 
-According to the ECMAScript [#f1]_ standard, an execution context has to be entered before executing any script code.
+According to the ECMAScript standard [#f1]_, an execution context has to be entered before executing any script code.
 
 :py:class:`JSContext` is a sandboxed execution context with its own set of built-in objects and functions.
 
 You could create a :py:class:`JSContext` instance, enter it with the :py:meth:`JSContext.enter` method, and use it to
-execute code with the :py:meth:`JSContext.eval` method. The best practice is to leave the context with the 
-:py:meth:`JSContext.leave` if you do not need it anymore.
+execute Javascript code with the :py:meth:`JSContext.eval` method. The best practice is to leave the context with the 
+:py:meth:`JSContext.leave` when you do not need it anymore.
 
 .. doctest::
 
@@ -33,7 +33,7 @@ execute code with the :py:meth:`JSContext.eval` method. The best practice is to 
 
 .. note::
 
-   To ensure the context could be enter/leave at the right time, we suggest to use the **with** statement (Python 2.5 or later).
+   To ensure the context is entered/left correctly, use the **with** statement
 
     .. testcode::
 
@@ -61,7 +61,7 @@ Property                        Description
 Global Object
 -------------
 
-.. sidebar:: global object
+.. sidebar:: Global object
 
     There is a unique *global object* (15.1), which is created before control enters any execution context. Initially the global object has the following properties:
 
@@ -72,9 +72,9 @@ Global Object
 
         -- ECMA-262 3rd Chapter 10.1.5
 
-The execution context has a global object, which could be accessed from the Python side with the :py:attr:`JSContext.locals`
-attribute or from the Javascript side using the global namespace. The Python and Javascript code could use such object to 
-perform seamless interoperable logic while SoirV8 will take care of :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
+The execution context has a global object which could be accessed both from the Python side with the :py:attr:`JSContext.locals`
+attribute and from the Javascript side using the global namespace. The Python and Javascript code could use such object to 
+perform seamless interoperable logic while SoirV8 takes care of :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
 
 .. testcode::
 
@@ -91,7 +91,7 @@ perform seamless interoperable logic while SoirV8 will take care of :ref:`typeco
    1
    2
 
-If you want to provide more complicated properties and methods to the Javascript code, you could pass a customized global object
+Providing more complicated properties and methods to the Javascript code can be easily done by passing a customized global object
 instance when the :py:class:`JSContext` instance is created.
 
 .. testcode::
@@ -185,5 +185,3 @@ JSContext - the execution context.
          * *Global code* is source text that is treated as an ECMAScript *Program*.
          * *Eval code* is the source text supplied to the built-in **eval** function.
          * *Function code* is source text that is parsed as part of a *FunctionBody*.
-
-.. [#f3] `Java Native Interface (JNI) <http://en.wikipedia.org/wiki/Java_Native_Interface>`_ is a programming framework that enables Java code running in a Java Virtual Machine (JVM) to call and to be called[1] by native applications (programs specific to a hardware and operating system platform) and libraries written in other languages such as C, C++ and assembly.

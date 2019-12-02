@@ -9,19 +9,23 @@
 Interoperability
 ================
 
-As the most basic and important design principle, the SoirV8 user doesn't need pay additional efforts for interoperability. It means that your Python code could seamless access the property or call the function of Javascript code, or vice versa. SoirV8 will do the dirty work under the table, such as :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
+SoirV8 was designed so that the end user doesn't need to spend additional efforts for interoperability. This means your Python 
+code could seamlessy access a property or call a Javascript function and SoirV8 will take care of performing all the dirty work 
+i.e. :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
 
 .. _typeconv:
 
 Type Conversion
 ---------------
 
-Python and Javascript has different type system and build-in primitives. SoirV8 have to guess the conversion by the type of source value.
+Python and Javascript have different type system and build-in primitives so SoirV8 is required to transparently perform the type
+conversion operations.
 
 Python to Javascript
 ^^^^^^^^^^^^^^^^^^^^
 
-When convert Python value to Javascript value, SoirV8 will try the following rules first. The remaining unknown Python type will be convert to a plain Javascript object.
+When converting a Python value to Javascript value, SoirV8 will try the following conversion rules first. The remaining unknown 
+Python types will be converted to a plain Javascript object.
 
 =============================   ===============     ==================  ================
 Python Type                     Python Value        Javascript Type     Javascript Value
@@ -50,11 +54,11 @@ function/method                                     Object/Function
 
     >>> protoof(None)
     '[object Null]'
+    >>> protoof(True)
+    '[object Boolean]'
     >>> typeof(True)
     'boolean'
     >>> typeof(123)
-    'number'
-    >>> typeof(123l)
     'number'
     >>> typeof(3.14)
     'number'
@@ -82,12 +86,12 @@ function/method                                     Object/Function
 
 .. note::
 
-    All the Python *function*, *method* and *type* will be convert to a Javascript function object, because the Python *type* could be used as a constructor and create a new instance.
+    All the Python *functions*, *methods* and *types* will be converted to a Javascript function object, because the Python *type* could be used as a constructor and create a new instance.
 
 Javascript to Python
 ^^^^^^^^^^^^^^^^^^^^
 
-When reverse direction of conversion, SoirV8 will try the following rules to map Javascript type to Python type.
+When converting from Javascript to Python, SoirV8 will try the following conversion rules
 
 ===============     ================    =============================   ============
 Javascript Type     Javascript Value    Python Type                     Python Value
@@ -106,7 +110,7 @@ Object                                  :py:class:`JSObject`
 
 .. note::
 
-    Even ECMAScript standard has only one Number type for both integer and float number, Google V8 defined the standalone Integer/Int32/Uint32 class to improve the performance. SoirV8 use the internal V8 type system to do the same job.
+    ECMAScript standard defines only one Number type for both integer and float numbers but Google V8 defined the Integer/Int32/Uint32 class to improve the overall performances. SoirV8 makes use of the same internal V8 type system to perform the same job.
 
 .. doctest::
 
@@ -134,8 +138,8 @@ Object                                  :py:class:`JSObject`
     >>> type(ctxt.eval("new Object()"))
     <class '_SoirV8.JSObject'>
 
-Sequence and Array
-^^^^^^^^^^^^^^^^^^
+Sequences and Arrays
+^^^^^^^^^^^^^^^^^^^^
 
 .. sidebar:: sequence
 

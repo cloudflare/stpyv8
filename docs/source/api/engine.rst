@@ -9,9 +9,12 @@
 Javascript Engine
 ==========================
 
-Besides to execute a Javascript code with :py:meth:`JSContext.eval`, you could create a new :py:class:`JSEngine` instance and compile the Javascript code with :py:meth:`JSEngine.compile` before execute it. A :py:class:`JSScript` object will be returned, and you could run it later with :py:meth:`JSScript.run` method many times, or visit its AST [#f1]_ with :py:meth:`JSScript.visit`.
+Besides executing Javascript code with the method :py:meth:`JSContext.eval`, you could create a new :py:class:`JSEngine` 
+instance and compile the Javascript code using the method :py:meth:`JSEngine.compile`. A :py:class:`JSScript` object is
+returned. This object allows code inspection and provides the method :py:meth:`JSScript.run` that allows to execute the
+compiled code.
 
-:py:class:`JSEngine` also contains some static properties and methods for the global v8 engine, for example:
+The class :py:class:`JSEngine` also provides the following static properties and methods
 
 ======================================= =====================================================
 Property or Method                      Description
@@ -25,10 +28,13 @@ Property or Method                      Description
 :py:meth:`JSEngine.terminateThread`     Forcefully terminate execution of a JavaScript thread
 ======================================= =====================================================
 
+
 Compile Script and Control Engine
 ---------------------------------
 
-When you use :py:meth:`JSEngine.compile` compile a Javascript code, the v8 engine will parse the sytanx and store the AST in a :py:class:`JSScript` object. You could execute it with :py:meth:`JSScript.run` or access the source code with :py:attr:`JSScript.source` later.
+When you use the method :py:meth:`JSEngine.compile` to compile a Javascript code, the V8 engine will parse the syntax and
+store the AST in a :py:class:`JSScript` object. You could then execute it with the method :py:meth:`JSScript.run` or access 
+the source code with the attribute :py:attr:`JSScript.source`.
 
 .. testcode::
 
@@ -36,29 +42,8 @@ When you use :py:meth:`JSEngine.compile` compile a Javascript code, the v8 engin
         with JSEngine() as engine:
             s = engine.compile("1+2")
 
-            print s.source # "1+2"
-            print s.run()  # 3
-
-.. testoutput::
-   :hide:
-
-   1+2
-   3
-
-You could only parse the sytanx with :py:meth:`JSEngine.precompile` before use it, which return a :py:class:`buffer` object contains some internal data. The buffer can't be executed directly, but could be used as the precompied parameter when call the :py:meth:`JSEngine.compile` later and improve the performance.
-
-.. testcode::
-
-        with JSContext() as ctxt:
-            with JSEngine() as engine:
-                buf = engine.precompile("1+2")
-
-                # do something
-
-                s = engine.compile("1+2", precompiled=buf) # use the parsed data to improve performancee
-
-                print s.source # "1+2"
-                print s.run()  # 3
+            print(s.source) # "1+2"
+            print(s.run())  # 3
 
 .. testoutput::
    :hide:
@@ -68,6 +53,7 @@ You could only parse the sytanx with :py:meth:`JSEngine.precompile` before use i
 
 If you need reuse the script in different contexts, you could refer to the :ref:`jsext`.
 
+
 JSEngine - the backend Javascript engine
 ----------------------------------------
 .. autoclass:: JSEngine
@@ -75,25 +61,16 @@ JSEngine - the backend Javascript engine
    :inherited-members:
    :exclude-members: compile, precompile
 
-   .. automethod:: compile(source, name='', line=-1, col=-1, precompiled=None) -> JSScript object
+   .. automethod:: compile(source, name = '', line = -1, col = -1) -> JSScript object
 
       Compile the Javascript code to a :py:class:`JSScript` object, which could be execute many times or visit it's AST.
 
-      :param source: the Javascript code
+      :param source: the Javascript code to be compiled
       :type source: str or unicode
       :param str name: the name of the Javascript code
       :param integer line: the start line number of the Javascript code
       :param integer col: the start column number of the Javascript code
-      :param buffer precompiled: the precompiled buffer of Javascript code
       :rtype: a compiled :py:class:`JSScript` object
-
-   .. automethod:: precompile(source) -> buffer object
-
-      Precompile the Javascript code to an internal buffer, which could be used to improve the performance when compile the same script later.
-
-      :param source: the Javascript code
-      :type source: str or unicode
-      :rtype: a buffer object contains the precompiled internal data
 
    .. automethod:: __enter__() -> JSEngine object
 
@@ -111,6 +88,7 @@ JSEngine - the backend Javascript engine
 
       The V8 thread id of the calling thread.
 
+
 JSScript - the compiled script
 ------------------------------
 .. autoclass:: JSScript
@@ -119,10 +97,6 @@ JSScript - the compiled script
    :exclude-members: run, visit
 
    .. automethod:: run() -> object
-
-   .. automethod:: visit(handler) -> None
-
-      Please refer to the :ref:`ast` page for more detail.
 
 .. toctree::
    :maxdepth: 2
