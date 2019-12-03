@@ -4,11 +4,6 @@
 
 #include "libplatform/libplatform.h"
 
-
-std::unique_ptr<v8::Platform> CPlatform::platform;
-bool CPlatform::inited = false;
-
-
 void CContext::Expose(void)
 {
   py::class_<CPlatform, boost::noncopyable>("JSPlatform", "JSPlatform allows the V8 platform to be initialized", py::no_init)
@@ -74,17 +69,17 @@ void CContext::Expose(void)
     .def("__bool__", &CContext::IsEntered, "the context has been entered.")
     ;
 
-  py::objects::class_value_wrapper<boost::shared_ptr<CPlatform>,
+  py::objects::class_value_wrapper<std::shared_ptr<CPlatform>,
     py::objects::make_ptr_instance<CPlatform,
-    py::objects::pointer_holder<boost::shared_ptr<CPlatform>,CPlatform> > >();
+    py::objects::pointer_holder<std::shared_ptr<CPlatform>,CPlatform> > >();
 
-  py::objects::class_value_wrapper<boost::shared_ptr<CIsolate>,
+  py::objects::class_value_wrapper<std::shared_ptr<CIsolate>,
     py::objects::make_ptr_instance<CIsolate,
-    py::objects::pointer_holder<boost::shared_ptr<CIsolate>,CIsolate> > >();
+    py::objects::pointer_holder<std::shared_ptr<CIsolate>,CIsolate> > >();
 
-  py::objects::class_value_wrapper<boost::shared_ptr<CContext>,
+  py::objects::class_value_wrapper<std::shared_ptr<CContext>,
     py::objects::make_ptr_instance<CContext,
-    py::objects::pointer_holder<boost::shared_ptr<CContext>,CContext> > >();
+    py::objects::pointer_holder<std::shared_ptr<CContext>,CContext> > >();
 }
 
 CContext::CContext(v8::Handle<v8::Context> context)
@@ -128,9 +123,9 @@ CContext::CContext(py::object global, py::list extensions)
 
   if (!ext_ptrs.empty()) cfg.reset(new v8::ExtensionConfiguration(ext_ptrs.size(), &ext_ptrs[0]));
 
-  v8::Handle<v8::Context> context = v8::Context::New(v8::Isolate::GetCurrent(), cfg.get());
+  v8::Handle<v8::Context> context = v8::Context::New(isolate, cfg.get());
 
-  m_context.Reset(v8::Isolate::GetCurrent(), context);
+  m_context.Reset(isolate, context);
 
   v8::Context::Scope context_scope(Handle());
 
@@ -138,7 +133,7 @@ CContext::CContext(py::object global, py::list extensions)
   {
     v8::Maybe<bool> retcode =
     Handle()->Global()->Set(context,
-        v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "__proto__").ToLocalChecked(), 
+        v8::String::NewFromUtf8(isolate, "__proto__").ToLocalChecked(),
         CPythonObject::Wrap(global));
     if(retcode.IsNothing()) {
       //TODO we need to do something if the set call failed
@@ -187,19 +182,21 @@ void CContext::SetSecurityToken(py::str token)
 
 py::object CContext::GetEntered(void)
 {
-  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
 
-  v8::Handle<v8::Context> entered = v8::Isolate::GetCurrent()->GetEnteredContext();
+  v8::Handle<v8::Context> entered = isolate->GetEnteredContext();
 
-  return (!v8::Isolate::GetCurrent()->InContext() || entered.IsEmpty()) ? py::object() :
+  return (!isolate->InContext() || entered.IsEmpty()) ? py::object() :
     py::object(py::handle<>(boost::python::converter::shared_ptr_to_python<CContext>(CContextPtr(new CContext(entered)))));
 }
 
 py::object CContext::GetCurrent(void)
 {
-  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
 
-  v8::Handle<v8::Context> current = v8::Isolate::GetCurrent()->GetCurrentContext();
+  v8::Handle<v8::Context> current = isolate->GetCurrentContext();
 
   return (current.IsEmpty()) ? py::object() :
     py::object(py::handle<>(boost::python::converter::shared_ptr_to_python<CContext>(CContextPtr(new CContext(current)))));
@@ -207,11 +204,12 @@ py::object CContext::GetCurrent(void)
 
 py::object CContext::GetCalling(void)
 {
-  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope handle_scope(isolate);
 
-  v8::Handle<v8::Context> calling = v8::Isolate::GetCurrent()->GetCurrentContext();
+  v8::Handle<v8::Context> calling = isolate->GetCurrentContext();
 
-  return (!v8::Isolate::GetCurrent()->InContext() || calling.IsEmpty()) ? py::object() :
+  return (!isolate->InContext() || calling.IsEmpty()) ? py::object() :
     py::object(py::handle<>(boost::python::converter::shared_ptr_to_python<CContext>(CContextPtr(new CContext(calling)))));
 }
 

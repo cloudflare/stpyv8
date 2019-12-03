@@ -1,10 +1,7 @@
 #pragma once
 
 #include <v8.h>
-#include <boost/shared_ptr.hpp>
-
 #include "Exception.h"
-
 
 class CIsolate
 {

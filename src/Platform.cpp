@@ -2,6 +2,8 @@
 
 #include "Platform.h"
 
+std::unique_ptr<v8::Platform> CPlatform::platform;
+bool CPlatform::inited = false;
 
 void CPlatform::Init()
 {

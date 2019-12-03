@@ -1,18 +1,11 @@
 //TODO make this an ifdef guard
 #pragma once
 
-/*
-#include "v8.h"
-#include "boost/python.hpp"
-
-namespace py = boost::python;
-*/
-
+#include <memory>
 #include <iostream>
 #include <map>
 #include <sstream>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
 #include "Exception.h"
@@ -20,10 +13,8 @@ namespace py = boost::python;
 class CJavascriptObject;
 class CJavascriptFunction;
 
-//TODO boost will now do standard shared pointers
-//typedef std::shared_ptr<CJavascriptObject> CJavascriptObjectPtr;
-typedef boost::shared_ptr<CJavascriptObject> CJavascriptObjectPtr;
-typedef boost::shared_ptr<CJavascriptFunction> CJavascriptFunctionPtr;
+typedef std::shared_ptr<CJavascriptObject> CJavascriptObjectPtr;
+typedef std::shared_ptr<CJavascriptFunction> CJavascriptFunctionPtr;
 
 class CJavascriptObject;
 
