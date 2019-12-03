@@ -33,7 +33,7 @@ Compile Script and Control Engine
 ---------------------------------
 
 When you use the method :py:meth:`JSEngine.compile` to compile a Javascript code, the V8 engine will parse the syntax and
-store the AST in a :py:class:`JSScript` object. You could then execute it with the method :py:meth:`JSScript.run` or access 
+store the AST [#f1]_ in a :py:class:`JSScript` object. You could then execute it with the method :py:meth:`JSScript.run` or access 
 the source code with the attribute :py:attr:`JSScript.source`.
 
 .. testcode::
