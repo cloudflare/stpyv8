@@ -1,16 +1,16 @@
-.. py:module:: SoirV8
+.. py:module:: SpyV8
 
 .. testsetup:: *
 
-   from SoirV8 import *
+   from SpyV8 import *
 
 .. _wrapper:
 
 Interoperability
 ================
 
-SoirV8 was designed so that the end user doesn't need to spend additional efforts for interoperability. This means your Python 
-code could seamlessy access a property or call a Javascript function and SoirV8 will take care of performing all the dirty work 
+SpyV8 was designed so that the end user doesn't need to spend additional efforts for interoperability. This means your Python 
+code could seamlessy access a property or call a Javascript function and SpyV8 will take care of performing all the dirty work 
 i.e. :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
 
 .. _typeconv:
@@ -18,13 +18,13 @@ i.e. :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
 Type Conversion
 ---------------
 
-Python and Javascript have different type system and build-in primitives so SoirV8 is required to transparently perform the type
+Python and Javascript have different type system and build-in primitives so SpyV8 is required to transparently perform the type
 conversion operations.
 
 Python to Javascript
 ^^^^^^^^^^^^^^^^^^^^
 
-When converting a Python value to Javascript value, SoirV8 will try the following conversion rules first. The remaining unknown 
+When converting a Python value to Javascript value, SpyV8 will try the following conversion rules first. The remaining unknown 
 Python types will be converted to a plain Javascript object.
 
 =============================   ===============     ==================  ================
@@ -91,7 +91,7 @@ function/method                                     Object/Function
 Javascript to Python
 ^^^^^^^^^^^^^^^^^^^^
 
-When converting from Javascript to Python, SoirV8 will try the following conversion rules
+When converting from Javascript to Python, SpyV8 will try the following conversion rules
 
 ===============     ================    =============================   ============
 Javascript Type     Javascript Value    Python Type                     Python Value
@@ -110,7 +110,7 @@ Object                                  :py:class:`JSObject`
 
 .. note::
 
-    ECMAScript standard defines only one Number type for both integer and float numbers but Google V8 defined the Integer/Int32/Uint32 class to improve the overall performances. SoirV8 makes use of the same internal V8 type system to perform the same job.
+    ECMAScript standard defines only one Number type for both integer and float numbers but Google V8 defined the Integer/Int32/Uint32 class to improve the overall performances. SpyV8 makes use of the same internal V8 type system to perform the same job.
 
 .. doctest::
 
@@ -132,11 +132,11 @@ Object                                  :py:class:`JSObject`
     >>> type(ctxt.eval("new Date()"))
     <type 'datetime.datetime'>
     >>> type(ctxt.eval("[1, 2, 3]"))
-    <class '_SoirV8.JSArray'>
+    <class '_SpyV8.JSArray'>
     >>> type(ctxt.eval("(function() {})"))
-    <class '_SoirV8.JSFunction'>
+    <class '_SpyV8.JSFunction'>
     >>> type(ctxt.eval("new Object()"))
-    <class '_SoirV8.JSObject'>
+    <class '_SpyV8.JSObject'>
 
 Sequences and Arrays
 ^^^^^^^^^^^^^^^^^^^^
@@ -147,7 +147,7 @@ Sequences and Arrays
 
 Since Python haven't built-in Array type but defines a sequence concept, you could access a object as a sequence if it implement the sequence interface.
 
-SoirV8 provides the :py:class:`JSArray` class which wraps the Javascript Array object acting as a Python sequence. You could access and modify it just like a normal Python list.
+SpyV8 provides the :py:class:`JSArray` class which wraps the Javascript Array object acting as a Python sequence. You could access and modify it just like a normal Python list.
 
 .. note::
 
@@ -236,7 +236,7 @@ Mapping and Property
 
 Like the sequence types, Python also defines mapping types, such as :py:class:`dict` etc.
 
-You could access the Python mapping with a named index or as a property and SoirV8 will access the value based on its type.
+You could access the Python mapping with a named index or as a property and SpyV8 will access the value based on its type.
 
 .. doctest::
 
@@ -279,7 +279,7 @@ All the Javascript objects could be accessed from the Python side as a mapping. 
     >>> dict([(k, ctxt.locals.obj[k]) for k in ctxt.locals.obj.keys()])
     {'a': 1, 'c': 3, 'b': 2}
 
-The Python new-style object [#f9]_ allows to define a property with a getter, a setter and a deleter. SoirV8 will propertly handle the property if built with the SUPPORT_PROPERTY enabled in the Config.h file (enabled by default). In such case the getter, the setter and/or the deleter will be called when the Javascript code access the property
+The Python new-style object [#f9]_ allows to define a property with a getter, a setter and a deleter. SpyV8 will propertly handle the property if built with the SUPPORT_PROPERTY enabled in the Config.h file (enabled by default). In such case the getter, the setter and/or the deleter will be called when the Javascript code access the property
 
 .. testcode::
 
@@ -318,7 +318,7 @@ Function and Constructor
 Exception Translation
 ---------------------
 
-Based on the aforementioned design principles, SoirV8 will take care of converting the exceptions between Python and Javascript so that direct use of **try...except** statements allows to handle the Javascript exception in the Python code, and vice versa.
+Based on the aforementioned design principles, SpyV8 will take care of converting the exceptions between Python and Javascript so that direct use of **try...except** statements allows to handle the Javascript exception in the Python code, and vice versa.
 
 .. testcode::
 

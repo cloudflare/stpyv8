@@ -2,17 +2,17 @@ import sys
 import unittest
 import logging
 
-import SoirV8
+import SpyV8
 
 
 class TestIsolate(unittest.TestCase):
     def testBase(self):
-        with SoirV8.JSIsolate() as isolate:
+        with SpyV8.JSIsolate() as isolate:
             self.assertIsNotNone(isolate.current)
             self.assertFalse(isolate.locked)
 
     def testEnterLeave(self):
-        with SoirV8.JSIsolate() as isolate:
+        with SpyV8.JSIsolate() as isolate:
             self.assertIsNotNone(isolate.current)
 
 if __name__ == '__main__':

@@ -1,8 +1,8 @@
-.. py:module:: SoirV8
+.. py:module:: SpyV8
 
 .. testsetup:: *
 
-   from SoirV8 import *
+   from SpyV8 import *
    
 .. _engine:
 

@@ -1,8 +1,8 @@
-.. py:module:: SoirV8
+.. py:module:: SpyV8
 
 .. testsetup:: *
 
-   from SoirV8 import *
+   from SpyV8 import *
 
 .. _context:
 
@@ -74,7 +74,7 @@ Global Object
 
 The execution context has a global object which could be accessed both from the Python side with the :py:attr:`JSContext.locals`
 attribute and from the Javascript side using the global namespace. The Python and Javascript code could use such object to 
-perform seamless interoperable logic while SoirV8 takes care of :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
+perform seamless interoperable logic while SpyV8 takes care of :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
 
 .. testcode::
 

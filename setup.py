@@ -98,8 +98,8 @@ def build_v8():
              msg = "Build V8 with ninja")
 
 
-def clean_soirv8():
-    build_folder = os.path.join(SOIRV8_HOME, 'build')
+def clean_spyv8():
+    build_folder = os.path.join(SPYV8_HOME, 'build')
 
     if os.path.exists(os.path.join(build_folder)):
         shutil.rmtree(build_folder)
@@ -110,54 +110,54 @@ def prepare_v8():
         install_depot()
         checkout_v8()
         build_v8()
-        clean_soirv8()
+        clean_spyv8()
     except Exception as e:
         log.error("Fail to checkout and build v8, %s", str(e))
 
 
-class soirv8_build(build):
+class spyv8_build(build):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_STABLE
         prepare_v8()
         build.run(self)
 
 
-class soirv8_develop(build):
+class spyv8_develop(build):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_MASTER
         prepare_v8()
         build.run(self)
 
 
-class soirv8_install_v8(build):
+class spyv8_install_v8(build):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_MASTER
         prepare_v8()
 
 
-class soirv8_build_no_v8(build):
+class spyv8_build_no_v8(build):
     def run(self):
-        clean_soirv8()
+        clean_spyv8()
         build.run(self)
 
 
-class soirv8_install(install):
+class spyv8_install(install):
     def run(self):
         self.skip_build = True
         install.run(self)
 
 
-soirv8 = Extension(name               = "_SoirV8",
-                   sources            = [os.path.join("src", source) for source in source_files],
-                   define_macros      = macros,
-                   include_dirs       = include_dirs,
-                   library_dirs       = library_dirs,
-                   libraries          = libraries,
-                   extra_compile_args = extra_compile_args,
-                   extra_link_args    = extra_link_args,
-                   )
+spyv8 = Extension(name               = "_SpyV8",
+                  sources            = [os.path.join("src", source) for source in source_files],
+                  define_macros      = macros,
+                  include_dirs       = include_dirs,
+                  library_dirs       = library_dirs,
+                  libraries          = libraries,
+                  extra_compile_args = extra_compile_args,
+                  extra_link_args    = extra_link_args,
+                  )
 
-setup(name         = 'soirv8',
+setup(name         = 'spyv8',
       version      = '0.1',
       description  = 'Python Wrapper for Google V8 Engine',
       platforms    = 'x86',
@@ -166,8 +166,8 @@ setup(name         = 'soirv8',
       url          = '',
       download_url = '',
       license      = '',
-      py_modules   = ['SoirV8'],
-      ext_modules  = [soirv8],
+      py_modules   = ['SpyV8'],
+      ext_modules  = [spyv8],
       classifiers  = [
         'Development Status :: 4 - Beta',
         'Environment :: Plugins',
@@ -186,9 +186,9 @@ setup(name         = 'soirv8',
         'Topic :: Utilities',
       ],
       cmdclass = dict(
-          build   = soirv8_build,
-          develop = soirv8_develop,
-          v8      = soirv8_install_v8,
-          soirv8  = soirv8_build_no_v8,
-          install = soirv8_install),
+          build   = spyv8_build,
+          develop = spyv8_develop,
+          v8      = spyv8_install_v8,
+          spyv8   = spyv8_build_no_v8,
+          install = spyv8_install),
 )

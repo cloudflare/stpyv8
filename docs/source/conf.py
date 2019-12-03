@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# SoirV8 documentation build configuration file, created by
+# SpyV8 documentation build configuration file, created by
 # sphinx-quickstart on Wed Nov 27 12:08:50 2019.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'SoirV8'
+project = u'SpyV8'
 copyright = u'2019, Area 1 Security'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -170,7 +170,7 @@ html_sidebars = {
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'SoirV8doc'
+htmlhelp_basename = 'SpyV8doc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -184,7 +184,7 @@ htmlhelp_basename = 'SoirV8doc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'SoirV8.tex', u'SoirV8 Documentation',
+  ('index', 'SpyV8.tex', u'SpyV8 Documentation',
    u'Area 1 Security', 'manual'),
 ]
 
@@ -217,7 +217,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'soirv8', u'SoirV8 Documentation',
+    ('index', 'spyv8', u'SpyV8 Documentation',
      [u'Area 1 Security'], 1)
 ]
 

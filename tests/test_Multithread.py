@@ -2,41 +2,41 @@ import sys
 import unittest
 import logging
 
-import SoirV8
+import SpyV8
 
 
 class TestMultithread(unittest.TestCase):
     def testLocker(self):
-        with SoirV8.JSIsolate():
-            self.assertFalse(SoirV8.JSLocker.active)
-            self.assertFalse(SoirV8.JSLocker.locked)
+        with SpyV8.JSIsolate():
+            self.assertFalse(SpyV8.JSLocker.active)
+            self.assertFalse(SpyV8.JSLocker.locked)
 
-            with SoirV8.JSLocker() as outter_locker:
-                self.assertTrue(SoirV8.JSLocker.active)
-                self.assertTrue(SoirV8.JSLocker.locked)
+            with SpyV8.JSLocker() as outter_locker:
+                self.assertTrue(SpyV8.JSLocker.active)
+                self.assertTrue(SpyV8.JSLocker.locked)
 
                 self.assertTrue(outter_locker)
 
-                with SoirV8.JSLocker() as inner_locker:
-                    self.assertTrue(SoirV8.JSLocker.locked)
+                with SpyV8.JSLocker() as inner_locker:
+                    self.assertTrue(SpyV8.JSLocker.locked)
 
                     self.assertTrue(outter_locker)
                     self.assertTrue(inner_locker)
 
-                    with SoirV8.JSUnlocker():
-                        self.assertFalse(SoirV8.JSLocker.locked)
+                    with SpyV8.JSUnlocker():
+                        self.assertFalse(SpyV8.JSLocker.locked)
 
                         self.assertTrue(outter_locker)
                         self.assertTrue(inner_locker)
 
-                    self.assertTrue(SoirV8.JSLocker.locked)
+                    self.assertTrue(SpyV8.JSLocker.locked)
 
-            self.assertTrue(SoirV8.JSLocker.active)
-            self.assertFalse(SoirV8.JSLocker.locked)
+            self.assertTrue(SpyV8.JSLocker.active)
+            self.assertFalse(SpyV8.JSLocker.locked)
 
-            locker = SoirV8.JSLocker()
+            locker = SpyV8.JSLocker()
 
-        with SoirV8.JSContext():
+        with SpyV8.JSContext():
             self.assertRaises(RuntimeError, locker.__enter__)
             self.assertRaises(RuntimeError, locker.__exit__, None, None, None)
 
@@ -58,8 +58,8 @@ class TestMultithread(unittest.TestCase):
         g = Global()
 
         def run():
-            with SoirV8.JSIsolate():
-                with SoirV8.JSContext(g) as ctxt:
+            with SpyV8.JSIsolate():
+                with SpyV8.JSContext(g) as ctxt:
                     ctxt.eval("""
                         started.wait();
 
@@ -91,7 +91,7 @@ class TestMultithread(unittest.TestCase):
             result = []
 
             def add(self, value):
-                with SoirV8.JSUnlocker():
+                with SpyV8.JSUnlocker():
                     time.sleep(0.1)
 
                     self.result.append(value)
@@ -99,7 +99,7 @@ class TestMultithread(unittest.TestCase):
         g = Global()
 
         def run():
-            with SoirV8.JSContext(g) as ctxt:
+            with SpyV8.JSContext(g) as ctxt:
                 ctxt.eval("""
                     for (i=0; i<10; i++)
                         add(i);
@@ -107,7 +107,7 @@ class TestMultithread(unittest.TestCase):
 
         threads = [threading.Thread(target = run), threading.Thread(target = run)]
 
-        with SoirV8.JSLocker():
+        with SpyV8.JSLocker():
             for t in threads: 
                 t.start()
 

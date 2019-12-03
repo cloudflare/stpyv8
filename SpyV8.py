@@ -12,7 +12,7 @@ import collections.abc
 import functools
 import json
 
-import _SoirV8
+import _SpyV8
 
 __version__ = '1.0'
 
@@ -112,14 +112,14 @@ class JSError(Exception):
     def frames(self):
         return self.parse_stack(self.stackTrace)
 
-_SoirV8._JSError._jsclass = JSError
+_SpyV8._JSError._jsclass = JSError
 
-JSObject    = _SoirV8.JSObject
-JSNull      = _SoirV8.JSNull
-JSUndefined = _SoirV8.JSUndefined
-JSArray     = _SoirV8.JSArray
-JSFunction  = _SoirV8.JSFunction
-JSPlatform  = _SoirV8.JSPlatform
+JSObject    = _SpyV8.JSObject
+JSNull      = _SpyV8.JSNull
+JSUndefined = _SpyV8.JSUndefined
+JSArray     = _SpyV8.JSArray
+JSFunction  = _SpyV8.JSFunction
+JSPlatform  = _SpyV8.JSPlatform
 
 
 # JS_ESCAPABLE = re.compile(r'([^\x00-\x7f])')
@@ -149,12 +149,12 @@ JSPlatform  = _SoirV8.JSPlatform
 #    return str(JS_ESCAPABLE.sub(_js_escape_unicode_re_callack, text))
 
 
-# class JSExtension(_SoirV8.JSExtension):
+# class JSExtension(_SpyV8.JSExtension):
 #    def __init__(self, name, source, callback=None, dependencies=[], register=True):
-#        _SoirV8.JSExtension.__init__(self, js_escape_unicode(name), js_escape_unicode(source), callback, dependencies, register)
+#        _SpyV8.JSExtension.__init__(self, js_escape_unicode(name), js_escape_unicode(source), callback, dependencies, register)
 
 
-class JSLocker(_SoirV8.JSLocker):
+class JSLocker(_SpyV8.JSLocker):
     def __enter__(self):
         self.enter()
 
@@ -175,7 +175,7 @@ class JSLocker(_SoirV8.JSLocker):
         return self.entered()
 
 
-class JSUnlocker(_SoirV8.JSUnlocker):
+class JSUnlocker(_SpyV8.JSUnlocker):
     def __enter__(self):
         self.enter()
         return self
@@ -286,13 +286,13 @@ class JSClassPrototype(JSClass):
         return self.cls.__name__
 
 
-# JSObjectSpace = _SoirV8.JSObjectSpace
-# JSAllocationAction = _SoirV8.JSAllocationAction
+# JSObjectSpace = _SpyV8.JSObjectSpace
+# JSAllocationAction = _SpyV8.JSAllocationAction
 
 
-class JSEngine(_SoirV8.JSEngine):
+class JSEngine(_SpyV8.JSEngine):
     def __init__(self):
-        _SoirV8.JSEngine.__init__(self)
+        _SpyV8.JSEngine.__init__(self)
 
     def __enter__(self):
         return self
@@ -301,14 +301,14 @@ class JSEngine(_SoirV8.JSEngine):
         del self
 
 
-JSScript = _SoirV8.JSScript
-JSStackTrace = _SoirV8.JSStackTrace
-JSStackTrace.Options = _SoirV8.JSStackTraceOptions
-JSStackTrace.GetCurrentStackTrace = staticmethod(lambda frame_limit, options: _SoirV8.JSIsolate.current.GetCurrentStackTrace(frame_limit, options))
-JSStackFrame = _SoirV8.JSStackFrame
+JSScript = _SpyV8.JSScript
+JSStackTrace = _SpyV8.JSStackTrace
+JSStackTrace.Options = _SpyV8.JSStackTraceOptions
+JSStackTrace.GetCurrentStackTrace = staticmethod(lambda frame_limit, options: _SpyV8.JSIsolate.current.GetCurrentStackTrace(frame_limit, options))
+JSStackFrame = _SpyV8.JSStackFrame
 
 
-class JSIsolate(_SoirV8.JSIsolate):
+class JSIsolate(_SpyV8.JSIsolate):
     def __enter__(self):
         self.enter()
         return self
@@ -318,16 +318,16 @@ class JSIsolate(_SoirV8.JSIsolate):
         del self
 
 
-class JSContext(_SoirV8.JSContext):
+class JSContext(_SpyV8.JSContext):
     def __init__(self, obj = None, extensions = None, ctxt = None):
         if JSLocker.active:
             self.lock = JSLocker()
             self.lock.enter()
 
         if ctxt:
-            _SoirV8.JSContext.__init__(self, ctxt)
+            _SpyV8.JSContext.__init__(self, ctxt)
         else:
-            _SoirV8.JSContext.__init__(self, obj, extensions or [])
+            _SpyV8.JSContext.__init__(self, obj, extensions or [])
 
     def __enter__(self):
         self.enter()

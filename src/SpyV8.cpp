@@ -6,7 +6,7 @@
 #include "Locker.h"
 
 
-BOOST_PYTHON_MODULE(_SoirV8)
+BOOST_PYTHON_MODULE(_SpyV8)
 {
   CJavascriptException::Expose();
   CWrapper::Expose();
@@ -16,5 +16,5 @@ BOOST_PYTHON_MODULE(_SoirV8)
 }
 
 
-#define INIT_MODULE PyInit__SoirV8
+#define INIT_MODULE PyInit__SpyV8
 extern "C" PyObject* INIT_MODULE();
