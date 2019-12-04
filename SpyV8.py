@@ -30,12 +30,9 @@ __all__ = ["ReadOnly",
            "JSEngine",
            "JSContext",
            "JSIsolate",
-           # "JSObjectSpace",
-           # "JSAllocationAction",
            "JSStackTrace",
            "JSStackFrame",
            "JSScript",
-           # "profiler",
            # "JSExtension",
            "JSLocker",
            "JSUnlocker",
@@ -284,10 +281,6 @@ class JSClassPrototype(JSClass):
     @property
     def name(self):
         return self.cls.__name__
-
-
-# JSObjectSpace = _SpyV8.JSObjectSpace
-# JSAllocationAction = _SpyV8.JSAllocationAction
 
 
 class JSEngine(_SpyV8.JSEngine):
