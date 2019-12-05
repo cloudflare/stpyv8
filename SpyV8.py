@@ -33,7 +33,6 @@ __all__ = ["ReadOnly",
            "JSStackTrace",
            "JSStackFrame",
            "JSScript",
-           # "JSExtension",
            "JSLocker",
            "JSUnlocker",
            "JSPlatform"]
@@ -117,38 +116,6 @@ JSUndefined = _SpyV8.JSUndefined
 JSArray     = _SpyV8.JSArray
 JSFunction  = _SpyV8.JSFunction
 JSPlatform  = _SpyV8.JSPlatform
-
-
-# JS_ESCAPABLE = re.compile(r'([^\x00-\x7f])')
-# HAS_UTF8     = re.compile(r'[\x80-\xff]')
-
-
-# def _js_escape_unicode_re_callack(match):
-#    n = ord(match.group(0))
-#    if n < 0x10000:
-#        return '\\u%04x' % (n,)
-#    else:
-#        # surrogate pair
-#        n -= 0x10000
-#        s1 = 0xd800 | ((n >> 10) & 0x3ff)
-#        s2 = 0xdc00 | (n & 0x3ff)
-#        return '\\u%04x\\u%04x' % (s1, s2)
-
-
-# def js_escape_unicode(text):
-#    """Return an ASCII-only representation of a JavaScript string"""
-#    if isinstance(text, str):
-#        if HAS_UTF8.search(text) is None:
-#            return text
-#
-#        text = text.decode('UTF-8')
-#
-#    return str(JS_ESCAPABLE.sub(_js_escape_unicode_re_callack, text))
-
-
-# class JSExtension(_SpyV8.JSExtension):
-#    def __init__(self, name, source, callback=None, dependencies=[], register=True):
-#        _SpyV8.JSExtension.__init__(self, js_escape_unicode(name), js_escape_unicode(source), callback, dependencies, register)
 
 
 class JSLocker(_SpyV8.JSLocker):
@@ -312,7 +279,7 @@ class JSIsolate(_SpyV8.JSIsolate):
 
 
 class JSContext(_SpyV8.JSContext):
-    def __init__(self, obj = None, extensions = None, ctxt = None):
+    def __init__(self, obj = None, ctxt = None):
         if JSLocker.active:
             self.lock = JSLocker()
             self.lock.enter()
@@ -320,7 +287,7 @@ class JSContext(_SpyV8.JSContext):
         if ctxt:
             _SpyV8.JSContext.__init__(self, ctxt)
         else:
-            _SpyV8.JSContext.__init__(self, obj, extensions or [])
+            _SpyV8.JSContext.__init__(self, obj)
 
     def __enter__(self):
         self.enter()
