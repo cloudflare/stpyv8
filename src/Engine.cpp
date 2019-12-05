@@ -79,30 +79,6 @@ void CEngine::Expose(void)
   py::objects::class_value_wrapper<std::shared_ptr<CScript>,
     py::objects::make_ptr_instance<CScript,
     py::objects::pointer_holder<std::shared_ptr<CScript>, CScript> > >();
-
-  /*
-#ifdef SUPPORT_EXTENSION
-
-  py::class_<CExtension, boost::noncopyable>("JSExtension", "JSExtension is a reusable script module.", py::no_init)
-    .def(py::init<const std::string&, const std::string&, py::object, py::list, bool>((py::arg("name"),
-                                                                                       py::arg("source"),
-                                                                                       py::arg("callback") = py::object(),
-                                                                                       py::arg("dependencies") = py::list(),
-                                                                                       py::arg("register") = true)))
-    .add_static_property("extensions", &CExtension::GetExtensions)
-
-    .add_property("name", &CExtension::GetName, "The name of extension")
-    .add_property("source", &CExtension::GetSource, "The source code of extension")
-    .add_property("dependencies", &CExtension::GetDependencies, "The extension dependencies which will be load before this extension")
-
-    .add_property("autoEnable", &CExtension::IsAutoEnable, &CExtension::SetAutoEnable, "Enable the extension by default.")
-
-    .add_property("registered", &CExtension::IsRegistered, "The extension has been registerd")
-    .def("register", &CExtension::Register, "Register the extension")
-    ;
-
-#endif
-*/
 }
 
 bool CEngine::IsDead(void)
@@ -249,13 +225,3 @@ py::object CScript::Run(void)
 
   return m_engine.ExecuteScript(Script());
 }
-
-#ifdef SUPPORT_EXTENSION
-/*
-class CPythonExtension : public v8::Extension
-{
-  py::object m_callback;
-*/
-#endif
-
-
