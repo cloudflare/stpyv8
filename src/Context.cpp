@@ -33,8 +33,8 @@ void CContext::Expose(void)
 
   py::class_<CContext, boost::noncopyable>("JSContext", "JSContext is an execution context.", py::no_init)
     .def(py::init<const CContext&>("Create a new context based on a existing context"))
-    .def(py::init<py::object>((py::arg("global") = py::object(),
-                               "Create a new context based on global object")))
+    .def(py::init<py::object>((py::arg("global") = py::object()),
+                               "Create a new context based on global object"))
 
     .add_property("securityToken", &CContext::GetSecurityToken, &CContext::SetSecurityToken)
 
