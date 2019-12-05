@@ -36,7 +36,6 @@ v8::Handle<v8::String> ToString(const std::wstring& str)
           v8::NewStringType::kNormal, 
           str.size())
         .ToLocalChecked());
-    //return scope.Escape(v8::String::NewFromTwoByte(v8::Isolate::GetCurrent(), (const uint16_t *) str.c_str(), v8::String::kNormalString, str.size()));
   }
 
   std::vector<uint16_t> data(str.size()+1);
@@ -55,7 +54,6 @@ v8::Handle<v8::String> ToString(const std::wstring& str)
         v8::NewStringType::kNormal, 
         str.size())
       .ToLocalChecked());
-  //orig: return scope.Escape(v8::String::NewFromTwoByte(v8::Isolate::GetCurrent(), &data[0], v8::String::kNormalString, str.size()));
 }
 
 v8::Handle<v8::String> ToString(py::object str)
@@ -71,7 +69,6 @@ v8::Handle<v8::String> ToString(py::object str)
           v8::NewStringType::kNormal, 
           PyBytes_GET_SIZE(str.ptr()))
         .ToLocalChecked());
-    //orig: return scope.Escape(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), PyBytes_AS_STRING(str.ptr()), v8::String::kNormalString, PyBytes_GET_SIZE(str.ptr())));
   }
 
   if (PyUnicode_CheckExact(str.ptr()))
@@ -82,8 +79,6 @@ v8::Handle<v8::String> ToString(py::object str)
           v8::Isolate::GetCurrent(), 
           reinterpret_cast<const uint16_t *>(PyUnicode_AS_UNICODE(str.ptr())))
         .ToLocalChecked());
-    //orig: return scope.Escape(v8::String::NewFromTwoByte(v8::Isolate::GetCurrent(),
-    //  reinterpret_cast<const uint16_t *>(PyUnicode_AS_UNICODE(str.ptr()))));
 
 #else
     Py_ssize_t len = PyUnicode_GET_SIZE(str.ptr());
@@ -105,7 +100,6 @@ v8::Handle<v8::String> ToString(py::object str)
           v8::NewStringType::kNormal, 
           len)
         .ToLocalChecked());
-    //orig: return scope.Escape(v8::String::NewFromTwoByte(v8::Isolate::GetCurrent(), &data[0], v8::String::kNormalString, len));
 #endif
   }
 

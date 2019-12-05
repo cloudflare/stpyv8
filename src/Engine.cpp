@@ -76,9 +76,9 @@ void CEngine::Expose(void)
     .def("run", &CScript::Run, "Execute the compiled code.")
     ;
 
-  py::objects::class_value_wrapper<boost::shared_ptr<CScript>,
+  py::objects::class_value_wrapper<std::shared_ptr<CScript>,
     py::objects::make_ptr_instance<CScript,
-    py::objects::pointer_holder<boost::shared_ptr<CScript>, CScript> > >();
+    py::objects::pointer_holder<std::shared_ptr<CScript>, CScript> > >();
 
   /*
 #ifdef SUPPORT_EXTENSION
@@ -165,7 +165,7 @@ void CEngine::SetStackLimit(uintptr_t stack_limit_size)
   v8::Isolate::GetCurrent()->SetStackLimit(stack_limit);
 }
 
-boost::shared_ptr<CScript> CEngine::InternalCompile(v8::Handle<v8::String> src,
+std::shared_ptr<CScript> CEngine::InternalCompile(v8::Handle<v8::String> src,
                                                     v8::Handle<v8::Value> name,
                                                     int line, int col)
 {
@@ -197,7 +197,7 @@ boost::shared_ptr<CScript> CEngine::InternalCompile(v8::Handle<v8::String> src,
 
   if (script.IsEmpty()) CJavascriptException::ThrowIf(m_isolate, try_catch);
 
-  return boost::shared_ptr<CScript>(new CScript(m_isolate, *this, script_source, script.ToLocalChecked()));
+  return std::shared_ptr<CScript>(new CScript(m_isolate, *this, script_source, script.ToLocalChecked()));
 }
 
 py::object CEngine::ExecuteScript(v8::Handle<v8::Script> script)

@@ -2,8 +2,8 @@
 
 #include <cassert>
 #include <stdexcept>
+#include <memory>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
 #include "Config.h"
@@ -28,8 +28,8 @@ struct ExceptionTranslator
 class CJavascriptStackTrace;
 class CJavascriptStackFrame;
 
-typedef boost::shared_ptr<CJavascriptStackTrace> CJavascriptStackTracePtr;
-typedef boost::shared_ptr<CJavascriptStackFrame> CJavascriptStackFramePtr;
+typedef std::shared_ptr<CJavascriptStackTrace> CJavascriptStackTracePtr;
+typedef std::shared_ptr<CJavascriptStackFrame> CJavascriptStackFramePtr;
 
 class CJavascriptStackTrace
 {

@@ -1,8 +1,7 @@
 #pragma once
 
 #include <cassert>
-
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "Isolate.h"
 #include "Platform.h"
@@ -13,8 +12,8 @@
 class CContext;
 class CIsolate;
 
-typedef boost::shared_ptr<CContext> CContextPtr;
-typedef boost::shared_ptr<CIsolate> CIsolatePtr;
+typedef std::shared_ptr<CContext> CContextPtr;
+typedef std::shared_ptr<CIsolate> CIsolatePtr;
 
 
 class CContext

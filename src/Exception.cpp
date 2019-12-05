@@ -46,13 +46,13 @@ void CJavascriptException::Expose(void)
     .add_property("isConstructor", &CJavascriptStackFrame::IsConstructor)
     ;
 
-  py::objects::class_value_wrapper<boost::shared_ptr<CJavascriptStackTrace>,
+  py::objects::class_value_wrapper<std::shared_ptr<CJavascriptStackTrace>,
     py::objects::make_ptr_instance<CJavascriptStackTrace,
-    py::objects::pointer_holder<boost::shared_ptr<CJavascriptStackTrace>, CJavascriptStackTrace> > >();
+    py::objects::pointer_holder<std::shared_ptr<CJavascriptStackTrace>, CJavascriptStackTrace> > >();
 
-  py::objects::class_value_wrapper<boost::shared_ptr<CJavascriptStackFrame>,
+  py::objects::class_value_wrapper<std::shared_ptr<CJavascriptStackFrame>,
     py::objects::make_ptr_instance<CJavascriptStackFrame,
-    py::objects::pointer_holder<boost::shared_ptr<CJavascriptStackFrame>, CJavascriptStackFrame> > >();
+    py::objects::pointer_holder<std::shared_ptr<CJavascriptStackFrame>, CJavascriptStackFrame> > >();
 
   py::class_<CJavascriptException>("_JSError", py::no_init)
     .def(str(py::self))
@@ -86,7 +86,7 @@ CJavascriptStackTracePtr CJavascriptStackTrace::GetCurrentStackTrace(
 
   if (st.IsEmpty()) CJavascriptException::ThrowIf(isolate, try_catch);
 
-  return boost::shared_ptr<CJavascriptStackTrace>(new CJavascriptStackTrace(isolate, st));
+  return std::shared_ptr<CJavascriptStackTrace>(new CJavascriptStackTrace(isolate, st));
 }
 
 CJavascriptStackFramePtr CJavascriptStackTrace::GetFrame(size_t idx) const
@@ -99,7 +99,7 @@ CJavascriptStackFramePtr CJavascriptStackTrace::GetFrame(size_t idx) const
 
   if (frame.IsEmpty()) CJavascriptException::ThrowIf(m_isolate, try_catch);
 
-  return boost::shared_ptr<CJavascriptStackFrame>(new CJavascriptStackFrame(m_isolate, frame));
+  return std::shared_ptr<CJavascriptStackFrame>(new CJavascriptStackFrame(m_isolate, frame));
 }
 
 void CJavascriptStackTrace::Dump(std::ostream& os) const
@@ -369,12 +369,11 @@ void ExceptionTranslator::Translate(CJavascriptException const& ex)
   }
   else
   {
-    v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+    v8::Isolate *isolate = v8::Isolate::GetCurrent();
+    v8::HandleScope handle_scope(isolate);
 
     if (!ex.Exception().IsEmpty() && ex.Exception()->IsObject())
     {
-      v8::Isolate *isolate = v8::Isolate::GetCurrent();
-
       v8::Handle<v8::Object> obj = ex.Exception()->ToObject(isolate->GetCurrentContext()).ToLocalChecked();
 
       v8::Local<v8::String> key_type = v8::String::NewFromUtf8(isolate, "exc_type").ToLocalChecked();

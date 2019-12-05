@@ -1,16 +1,15 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <map>
-
-#include <boost/shared_ptr.hpp>
 
 #include "Utils.h"
 
 class CScript;
 
-typedef boost::shared_ptr<CScript> CScriptPtr;
+typedef std::shared_ptr<CScript> CScriptPtr;
 
 class CEngine
 {
