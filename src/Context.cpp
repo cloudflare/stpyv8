@@ -33,8 +33,8 @@ void CContext::Expose(void)
 
   py::class_<CContext, boost::noncopyable>("JSContext", "JSContext is an execution context.", py::no_init)
     .def(py::init<const CContext&>("Create a new context based on a existing context"))
-    .def(py::init<py::object, py::list>((py::arg("global") = py::object(),
-                                        "Create a new context based on global object"))
+    .def(py::init<py::object>((py::arg("global") = py::object(),
+                               "Create a new context based on global object")))
 
     .add_property("securityToken", &CContext::GetSecurityToken, &CContext::SetSecurityToken)
 
@@ -101,7 +101,7 @@ CContext::CContext(py::object global)
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
   v8::HandleScope handle_scope(isolate);
 
-  v8::Handle<v8::Context> context = v8::Context::New(isolate, cfg.get());
+  v8::Handle<v8::Context> context = v8::Context::New(isolate);
 
   m_context.Reset(isolate, context);
 
