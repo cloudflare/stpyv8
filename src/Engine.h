@@ -98,38 +98,3 @@ public:
 
   py::object Run(void);
 };
-
-/*
-#ifdef SUPPORT_EXTENSION
-
-class CExtension
-{
-  py::list m_deps;
-  std::vector<std::string> m_depNames;
-  std::vector<const char *> m_depPtrs;
-
-  bool m_registered;
-
-  boost::shared_ptr<v8::Extension> m_extension;
-
-  static std::vector< boost::shared_ptr<v8::Extension> > s_extensions;
-public:
-  CExtension(const std::string& name, const std::string& source, py::object callback, py::list dependencies, bool autoRegister);
-
-  const std::string GetName(void) { return m_extension->name(); }
-  const std::string GetSource(void) { return std::string(m_extension->source()->data(), m_extension->source()->length()); }
-
-  bool IsRegistered(void) { return m_registered; }
-  void Register(void);
-
-  bool IsAutoEnable(void) { return m_extension->auto_enable(); }
-  void SetAutoEnable(bool value) { m_extension->set_auto_enable(value); }
-
-  py::list GetDependencies(void) { return m_deps; }
-
-  static py::list GetExtensions(void);
-};
-
-#endif // SUPPORT_EXTENSION
-
-*/
