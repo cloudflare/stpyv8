@@ -1529,22 +1529,10 @@ py::object CJavascriptArray::DelItem(py::object key)
 
     if (0 == PySlice_GetIndicesEx(PySlice_Cast(key.ptr()), arrayLen, &start, &stop, &step, &sliceLen))
     {
-      for (Py_ssize_t idx=stop; idx<arrayLen; idx++)
-      {
-        Object()->Set(context, (uint32_t) (idx - sliceLen), Object()->Get(context, (uint32_t) idx).ToLocalChecked());
-      }
-
-      for (Py_ssize_t idx=arrayLen-1; idx>arrayLen-sliceLen-1; idx--)
+      for (Py_ssize_t idx = start; idx < stop; idx += step)
       {
         Object()->Delete(context, (uint32_t)idx);
       }
-
-      /* TODO port me BUGBUG
-       * Look into if we have to use the private api
-      v8i::Handle<v8i::JSArray> array = v8::Utils::OpenHandle(*Object());
-
-      array->set_length(v8i::Smi::FromInt(arrayLen - sliceLen));
-      */
     }
 
     return py::object();
