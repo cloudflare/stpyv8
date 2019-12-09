@@ -1436,45 +1436,64 @@ py::object CJavascriptArray::SetItem(py::object key, py::object value)
       Py_ssize_t arrayLen = v8::Handle<v8::Array>::Cast(Object())->Length();
       Py_ssize_t start, stop, step, sliceLen;
 
-      if (0 == PySlice_GetIndicesEx(PySlice_Cast(key.ptr()), arrayLen, &start, &stop, &step, &sliceLen))
-      {
-        /* TODO port me BUGBUG
-         * This will require some work since we are trying to avoid the
-         * internal interface.  But, it may be needed.
+      PySlice_Unpack(PySlice_Cast(key.ptr()), &start, &stop, &step);
+
+      /*
+       * If the slice start is greater than the array length we append null elements
+       * to the tail of the array to fill the gap
+       */
+      if (start > arrayLen) {
+		for (Py_ssize_t idx = arrayLen; idx < start; idx++) {
+			Object()->Set(context, (uint32_t) (arrayLen + idx), v8::Null(isolate));
+        }
+
+        arrayLen = v8::Handle<v8::Array>::Cast(Object())->Length();
+      }
+
+      /*
+       * If the slice stop is greater than the array length (which was potentially
+       * modified by the previous check) we append null elements to the tail of the
+       * array. This step guarantees that the length of the array will always be
+       * greater or equal than stop
+       */
+      if (stop > arrayLen) {
+        for (Py_ssize_t idx = arrayLen; idx < stop; idx++) {
+          Object()->Set(context, (uint32_t) idx, v8::Null(isolate));
+	    }
+
+	    arrayLen = v8::Handle<v8::Array>::Cast(Object())->Length();
+	  }
+
+      if (0 == PySlice_GetIndicesEx(PySlice_Cast(key.ptr()), arrayLen, &start, &stop, &step, &sliceLen)) {
         if (itemSize != sliceLen)
         {
-          v8i::Handle<v8i::JSArray> array = v8::Utils::OpenHandle(*Object());
-
-          array->set_length(v8i::Smi::FromInt(arrayLen - sliceLen + itemSize));
-
           if (itemSize < sliceLen)
           {
             Py_ssize_t diff = sliceLen - itemSize;
 
-            for (Py_ssize_t idx=start+itemSize; idx<arrayLen-diff; idx++)
+            for (Py_ssize_t idx = start + itemSize; idx < arrayLen - diff; idx++)
             {
-              Object()->Set(idx, Object()->Get((uint32_t) (idx + diff)));
+              Object()->Set(context, idx, Object()->Get(context, (uint32_t) (idx + diff)).ToLocalChecked());
             }
-            for (Py_ssize_t idx=arrayLen-1; idx >arrayLen-diff-1; idx--)
+            for (Py_ssize_t idx = arrayLen - 1; idx > arrayLen - diff - 1; idx--)
             {
-              Object()->Delete((uint32_t) idx);
+              Object()->Delete(context, (uint32_t) idx);
             }
           }
           else if (itemSize > sliceLen)
           {
             Py_ssize_t diff = itemSize - sliceLen;
 
-            for (Py_ssize_t idx=arrayLen+diff-1; idx>stop-1; idx--)
+            for (Py_ssize_t idx = arrayLen + diff - 1; idx > stop - 1; idx--)
             {
-              Object()->Set(idx, Object()->Get((uint32_t) (idx - diff)));
+              Object()->Set(context, idx, Object()->Get(context, (uint32_t) (idx - diff)).ToLocalChecked());
             }
           }
         }
-        */
 
-        for (Py_ssize_t idx=0; idx<itemSize; idx++)
+        for (Py_ssize_t idx = 0; idx < itemSize; idx++)
         {
-          Object()->Set(context, (uint32_t) (start + idx), CPythonObject::Wrap(py::object(py::handle<>(py::borrowed(items[idx])))));
+          Object()->Set(context, (uint32_t) (start + idx * step), CPythonObject::Wrap(py::object(py::handle<>(py::borrowed(items[idx])))));
         }
       }
     }
