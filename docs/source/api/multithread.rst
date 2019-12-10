@@ -1,4 +1,5 @@
 .. py:module:: SpyV8
+    :noindex:
 
 .. testsetup:: *
 
