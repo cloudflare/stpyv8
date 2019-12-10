@@ -16,17 +16,14 @@ compiled code.
 
 The class :py:class:`JSEngine` also provides the following static properties and methods
 
-======================================= =====================================================
+======================================= =======================================================
 Property or Method                      Description
-======================================= =====================================================
+======================================= =======================================================
 :py:attr:`JSEngine.version`             Get the compiled v8 version
 :py:attr:`JSEngine.dead`                Check if V8 is dead and therefore unusable
-:py:meth:`JSEngine.collect`             Force a full garbage collection
 :py:meth:`JSEngine.dispose`             Releases any resources used by v8
-:py:attr:`JSEngine.currentThreadId`     Get the current v8 thread id
-:py:meth:`JSEngine.terminateAllThreads` Forcefully terminate the current JavaScript thread
-:py:meth:`JSEngine.terminateThread`     Forcefully terminate execution of a JavaScript thread
-======================================= =====================================================
+:py:meth:`JSEngine.terminateAllThreads` Forcefully terminate all the current JavaScript threads
+======================================= =======================================================
 
 
 Compile Script and Control Engine
@@ -83,10 +80,6 @@ JSEngine - the backend Javascript engine
    .. py:attribute:: dead
 
       Check if V8 is dead and therefore unusable.
-
-   .. py:attribute:: currentThreadId
-
-      The V8 thread id of the calling thread.
 
 
 JSScript - the compiled script
