@@ -131,10 +131,9 @@ JSContext - the execution context.
 
    JSContext is an execution context.
 
-   .. automethod:: __init__(global = None, extensions = []) -> JSContext object
+   .. automethod:: __init__(global = None) -> JSContext object
 
       :param object global: the global object
-      :param list extensions: the name of extensions
       :rtype: :py:class:`JSContext` instance
 
    .. automethod:: __init__(ctxt) -> JSContext object
