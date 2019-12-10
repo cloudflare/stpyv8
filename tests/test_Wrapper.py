@@ -502,6 +502,89 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SpyV8.JSArray((1, 2, 3))))
             self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SpyV8.JSArray(list(range(3)))))
 
+    def testArraySlices(self):
+        with SpyV8.JSContext() as ctxt:
+            array = ctxt.eval("""
+                var array = new Array();
+                array;
+            """)
+
+            array[2:4] = [42, 24]
+            # array         [None, None, 42, 24]
+            self.assertEqual(len(array), 4)
+            self.assertEqual(ctxt.eval('array[0]'), None)
+            self.assertEqual(ctxt.eval('array[1]'), None)
+            self.assertEqual(ctxt.eval('array[2]'), 42)
+            self.assertEqual(ctxt.eval('array[3]'), 24)
+
+            array[2:4] = [1, 2]
+            # array         [None, None, 1, 2]
+            self.assertEqual(len(array), 4)
+            self.assertEqual(ctxt.eval('array[0]'), None)
+            self.assertEqual(ctxt.eval('array[1]'), None)
+            self.assertEqual(ctxt.eval('array[2]'), 1)
+            self.assertEqual(ctxt.eval('array[3]'), 2)
+
+            array[0:4:2] = [7, 8]
+            # array         [7, None, 8, 2]
+            self.assertEqual(len(array), 4)
+            self.assertEqual(ctxt.eval('array[0]'), 7)
+            self.assertEqual(ctxt.eval('array[1]'), None)
+            self.assertEqual(ctxt.eval('array[2]'), 8)
+            self.assertEqual(ctxt.eval('array[3]'), 2)
+
+            array[1:4] = [10]
+            # array         [7, 10, None, None]
+            self.assertEqual(len(array), 4)
+            self.assertEqual(ctxt.eval('array[0]'), 7)
+            self.assertEqual(ctxt.eval('array[1]'), 10)
+            self.assertEqual(ctxt.eval('array[2]'), None)
+            self.assertEqual(ctxt.eval('array[3]'), None)
+
+            array[0:7] = [0, 1, 2]
+            # array         [0, 1, 2, None, None, None, None]
+            self.assertEqual(len(array), 7)
+            self.assertEqual(ctxt.eval('array[0]'), 0)
+            self.assertEqual(ctxt.eval('array[1]'), 1)
+            self.assertEqual(ctxt.eval('array[2]'), 2)
+            self.assertEqual(ctxt.eval('array[3]'), None)
+            self.assertEqual(ctxt.eval('array[4]'), None)
+            self.assertEqual(ctxt.eval('array[5]'), None)
+            self.assertEqual(ctxt.eval('array[6]'), None)
+
+            array[0:7] = [0, 1, 2, 3, 4, 5, 6]
+            # array         [0, 1, 2, 3, 4, 5, 6]
+            self.assertEqual(len(array), 7)
+            self.assertEqual(ctxt.eval('array[0]'), 0)
+            self.assertEqual(ctxt.eval('array[1]'), 1)
+            self.assertEqual(ctxt.eval('array[2]'), 2)
+            self.assertEqual(ctxt.eval('array[3]'), 3)
+            self.assertEqual(ctxt.eval('array[4]'), 4)
+            self.assertEqual(ctxt.eval('array[5]'), 5)
+            self.assertEqual(ctxt.eval('array[6]'), 6)
+
+            del array[0:2]
+            # array         [None, None, 2, 3, 4, 5, 6]
+            self.assertEqual(len(array), 7)
+            self.assertEqual(ctxt.eval('array[0]'), None)
+            self.assertEqual(ctxt.eval('array[1]'), None)
+            self.assertEqual(ctxt.eval('array[2]'), 2)
+            self.assertEqual(ctxt.eval('array[3]'), 3)
+            self.assertEqual(ctxt.eval('array[4]'), 4)
+            self.assertEqual(ctxt.eval('array[5]'), 5)
+            self.assertEqual(ctxt.eval('array[6]'), 6)
+
+            del array[3:7:2]
+            # array         [None, None, 2, None, 4, None, 6]
+            self.assertEqual(len(array), 7)
+            self.assertEqual(ctxt.eval('array[0]'), None)
+            self.assertEqual(ctxt.eval('array[1]'), None)
+            self.assertEqual(ctxt.eval('array[2]'), 2)
+            self.assertEqual(ctxt.eval('array[3]'), None)
+            self.assertEqual(ctxt.eval('array[4]'), 4)
+            self.assertEqual(ctxt.eval('array[5]'), None)
+            self.assertEqual(ctxt.eval('array[6]'), 6)
+
     def testMultiDimArray(self):
         with SpyV8.JSContext() as ctxt:
             ret = ctxt.eval("""
