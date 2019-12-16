@@ -6,5 +6,5 @@ python setup.py v8
 sudo rm /usr/bin/python
 sudo ln -s /usr/bin/python3 /usr/bin/python
 
-python setup.py spyv8
+python setup.py stpyv8
 sudo python setup.py install

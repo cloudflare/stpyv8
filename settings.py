@@ -2,9 +2,9 @@ import sys
 import os
 import platform
 
-SPYV8_HOME = os.path.dirname(os.path.realpath(__file__))
-DEPOT_HOME = os.environ.get('DEPOT_HOME', os.path.join(SPYV8_HOME, 'depot_tools'))
-V8_HOME    = os.environ.get('V8_HOME', os.path.join(SPYV8_HOME, 'v8'))
+STPYV8_HOME = os.path.dirname(os.path.realpath(__file__))
+DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tools'))
+V8_HOME     = os.environ.get('V8_HOME', os.path.join(STPYV8_HOME, 'v8'))
 
 V8_GIT_URL        = "https://chromium.googlesource.com/v8/v8.git"
 V8_GIT_TAG_STABLE = "7.8.279.23"
@@ -37,7 +37,7 @@ source_files = ["Exception.cpp",
                 "Wrapper.cpp",
                 "Locker.cpp",
                 "Utils.cpp",
-                "SpyV8.cpp"]
+                "STPyV8.cpp"]
 
 
 macros             = [("BOOST_PYTHON_STATIC_LIB", None)]

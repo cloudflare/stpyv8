@@ -1,9 +1,9 @@
-.. py:module:: SpyV8
+.. py:module:: STPyV8
     :noindex:
 
 .. testsetup:: *
 
-   from SpyV8 import *
+   from STPyV8 import *
 
 .. _context:
 
@@ -75,7 +75,7 @@ Global Object
 
 The execution context has a global object which could be accessed both from the Python side with the :py:attr:`JSContext.locals`
 attribute and from the Javascript side using the global namespace. The Python and Javascript code could use such object to 
-perform seamless interoperable logic while SpyV8 takes care of :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
+perform seamless interoperable logic while STPyV8 takes care of :ref:`typeconv`, :ref:`funcall` and :ref:`exctrans`.
 
 .. testcode::
 

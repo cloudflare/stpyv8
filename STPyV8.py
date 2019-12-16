@@ -12,7 +12,7 @@ import collections.abc
 import functools
 import json
 
-import _SpyV8
+import _STPyV8
 
 __version__ = '1.0'
 
@@ -108,17 +108,17 @@ class JSError(Exception):
     def frames(self):
         return self.parse_stack(self.stackTrace)
 
-_SpyV8._JSError._jsclass = JSError
+_STPyV8._JSError._jsclass = JSError
 
-JSObject    = _SpyV8.JSObject
-JSNull      = _SpyV8.JSNull
-JSUndefined = _SpyV8.JSUndefined
-JSArray     = _SpyV8.JSArray
-JSFunction  = _SpyV8.JSFunction
-JSPlatform  = _SpyV8.JSPlatform
+JSObject    = _STPyV8.JSObject
+JSNull      = _STPyV8.JSNull
+JSUndefined = _STPyV8.JSUndefined
+JSArray     = _STPyV8.JSArray
+JSFunction  = _STPyV8.JSFunction
+JSPlatform  = _STPyV8.JSPlatform
 
 
-class JSLocker(_SpyV8.JSLocker):
+class JSLocker(_STPyV8.JSLocker):
     def __enter__(self):
         self.enter()
 
@@ -139,7 +139,7 @@ class JSLocker(_SpyV8.JSLocker):
         return self.entered()
 
 
-class JSUnlocker(_SpyV8.JSUnlocker):
+class JSUnlocker(_STPyV8.JSUnlocker):
     def __enter__(self):
         self.enter()
         return self
@@ -250,9 +250,9 @@ class JSClassPrototype(JSClass):
         return self.cls.__name__
 
 
-class JSEngine(_SpyV8.JSEngine):
+class JSEngine(_STPyV8.JSEngine):
     def __init__(self):
-        _SpyV8.JSEngine.__init__(self)
+        _STPyV8.JSEngine.__init__(self)
 
     def __enter__(self):
         return self
@@ -261,14 +261,14 @@ class JSEngine(_SpyV8.JSEngine):
         del self
 
 
-JSScript = _SpyV8.JSScript
-JSStackTrace = _SpyV8.JSStackTrace
-JSStackTrace.Options = _SpyV8.JSStackTraceOptions
-JSStackTrace.GetCurrentStackTrace = staticmethod(lambda frame_limit, options: _SpyV8.JSIsolate.current.GetCurrentStackTrace(frame_limit, options))
-JSStackFrame = _SpyV8.JSStackFrame
+JSScript = _STPyV8.JSScript
+JSStackTrace = _STPyV8.JSStackTrace
+JSStackTrace.Options = _STPyV8.JSStackTraceOptions
+JSStackTrace.GetCurrentStackTrace = staticmethod(lambda frame_limit, options: _STPyV8.JSIsolate.current.GetCurrentStackTrace(frame_limit, options))
+JSStackFrame = _STPyV8.JSStackFrame
 
 
-class JSIsolate(_SpyV8.JSIsolate):
+class JSIsolate(_STPyV8.JSIsolate):
     def __enter__(self):
         self.enter()
         return self
@@ -278,16 +278,16 @@ class JSIsolate(_SpyV8.JSIsolate):
         del self
 
 
-class JSContext(_SpyV8.JSContext):
+class JSContext(_STPyV8.JSContext):
     def __init__(self, obj = None, ctxt = None):
         if JSLocker.active:
             self.lock = JSLocker()
             self.lock.enter()
 
         if ctxt:
-            _SpyV8.JSContext.__init__(self, ctxt)
+            _STPyV8.JSContext.__init__(self, ctxt)
         else:
-            _SpyV8.JSContext.__init__(self, obj)
+            _STPyV8.JSContext.__init__(self, obj)
 
     def __enter__(self):
         self.enter()

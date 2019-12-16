@@ -2,41 +2,41 @@ import sys
 import unittest
 import logging
 
-import SpyV8
+import STPyV8
 
 
 class TestMultithread(unittest.TestCase):
     def testLocker(self):
-        with SpyV8.JSIsolate():
-            self.assertFalse(SpyV8.JSLocker.active)
-            self.assertFalse(SpyV8.JSLocker.locked)
+        with STPyV8.JSIsolate():
+            self.assertFalse(STPyV8.JSLocker.active)
+            self.assertFalse(STPyV8.JSLocker.locked)
 
-            with SpyV8.JSLocker() as outter_locker:
-                self.assertTrue(SpyV8.JSLocker.active)
-                self.assertTrue(SpyV8.JSLocker.locked)
+            with STPyV8.JSLocker() as outter_locker:
+                self.assertTrue(STPyV8.JSLocker.active)
+                self.assertTrue(STPyV8.JSLocker.locked)
 
                 self.assertTrue(outter_locker)
 
-                with SpyV8.JSLocker() as inner_locker:
-                    self.assertTrue(SpyV8.JSLocker.locked)
+                with STPyV8.JSLocker() as inner_locker:
+                    self.assertTrue(STPyV8.JSLocker.locked)
 
                     self.assertTrue(outter_locker)
                     self.assertTrue(inner_locker)
 
-                    with SpyV8.JSUnlocker():
-                        self.assertFalse(SpyV8.JSLocker.locked)
+                    with STPyV8.JSUnlocker():
+                        self.assertFalse(STPyV8.JSLocker.locked)
 
                         self.assertTrue(outter_locker)
                         self.assertTrue(inner_locker)
 
-                    self.assertTrue(SpyV8.JSLocker.locked)
+                    self.assertTrue(STPyV8.JSLocker.locked)
 
-            self.assertTrue(SpyV8.JSLocker.active)
-            self.assertFalse(SpyV8.JSLocker.locked)
+            self.assertTrue(STPyV8.JSLocker.active)
+            self.assertFalse(STPyV8.JSLocker.locked)
 
-            locker = SpyV8.JSLocker()
+            locker = STPyV8.JSLocker()
 
-        with SpyV8.JSContext():
+        with STPyV8.JSContext():
             self.assertRaises(RuntimeError, locker.__enter__)
             self.assertRaises(RuntimeError, locker.__exit__, None, None, None)
 
@@ -58,8 +58,8 @@ class TestMultithread(unittest.TestCase):
         g = Global()
 
         def run():
-            with SpyV8.JSIsolate():
-                with SpyV8.JSContext(g) as ctxt:
+            with STPyV8.JSIsolate():
+                with STPyV8.JSContext(g) as ctxt:
                     ctxt.eval("""
                         started.wait();
 
@@ -91,7 +91,7 @@ class TestMultithread(unittest.TestCase):
             result = []
 
             def add(self, value):
-                with SpyV8.JSUnlocker():
+                with STPyV8.JSUnlocker():
                     time.sleep(0.1)
 
                     self.result.append(value)
@@ -99,7 +99,7 @@ class TestMultithread(unittest.TestCase):
         g = Global()
 
         def run():
-            with SpyV8.JSContext(g) as ctxt:
+            with STPyV8.JSContext(g) as ctxt:
                 ctxt.eval("""
                     for (i=0; i<10; i++)
                         add(i);
@@ -107,7 +107,7 @@ class TestMultithread(unittest.TestCase):
 
         threads = [threading.Thread(target = run), threading.Thread(target = run)]
 
-        with SpyV8.JSLocker():
+        with STPyV8.JSLocker():
             for t in threads: 
                 t.start()
 

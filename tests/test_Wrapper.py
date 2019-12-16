@@ -8,14 +8,14 @@ import logging
 
 import datetime
 
-import SpyV8
+import STPyV8
 
 
 def convert(obj):
-    if isinstance(obj, SpyV8.JSArray):
+    if isinstance(obj, STPyV8.JSArray):
         return [convert(v) for v in obj]
 
-    if isinstance(obj, SpyV8.JSObject):
+    if isinstance(obj, STPyV8.JSObject):
         return dict([[str(k), convert(obj.__getattr__(str(k)))] for k in obj.__dir__()])
 
     return obj
@@ -23,7 +23,7 @@ def convert(obj):
 
 class TestWrapper(unittest.TestCase):
     def testObject(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             o = ctxt.eval("new Object()")
 
             self.assertTrue(hash(o) > 0)
@@ -36,7 +36,7 @@ class TestWrapper(unittest.TestCase):
         self.assertRaises(UnboundLocalError, o.clone)
 
     def testAutoConverter(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             ctxt.eval("""
                 var_i = 1;
                 var_f = 1.0;
@@ -83,16 +83,16 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue("var_f_obj" in attrs)
 
     def testExactConverter(self):
-        class MyInteger(int, SpyV8.JSClass):
+        class MyInteger(int, STPyV8.JSClass):
             pass
 
-        class MyString(str, SpyV8.JSClass):
+        class MyString(str, STPyV8.JSClass):
             pass
 
-        class MyDateTime(datetime.time, SpyV8.JSClass):
+        class MyDateTime(datetime.time, STPyV8.JSClass):
             pass
 
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             var_bool = True
             var_int = 1
             var_float = 1.0
@@ -105,7 +105,7 @@ class TestWrapper(unittest.TestCase):
             var_mystr = MyString('mystr')
             var_mytime = MyDateTime()
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             typename = ctxt.eval("(function (name) { return this[name].constructor.name; })")
             typeof = ctxt.eval("(function (name) { return typeof(this[name]); })")
 
@@ -126,7 +126,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual('function', typeof('var_mytime'))
 
     def testJavascriptWrapper(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             self.assertEqual(type(None), type(ctxt.eval("null")))
             self.assertEqual(type(None), type(ctxt.eval("undefined")))
             self.assertEqual(bool, type(ctxt.eval("true")))
@@ -134,12 +134,12 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(int, type(ctxt.eval("123")))
             self.assertEqual(float, type(ctxt.eval("3.14")))
             self.assertEqual(datetime.datetime, type(ctxt.eval("new Date()")))
-            self.assertEqual(SpyV8.JSArray, type(ctxt.eval("[1, 2, 3]")))
-            self.assertEqual(SpyV8.JSFunction, type(ctxt.eval("(function() {})")))
-            self.assertEqual(SpyV8.JSObject, type(ctxt.eval("new Object()")))
+            self.assertEqual(STPyV8.JSArray, type(ctxt.eval("[1, 2, 3]")))
+            self.assertEqual(STPyV8.JSFunction, type(ctxt.eval("(function() {})")))
+            self.assertEqual(STPyV8.JSObject, type(ctxt.eval("new Object()")))
 
     def testPythonWrapper(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             typeof = ctxt.eval("(function type(value) { return typeof value; })")
             protoof = ctxt.eval("(function protoof(value) { return Object.prototype.toString.apply(value); })")
 
@@ -163,7 +163,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual('[object Function]', protoof(int))
 
     def testFunction(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             func = ctxt.eval("""
                 (function ()
                 {
@@ -203,23 +203,23 @@ class TestWrapper(unittest.TestCase):
             def __call__(self, name):
                 return "hello " + name
 
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             hello = Hello()
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             self.assertEqual("hello world", ctxt.eval("hello('world')"))
 
     def testJSFunction(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             hello = ctxt.eval("(function (name) { return 'Hello ' + name; })")
 
-            self.assertTrue(isinstance(hello, SpyV8.JSFunction))
+            self.assertTrue(isinstance(hello, STPyV8.JSFunction))
             self.assertEqual("Hello world", hello('world'))
             self.assertEqual("Hello world", hello.invoke(['world']))
 
             obj = ctxt.eval("({ 'name': 'world', 'hello': function (name) { return 'Hello ' + name + ' from ' + this.name; }})")
             hello = obj.hello
-            self.assertTrue(isinstance(hello, SpyV8.JSFunction))
+            self.assertTrue(isinstance(hello, STPyV8.JSFunction))
             self.assertEqual("Hello world from world", hello('world'))
 
             tester = ctxt.eval("({ 'name': 'tester' })")
@@ -227,7 +227,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual("Hello world from json", hello.apply({ 'name': 'json' }, ['world']))
 
     def testConstructor(self):
-        with SpyV8.JSContext() as ctx:
+        with STPyV8.JSContext() as ctx:
             ctx.eval("""
                 var Test = function() {
                     this.trySomething();
@@ -241,32 +241,32 @@ class TestWrapper(unittest.TestCase):
                 };
                 """)
 
-            self.assertTrue(isinstance(ctx.locals.Test, SpyV8.JSFunction))
+            self.assertTrue(isinstance(ctx.locals.Test, STPyV8.JSFunction))
 
-            test = SpyV8.JSObject.create(ctx.locals.Test)
+            test = STPyV8.JSObject.create(ctx.locals.Test)
 
-            self.assertTrue(isinstance(ctx.locals.Test, SpyV8.JSObject))
+            self.assertTrue(isinstance(ctx.locals.Test, STPyV8.JSObject))
             self.assertEqual("soirv8", test.name);
 
-            test2 = SpyV8.JSObject.create(ctx.locals.Test2, ('John', 'Doe'))
+            test2 = STPyV8.JSObject.create(ctx.locals.Test2, ('John', 'Doe'))
 
             self.assertEqual("John Doe", test2.name);
 
-            test3 = SpyV8.JSObject.create(ctx.locals.Test2, ('John', 'Doe'), { 'email': 'john.doe@randommail.com' })
+            test3 = STPyV8.JSObject.create(ctx.locals.Test2, ('John', 'Doe'), { 'email': 'john.doe@randommail.com' })
 
             self.assertEqual("john.doe@randommail.com", test3.email);
 
     def testJSError(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             try:
                 ctxt.eval('throw "test"')
                 self.fail()
             except Exception:
-                self.assertTrue(SpyV8.JSError, sys.exc_info()[0])
+                self.assertTrue(STPyV8.JSError, sys.exc_info()[0])
 
     def testErrorInfo(self):
-        with SpyV8.JSContext():
-            with SpyV8.JSEngine() as engine:
+        with STPyV8.JSContext():
+            with STPyV8.JSEngine() as engine:
                 try:
                     engine.compile("""
                         function hello()
@@ -276,7 +276,7 @@ class TestWrapper(unittest.TestCase):
 
                         hello();""", "test", 10, 10).run()
                     self.fail()
-                except SpyV8.JSError as e:
+                except STPyV8.JSError as e:
                     self.assertTrue("JSError: Error: hello world ( test @ 14 : 28 )  ->" in str(e))
                     self.assertEqual("Error", e.name)
                     self.assertEqual("hello world", e.message)
@@ -301,7 +301,7 @@ class TestWrapper(unittest.TestCase):
             ('g', 'test2', 1, 15),
             (None, 'test3', 1, None),
             (None, 'test3', 1, 1),
-        ], SpyV8.JSError.parse_stack("""Error: err
+        ], STPyV8.JSError.parse_stack("""Error: err
             at Error (unknown source)
             at test (native)
             at new <anonymous> (test0:3:5)
@@ -311,11 +311,11 @@ class TestWrapper(unittest.TestCase):
             at test3:1:1"""))
 
     def testStackTrace(self):
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             def GetCurrentStackTrace(self, limit):
-                return SpyV8.JSStackTrace.GetCurrentStackTrace(4, SpyV8.JSStackTrace.Options.Detailed)
+                return STPyV8.JSStackTrace.GetCurrentStackTrace(4, STPyV8.JSStackTrace.Options.Detailed)
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             st = ctxt.eval("""
                 function a()
                 {
@@ -340,11 +340,11 @@ class TestWrapper(unittest.TestCase):
                                 ' constructor' if f.isConstructor else '') for f in st]))
 
     def testPythonException(self):
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             def raiseException(self):
                 raise RuntimeError("Hello")
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             ctxt.eval("""
                 msg ="";
                 try
@@ -365,7 +365,7 @@ class TestWrapper(unittest.TestCase):
         class TestException(Exception):
             pass
 
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             def raiseIndexError(self):
                 return [1, 2, 3][5]
 
@@ -384,7 +384,7 @@ class TestWrapper(unittest.TestCase):
             def raiseExceptions(self):
                 raise TestException()
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             ctxt.eval("try { this.raiseIndexError(); } catch (e) { msg = e; }")
 
             self.assertEqual("RangeError: list index out of range", str(ctxt.locals.msg))
@@ -408,7 +408,7 @@ class TestWrapper(unittest.TestCase):
             self.assertRaises(TestException, ctxt.eval, "this.raiseExceptions();")
 
     def testArray(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             array = ctxt.eval("""
                 var array = new Array();
 
@@ -420,7 +420,7 @@ class TestWrapper(unittest.TestCase):
                 array;
                 """)
 
-            self.assertTrue(isinstance(array, SpyV8.JSArray))
+            self.assertTrue(isinstance(array, STPyV8.JSArray))
             self.assertEqual(10, len(array))
 
             self.assertTrue(5 in array)
@@ -462,8 +462,8 @@ class TestWrapper(unittest.TestCase):
 
             self.assertEqual([10, None, 9, 7, 6, 8, 8, 3, 2, 1], list(array))
 
-            ctxt.locals.array1 = SpyV8.JSArray(5)
-            ctxt.locals.array2 = SpyV8.JSArray([1, 2, 3, 4, 5])
+            ctxt.locals.array1 = STPyV8.JSArray(5)
+            ctxt.locals.array2 = STPyV8.JSArray([1, 2, 3, 4, 5])
 
             for i in range(len(ctxt.locals.array2)):
                 ctxt.locals.array1[i] = ctxt.locals.array2[i] * 10
@@ -496,14 +496,14 @@ class TestWrapper(unittest.TestCase):
                 self.assertEqual(arg[1], str(array))
                 self.assertEqual(arg[2], [array[i] for i in range(len(array))])
 
-            self.assertEqual(3, ctxt.eval("(function (arr) { return arr.length; })")(SpyV8.JSArray([1, 2, 3])))
-            self.assertEqual(2, ctxt.eval("(function (arr, idx) { return arr[idx]; })")(SpyV8.JSArray([1, 2, 3]), 1))
-            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SpyV8.JSArray([1, 2, 3])))
-            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SpyV8.JSArray((1, 2, 3))))
-            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(SpyV8.JSArray(list(range(3)))))
+            self.assertEqual(3, ctxt.eval("(function (arr) { return arr.length; })")(STPyV8.JSArray([1, 2, 3])))
+            self.assertEqual(2, ctxt.eval("(function (arr, idx) { return arr[idx]; })")(STPyV8.JSArray([1, 2, 3]), 1))
+            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(STPyV8.JSArray([1, 2, 3])))
+            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(STPyV8.JSArray((1, 2, 3))))
+            self.assertEqual('[object Array]', ctxt.eval("(function (arr) { return Object.prototype.toString.call(arr); })")(STPyV8.JSArray(list(range(3)))))
 
     def testArraySlices(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             array = ctxt.eval("""
                 var array = new Array();
                 array;
@@ -586,7 +586,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(ctxt.eval('array[6]'), 6)
 
     def testMultiDimArray(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             ret = ctxt.eval("""
                 ({
                     'test': function(){
@@ -601,11 +601,11 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual([[1, 'abla'], [2, 'ajkss']], convert(ret))
 
     def testLazyConstructor(self):
-        class Globals(SpyV8.JSClass):
+        class Globals(STPyV8.JSClass):
             def __init__(self):
-                self.array=SpyV8.JSArray([1,2,3])
+                self.array=STPyV8.JSArray([1,2,3])
 
-        with SpyV8.JSContext(Globals()) as ctxt:
+        with STPyV8.JSContext(Globals()) as ctxt:
             self.assertEqual(2, ctxt.eval("""array[1]"""))
 
     def testForEach(self):
@@ -623,7 +623,7 @@ class TestWrapper(unittest.TestCase):
             for i in range(x):
                 yield i
 
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             func = ctxt.eval("""(function (k) {
                 var result = [];
                 for (var prop in k) {
@@ -640,7 +640,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(["0", "1", "2"], list(func(list(gen(3)))))
 
     def testDict(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             obj = ctxt.eval("var r = { 'a' : 1, 'b' : 2 }; r")
 
             self.assertEqual(1, obj.a)
@@ -665,7 +665,7 @@ class TestWrapper(unittest.TestCase):
                                e: null }; x""")))
 
     def testDate(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             now1 = ctxt.eval("new Date();")
 
             self.assertTrue(now1)
@@ -688,7 +688,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(now3, ctxt.locals.identity(now3))
 
     def testUnicode(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             self.assertEqual(u"人", ctxt.eval(u"\"人\""))
             self.assertEqual(u"é", ctxt.eval(u"\"é\""))
 
@@ -707,19 +707,19 @@ class TestWrapper(unittest.TestCase):
             def fs(self):
                 return FileSystemWrapper()
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             self.assertEqual(os.getcwd(), ctxt.eval("fs.cwd"))
 
     def testRefCount(self):
         count = sys.getrefcount(None)
 
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             pass
 
         g = Global()
         g_refs = sys.getrefcount(g)
 
-        with SpyV8.JSContext(g) as ctxt:
+        with STPyV8.JSContext(g) as ctxt:
             ctxt.eval("""
                 var none = null;
             """)
@@ -737,7 +737,7 @@ class TestWrapper(unittest.TestCase):
         self.assertEqual(g_refs, sys.getrefcount(g))
 
     def testProperty(self):
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             def __init__(self, name):
                 self._name = name
 
@@ -754,7 +754,7 @@ class TestWrapper(unittest.TestCase):
 
         g = Global('world')
 
-        with SpyV8.JSContext(g) as ctxt:
+        with STPyV8.JSContext(g) as ctxt:
             self.assertEqual('world', ctxt.eval("name"))
             self.assertEqual('foobar', ctxt.eval("this.name = 'foobar';"))
             self.assertEqual('foobar', ctxt.eval("name"))
@@ -767,11 +767,11 @@ class TestWrapper(unittest.TestCase):
             # self.assertEqual('fixed', ctxt.eval("name"))
 
     def testGetterAndSetter(self):
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
            def __init__(self, testval):
                self.testval = testval
 
-        with SpyV8.JSContext(Global("Test Value A")) as ctxt:
+        with STPyV8.JSContext(Global("Test Value A")) as ctxt:
            self.assertEqual("Test Value A", ctxt.locals.testval)
            ctxt.eval("""
                this.__defineGetter__("test", function() {
@@ -796,7 +796,7 @@ class TestWrapper(unittest.TestCase):
                 owner.deleted = True
 
         def test():
-            with SpyV8.JSContext() as ctxt:
+            with STPyV8.JSContext() as ctxt:
                 fn = ctxt.eval("(function (obj) { obj.say(); })")
 
                 obj = Hello()
@@ -812,24 +812,24 @@ class TestWrapper(unittest.TestCase):
         test()
 
     def testNullInString(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             fn = ctxt.eval("(function (s) { return s; })")
 
             self.assertEqual("hello \0 world", fn("hello \0 world"))
 
     def testLivingObjectCache(self):
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             i = 1
             b = True
             o = object()
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             self.assertTrue(ctxt.eval("i == i"))
             self.assertTrue(ctxt.eval("b == b"))
             self.assertTrue(ctxt.eval("o == o"))
 
     def testNamedSetter(self):
-        class Obj(SpyV8.JSClass):
+        class Obj(STPyV8.JSClass):
             @property
             def p(self):
                 return self._p
@@ -838,13 +838,13 @@ class TestWrapper(unittest.TestCase):
             def p(self, value):
                 self._p = value
 
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             def __init__(self):
                 self.obj = Obj()
                 self.d = {}
                 self.p = None
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             ctxt.eval("""
             x = obj;
             x.y = 10;
@@ -856,15 +856,15 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(10, ctxt.locals.d['y'])
 
     def testWatch(self):
-        class Obj(SpyV8.JSClass):
+        class Obj(STPyV8.JSClass):
             def __init__(self):
                 self.p = 1
 
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             def __init__(self):
                 self.o = Obj()
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             ctxt.eval("""
             o.watch("p", function (id, oldval, newval) {
                 return oldval + newval;
@@ -892,11 +892,11 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(1, ctxt.eval("o.p"))
 
     def testReferenceError(self):
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             def __init__(self):
                 self.s = self
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             self.assertRaises(ReferenceError, ctxt.eval, 'x')
 
             self.assertTrue(ctxt.eval("typeof(x) === 'undefined'"))
@@ -908,38 +908,38 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue(ctxt.eval("typeof(s.z) === 'undefined'"))
 
     def testRaiseExceptionInGetter(self):
-        class Document(SpyV8.JSClass):
+        class Document(STPyV8.JSClass):
             def __getattr__(self, name):
                 if name == 'y':
                     raise TypeError()
 
-                return SpyV8.JSClass.__getattr__(self, name)
+                return STPyV8.JSClass.__getattr__(self, name)
 
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             def __init__(self):
                 self.document = Document()
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             self.assertEqual(None, ctxt.eval('document.x'))
             self.assertRaises(TypeError, ctxt.eval, 'document.y')
 
     def testUndefined(self):
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             def returnNull(self):
-                return SpyV8.JSNull()
+                return STPyV8.JSNull()
 
             def returnUndefined(self):
-                return SpyV8.JSUndefined()
+                return STPyV8.JSUndefined()
 
             def returnNone(self):
                 return None
 
-        with SpyV8.JSContext(Global()) as ctxt:
-            self.assertFalse(bool(SpyV8.JSNull()))
-            self.assertFalse(bool(SpyV8.JSUndefined()))
+        with STPyV8.JSContext(Global()) as ctxt:
+            self.assertFalse(bool(STPyV8.JSNull()))
+            self.assertFalse(bool(STPyV8.JSUndefined()))
 
-            self.assertEqual("null", str(SpyV8.JSNull()))
-            self.assertEqual("undefined", str(SpyV8.JSUndefined()))
+            self.assertEqual("null", str(STPyV8.JSNull()))
+            self.assertEqual("undefined", str(STPyV8.JSUndefined()))
 
             self.assertTrue(ctxt.eval('null == returnNull()'))
             self.assertTrue(ctxt.eval('undefined == returnUndefined()'))

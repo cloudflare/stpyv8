@@ -98,8 +98,8 @@ def build_v8():
              msg = "Build V8 with ninja")
 
 
-def clean_spyv8():
-    build_folder = os.path.join(SPYV8_HOME, 'build')
+def clean_stpyv8():
+    build_folder = os.path.join(STPYV8_HOME, 'build')
 
     if os.path.exists(os.path.join(build_folder)):
         shutil.rmtree(build_folder)
@@ -110,54 +110,54 @@ def prepare_v8():
         install_depot()
         checkout_v8()
         build_v8()
-        clean_spyv8()
+        clean_stpyv8()
     except Exception as e:
         log.error("Fail to checkout and build v8, %s", str(e))
 
 
-class spyv8_build(build):
+class stpyv8_build(build):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_STABLE
         prepare_v8()
         build.run(self)
 
 
-class spyv8_develop(build):
+class stpyv8_develop(build):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_MASTER
         prepare_v8()
         build.run(self)
 
 
-class spyv8_install_v8(build):
+class stpyv8_install_v8(build):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_MASTER
         prepare_v8()
 
 
-class spyv8_build_no_v8(build):
+class stpyv8_build_no_v8(build):
     def run(self):
-        clean_spyv8()
+        clean_stpyv8()
         build.run(self)
 
 
-class spyv8_install(install):
+class stpyv8_install(install):
     def run(self):
         self.skip_build = True
         install.run(self)
 
 
-spyv8 = Extension(name               = "_SpyV8",
-                  sources            = [os.path.join("src", source) for source in source_files],
-                  define_macros      = macros,
-                  include_dirs       = include_dirs,
-                  library_dirs       = library_dirs,
-                  libraries          = libraries,
-                  extra_compile_args = extra_compile_args,
-                  extra_link_args    = extra_link_args,
-                  )
+stpyv8 = Extension(name               = "_STPyV8",
+                   sources            = [os.path.join("src", source) for source in source_files],
+                   define_macros      = macros,
+                   include_dirs       = include_dirs,
+                   library_dirs       = library_dirs,
+                   libraries          = libraries,
+                   extra_compile_args = extra_compile_args,
+                   extra_link_args    = extra_link_args,
+                   )
 
-setup(name         = 'spyv8',
+setup(name         = 'stpyv8',
       version      = '0.1',
       description  = 'Python Wrapper for Google V8 Engine',
       platforms    = 'x86',
@@ -166,8 +166,8 @@ setup(name         = 'spyv8',
       url          = '',
       download_url = '',
       license      = '',
-      py_modules   = ['SpyV8'],
-      ext_modules  = [spyv8],
+      py_modules   = ['STPyV8'],
+      ext_modules  = [stpyv8],
       classifiers  = [
         'Development Status :: 4 - Beta',
         'Environment :: Plugins',
@@ -186,9 +186,9 @@ setup(name         = 'spyv8',
         'Topic :: Utilities',
       ],
       cmdclass = dict(
-          build   = spyv8_build,
-          develop = spyv8_develop,
-          v8      = spyv8_install_v8,
-          spyv8   = spyv8_build_no_v8,
-          install = spyv8_install),
+          build   = stpyv8_build,
+          develop = stpyv8_develop,
+          v8      = stpyv8_install_v8,
+          stpyv8  = stpyv8_build_no_v8,
+          install = stpyv8_install),
 )
