@@ -1,12 +1,12 @@
-.. SpyV8 documentation master file
+.. STPyV8 documentation master file
 
 .. _index:
-.. py:module:: SpyV8
+.. py:module:: STPyV8
 
-Welcome to SpyV8's documentation!
+Welcome to STPyV8's documentation!
 ==================================
 
-SpyV8 is a Python wrapper for the Google V8 engine [#f1]_ acting as a bridge between the Python and JavaScript
+STPyV8 is a Python wrapper for the Google V8 engine [#f1]_ acting as a bridge between the Python and JavaScript
 objects and supporting the embedding of the Google V8 engine in a Python script.
 
 Creating and entering a context to evaluate Javascript code can be done in a few lines of code.

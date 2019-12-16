@@ -6,21 +6,21 @@ import os
 import unittest
 import logging
 
-import SpyV8
+import STPyV8
 
 
 class TestEngine(unittest.TestCase):
     def testClassProperties(self):
-        with SpyV8.JSContext():
-            self.assertTrue(str(SpyV8.JSEngine.version).startswith("7."))
-            self.assertFalse(SpyV8.JSEngine.dead)
+        with STPyV8.JSContext():
+            self.assertTrue(str(STPyV8.JSEngine.version).startswith("7."))
+            self.assertFalse(STPyV8.JSEngine.dead)
 
     def testCompile(self):
-        with SpyV8.JSContext():
-            with SpyV8.JSEngine() as engine:
+        with STPyV8.JSContext():
+            with STPyV8.JSEngine() as engine:
                 s = engine.compile("1+2")
 
-                self.assertTrue(isinstance(s, SpyV8.JSScript))
+                self.assertTrue(isinstance(s, STPyV8.JSScript))
 
                 self.assertEqual("1+2", s.source)
                 self.assertEqual(3, int(s.run()))
@@ -28,19 +28,19 @@ class TestEngine(unittest.TestCase):
                 self.assertRaises(SyntaxError, engine.compile, "1+")
 
     def testUnicodeSource(self):
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             var = u'测试'
 
             def __getattr__(self, name):
                 if name:
                     return self.var
 
-                return SpyV8.JSClass.__getattr__(self, name)
+                return STPyV8.JSClass.__getattr__(self, name)
 
         g = Global()
 
-        with SpyV8.JSContext(g) as ctxt:
-            with SpyV8.JSEngine() as engine:
+        with STPyV8.JSContext(g) as ctxt:
+            with STPyV8.JSEngine() as engine:
                 src = u"""
                 function 函数() { return 变量.length; }
 
@@ -51,7 +51,7 @@ class TestEngine(unittest.TestCase):
 
                 s = engine.compile(src)
 
-                self.assertTrue(isinstance(s, SpyV8.JSScript))
+                self.assertTrue(isinstance(s, STPyV8.JSScript))
 
                 self.assertEqual(src, s.source)
                 self.assertEqual(2, s.run())
@@ -62,7 +62,7 @@ class TestEngine(unittest.TestCase):
 
                 func = getattr(ctxt.locals, func_name)
 
-                self.assertTrue(isinstance(func, SpyV8.JSFunction))
+                self.assertTrue(isinstance(func, STPyV8.JSFunction))
 
                 self.assertEqual(func_name, func.name)
                 self.assertEqual("", func.resname)
@@ -79,14 +79,14 @@ class TestEngine(unittest.TestCase):
                 self.assertEqual("func", ctxt.locals.func.inferredname)
 
     def testEval(self):
-        with SpyV8.JSContext() as ctxt:
+        with STPyV8.JSContext() as ctxt:
             self.assertEqual(3, int(ctxt.eval("1+2")))
 
     def testGlobal(self):
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             version = "1.0"
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             _vars = ctxt.locals
 
             # getter
@@ -101,18 +101,18 @@ class TestEngine(unittest.TestCase):
             self.assertEqual(2.0, float(_vars.version))
 
     def testThis(self):
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             version = 1.0
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             self.assertEqual("[object Global]", str(ctxt.eval("this")))
             self.assertEqual(1.0, float(ctxt.eval("this.version")))
 
     def testObjectBuiltInMethods(self):
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             version = 1.0
 
-        with SpyV8.JSContext(Global()) as ctxt:
+        with STPyV8.JSContext(Global()) as ctxt:
             self.assertEqual("[object Global]", str(ctxt.eval("this.toString()")))
             self.assertEqual("[object Global]", str(ctxt.eval("this.toLocaleString()")))
             self.assertEqual(Global.version, float(ctxt.eval("this.valueOf()").version))
@@ -122,13 +122,13 @@ class TestEngine(unittest.TestCase):
             self.assertFalse(ctxt.eval("this.hasOwnProperty(\"nonexistent\")"))
 
     def testPythonWrapper(self):
-        class Global(SpyV8.JSClass):
+        class Global(STPyV8.JSClass):
             s = [1, 2, 3]
             d = {'a': {'b': 'c'}, 'd': ['e', 'f']}
 
         g = Global()
 
-        with SpyV8.JSContext(g) as ctxt:
+        with STPyV8.JSContext(g) as ctxt:
             ctxt.eval("""
                 s[2] = s[1] + 2;
                 s[0] = s[1];
@@ -150,43 +150,43 @@ class TestEngine(unittest.TestCase):
         def callback(space, action, size):
             alloc[(space, action)] = alloc.setdefault((space, action), 0) + size
 
-        SpyV8.JSEngine.setMemoryAllocationCallback(callback)
+        STPyV8.JSEngine.setMemoryAllocationCallback(callback)
 
-        with SpyV8.JSContext() as ctxt:
-            self.assertFalse((SpyV8.JSObjectSpace.Code, SpyV8.JSAllocationAction.alloc) in alloc)
+        with STPyV8.JSContext() as ctxt:
+            self.assertFalse((STPyV8.JSObjectSpace.Code, STPyV8.JSAllocationAction.alloc) in alloc)
 
             ctxt.eval("var o = new Array(1000);")
 
-            self.assertTrue((SpyV8.JSObjectSpace.Code, SpyV8.JSAllocationAction.alloc) in alloc)
+            self.assertTrue((STPyV8.JSObjectSpace.Code, STPyV8.JSAllocationAction.alloc) in alloc)
 
-        SpyV8.JSEngine.setMemoryAllocationCallback(None)
+        STPyV8.JSEngine.setMemoryAllocationCallback(None)
 
     def _testOutOfMemory(self):
-        with SpyV8.JSIsolate():
-            SpyV8.JSEngine.setMemoryLimit(max_young_space_size=16 * 1024, max_old_space_size=4 * 1024 * 1024)
+        with STPyV8.JSIsolate():
+            STPyV8.JSEngine.setMemoryLimit(max_young_space_size=16 * 1024, max_old_space_size=4 * 1024 * 1024)
 
-            with SpyV8.JSContext() as ctxt:
-                SpyV8.JSEngine.ignoreOutOfMemoryException()
+            with STPyV8.JSContext() as ctxt:
+                STPyV8.JSEngine.ignoreOutOfMemoryException()
 
                 ctxt.eval("var a = new Array(); while(true) a.push(a);")
 
                 self.assertTrue(ctxt.hasOutOfMemoryException)
 
-                SpyV8.JSEngine.setMemoryLimit()
+                STPyV8.JSEngine.setMemoryLimit()
 
-                SpyV8.JSEngine.collect()
+                STPyV8.JSEngine.collect()
 
     def testStackLimit(self):
-        with SpyV8.JSIsolate():
-            SpyV8.JSEngine.setStackLimit(256 * 1024)
+        with STPyV8.JSIsolate():
+            STPyV8.JSEngine.setStackLimit(256 * 1024)
 
-            with SpyV8.JSContext() as ctxt:
+            with STPyV8.JSContext() as ctxt:
                 oldStackSize = ctxt.eval("var maxStackSize = function(i){try{(function m(){++i&&m()}())}catch(e){return i}}(0); maxStackSize")
 
-        with SpyV8.JSIsolate():
-            SpyV8.JSEngine.setStackLimit(512 * 1024)
+        with STPyV8.JSIsolate():
+            STPyV8.JSEngine.setStackLimit(512 * 1024)
 
-            with SpyV8.JSContext() as ctxt:
+            with STPyV8.JSContext() as ctxt:
                 newStackSize = ctxt.eval("var maxStackSize = function(i){try{(function m(){++i&&m()}())}catch(e){return i}}(0); maxStackSize")
 
         self.assertTrue(newStackSize > oldStackSize * 2)

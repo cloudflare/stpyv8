@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# SpyV8 documentation build configuration file, created by
+# STPyV8 documentation build configuration file, created by
 # sphinx-quickstart on Wed Nov 27 12:08:50 2019.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'SpyV8'
+project = u'STPyV8'
 copyright = u'2019, Area 1 Security'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -170,7 +170,7 @@ html_sidebars = {
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'SpyV8doc'
+htmlhelp_basename = 'STPyV8doc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -184,7 +184,7 @@ htmlhelp_basename = 'SpyV8doc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'SpyV8.tex', u'SpyV8 Documentation',
+  ('index', 'STPyV8.tex', u'STPyV8 Documentation',
    u'Area 1 Security', 'manual'),
 ]
 
@@ -217,7 +217,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'spyv8', u'SpyV8 Documentation',
+    ('index', 'stpyv8', u'STPyV8 Documentation',
      [u'Area 1 Security'], 1)
 ]
 

@@ -1,9 +1,9 @@
-.. py:module:: SpyV8
+.. py:module:: STPyV8
     :noindex:
 
 .. testsetup:: *
 
-   from SpyV8 import *
+   from STPyV8 import *
 
 .. _multithread:
 
