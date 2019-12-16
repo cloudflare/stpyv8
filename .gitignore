@@ -1,4 +1,9 @@
 build
 .cache
+.cipd
+.gclient
+.gclient_entries
+depot_tools
+v8
 *.pyc
 *.cmake
