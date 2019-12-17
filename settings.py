@@ -2,6 +2,8 @@ import sys
 import os
 import platform
 
+STPYV8_VERSION = "0.1"
+
 STPYV8_HOME = os.path.dirname(os.path.realpath(__file__))
 DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tools'))
 V8_HOME     = os.environ.get('V8_HOME', os.path.join(STPYV8_HOME, 'v8'))

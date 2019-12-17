@@ -158,7 +158,7 @@ stpyv8 = Extension(name               = "_STPyV8",
                    )
 
 setup(name         = 'stpyv8',
-      version      = '0.1',
+      version      = STPYV8_VERSION,
       description  = 'Python Wrapper for Google V8 Engine',
       platforms    = 'x86',
       author       = '',
