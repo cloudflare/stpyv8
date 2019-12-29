@@ -98,8 +98,8 @@ A Python3 virtual environment is recommended.  (Google's build tools will establ
 Building on Ubuntu 18.04, 19.10, and Debian distros:
 
 ```Shell
-$ sudo apt install python python3 python3-venv python3-dev build-essential libboost-python-dev
-$ # This step will take some time, to build V8 as a static library
+$ sudo apt install python python3 python3-venv python3-dev build-essential libboost-dev libboost-system-dev libboost-python-dev
+$ # This step will take some time, install other packages (with sudo), to build V8 as a static library
 $ python2 setup.py v8 
 $ python3 -m venv env
 $ source env/bin/activate
@@ -107,7 +107,7 @@ $ python setup.py stpyv8
 $ python setup.py install
 ```
 
-Building on Ubuntu 16.04 requires an external PPA addition for python3.  Building on other Linux distribution requires appropriate use of their package managers for these external dependencies.
+Building on Ubuntu 16.04 requires an external PPA addition for python3.  Building on other Linux distributions requires appropriate use of their package managers for these external dependencies, and some gymnastics for the V8 build dependecies.
 
 Building on MacOS, assuming [HomeBrew](https://brew.sh) and XCode [command line tools](https://stackoverflow.com/questions/9329243/how-to-install-xcode-command-line-tools) are installed:
 
@@ -124,7 +124,7 @@ $ python setup.py install
 More detailed build instructions are in the [docs](docs/source/build.rst) folder.
 
 # How does this work?
-STPyV8 is a Python [C++ Extension Module](https://docs.python.org/3/c-api/index.html) that links to an [embedded V8](https://v8.dev/docs/embed) library.  Since PyV8 used the [Boost.Python C++](https://www.boost.org/doc/libs/1_70_0/libs/python/doc/html/index.html) library we kept it, but future work may include just using the C API exposed by Python.  Think of this as an Oreo cookie - Python and V8 crackers with C++ icing in the middle gluing them together.
+STPyV8 is a Python [C++ Extension Module](https://docs.python.org/3/c-api/index.html) that links to an [embedded V8](https://v8.dev/docs/embed) library.  Since PyV8 used the [Boost.Python C++](https://www.boost.org/doc/libs/1_70_0/libs/python/doc/html/index.html) library (as wells as some others) we kept it, but future work may include just using the C API exposed by Python and elimimating boost.  Think of this as an Oreo cookie - Python and V8 crackers with C++ icing in the middle gluing them together.
 
 ## Is STPyV8 fast?
 STPyV8 needs to translate Python arguments (and JavaScript arguments) back and forth between function and method calls in the two languages. It does the minimum amount of work using native code, but if you are interested in the height of performance, make your interface between Python and JavaScript "chunky" ... i.e., make the minimum number of transitions between the two.
