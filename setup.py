@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import os
 import subprocess
 import shutil
@@ -84,10 +85,9 @@ def checkout_v8():
              '-D',
              cwd = os.path.dirname(V8_HOME),
              msg = "Syncing Google V8 code")
-    #On linux, install additional dependencies, per
-    #https://v8.dev/docs/build step 4
-    from sys import platform
-    if platform == "linux" or platform == "linux2":
+    # On Linux, install additional dependencies, per
+    # https://v8.dev/docs/build step 4
+    if sys.platform in ("linux", "linux2", ):
         exec_cmd('./v8/build/install-build-deps.sh',
                  cwd = os.path.dirname(V8_HOME),
                  msg = "Installing additional linux dependencies")
