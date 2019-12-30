@@ -2,8 +2,6 @@ import sys
 import os
 import platform
 
-STPYV8_VERSION = "0.1"
-
 STPYV8_HOME = os.path.dirname(os.path.realpath(__file__))
 DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tools'))
 V8_HOME     = os.environ.get('V8_HOME', os.path.join(STPYV8_HOME, 'v8'))
@@ -13,6 +11,8 @@ V8_GIT_TAG_STABLE = "7.9.317.31"
 V8_GIT_TAG_MASTER = "master"
 V8_GIT_TAG        = V8_GIT_TAG_STABLE
 DEPOT_GIT_URL     = "https://chromium.googlesource.com/chromium/tools/depot_tools.git"
+
+STPYV8_VERSION = V8_GIT_TAG_STABLE
 
 os.environ['PATH'] = "{}:{}".format(os.environ['PATH'], DEPOT_HOME)
 
