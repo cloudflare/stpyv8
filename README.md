@@ -2,7 +2,7 @@
 
 STPyV8 allows interop between Python 3 and JavaScript running Google's V8 engine.  Use STPyV8 to embed JavaScript code directly into your Python project, or to call Python code from JavaScript.
 
-STPyV8 is a fork of the original [PyV8](https://code.google.com/archive/p/pyv8/) project, with code changed to work with the latest V8 engine.  STPyV8 links with Google V8 built as a static library. Currently the library builds on Linux and MacOS, with Windows planned for the future.
+STPyV8 is a fork of the original [PyV8](https://code.google.com/archive/p/pyv8/) project, with code changed to work with the latest V8 engine and Python 3.  STPyV8 links with Google V8 built as a static library. Currently the library builds on Linux and MacOS, with Windows planned for the future.
 
 # Usage Examples
 
@@ -112,7 +112,7 @@ Building on Ubuntu 16.04 requires an external PPA addition for python3.  Buildin
 
 ### MacOS
 
-Building on MacOS requires full [XCode](https://developer.apple.com/xcode/) (not just the command line tools) to compile V8.  The command line tools bundled with XCode are required (rather than the stand-alone command line tools, sometime requiring [drastic measures](https://bugs.chromium.org/p/chromium/issues/detail?id=729990#c1) .)
+Building on MacOS requires full [XCode](https://developer.apple.com/xcode/) (not just the command line tools) to compile V8.  The command line tools bundled with XCode are required (rather than the stand-alone command line tools, sometimes requiring [drastic measures](https://bugs.chromium.org/p/chromium/issues/detail?id=729990#c1) .)
 
 Using [HomeBrew](https://brew.sh) makes the boost-python and related dependencies easier for STPyV8:
 
