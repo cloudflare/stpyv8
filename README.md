@@ -28,7 +28,7 @@ HELLO WORLD!
 
 ## Using Python in V8
 
-STPyV8 allows you to use Python functions, classes, and objects from within V8.  
+STPyV8 allows you to use Python functions, classes, and objects from within V8.
 
 Exporting a Python class into V8 and using it from JavaScript:
 
@@ -89,12 +89,13 @@ Find more in the [tests](tests) directory.
 
 # Building
 
-GCC/clang or equivalent and Python3 headers are needed to build the main STPyV8 source code, as well as boost-python. For a short while, Python 2.7 is still needed by Google's toolchain to build a local library version of V8.  
+GCC/clang or equivalent and Python3 headers are needed to build the main STPyV8 source code, as well as boost-python and some other boost dependencies. For a short while, Python 2.7 is still needed by Google's toolchain to build a local library version of V8.
 
 A Python3 virtual environment is recommended.  (Google's build tools will establish their own Python2 virtual environment during the compilation of V8, but this can be ignored.)
 
 ## Build Examples
 
+### Ubuntu
 Building on Ubuntu 18.04, 19.10, and Debian distros:
 
 ```Shell
@@ -107,12 +108,16 @@ $ python setup.py stpyv8
 $ python setup.py install
 ```
 
-Building on Ubuntu 16.04 requires an external PPA addition for python3.  Building on other Linux distributions requires appropriate use of their package managers for these external dependencies, and some gymnastics for the V8 build dependecies.
+Building on Ubuntu 16.04 requires an external PPA addition for python3.  Building on other Linux distributions requires appropriate use of their package managers for these external dependencies, and some gymnastics for the V8 build dependencies.
 
-Building on MacOS, assuming [HomeBrew](https://brew.sh) and XCode [command line tools](https://stackoverflow.com/questions/9329243/how-to-install-xcode-command-line-tools) are installed:
+### MacOS
+
+Building on MacOS requires full [XCode] (https://developer.apple.com/xcode/) (not just the command line tools) to compile V8.  The command line tools bundled with XCode are required (rather than the stand-alone command line tools, sometime requiring [drastic measures](https://bugs.chromium.org/p/chromium/issues/detail?id=729990#c1).
+
+Using [HomeBrew](https://brew.sh) makes the boost-python and related dependencies easier for STPyV8:
 
 ```Shell
-$ brew install python2 python3 boost-python3
+$ brew install boost-python3
 $ # This step will take some time, to build V8 as a static library
 $ python2 setup.py v8 
 $ python3 -m venv env
@@ -124,10 +129,10 @@ $ python setup.py install
 More detailed build instructions are in the [docs](docs/source/build.rst) folder.
 
 # How does this work?
-STPyV8 is a Python [C++ Extension Module](https://docs.python.org/3/c-api/index.html) that links to an [embedded V8](https://v8.dev/docs/embed) library.  Since PyV8 used the [Boost.Python C++](https://www.boost.org/doc/libs/1_70_0/libs/python/doc/html/index.html) library (as wells as some others) we kept it, but future work may include just using the C API exposed by Python and elimimating boost.  Think of this as an Oreo cookie - Python and V8 crackers with C++ icing in the middle gluing them together.
+STPyV8 is a Python [C++ Extension Module](https://docs.python.org/3/c-api/index.html) that links to an [embedded V8](https://v8.dev/docs/embed) library.  Since PyV8 used the [Boost.Python C++](https://www.boost.org/doc/libs/1_70_0/libs/python/doc/html/index.html) library (as wells as some others) we kept it, but future work may include just using the C API exposed by Python and eliminating boost.  Think of this as an Oreo cookie - Python and V8 crackers with C++ icing in the middle gluing them together.
 
 ## Is STPyV8 fast?
 STPyV8 needs to translate Python arguments (and JavaScript arguments) back and forth between function and method calls in the two languages. It does the minimum amount of work using native code, but if you are interested in the height of performance, make your interface between Python and JavaScript "chunky" ... i.e., make the minimum number of transitions between the two.
 
 # What can I use this for?
-We use STPyV8 to simulate a [browser](https://github.com/buffer/thug), and then execute sketchy JavaScript in an instrumented container.  Other kinds of JavaScript sandboxing (simulating and monitoring the external world to JavaScript code) are a natural fit.  Other uses include squeezing in some "bare-metal" [hyper-optimized](https://nodesource.com/blog/why-the-new-v8-is-so-damn-fast/) (by V8) JavaScript into your Python projects, say as a stepping-stone to a full [node.js](https://nodejs.org/) port.
+We use STPyV8 to simulate a [browser](https://github.com/buffer/thug), and then execute sketchy JavaScript in an instrumented container.  Other kinds of JavaScript sand-boxing (simulating and monitoring the external world to JavaScript code) are a natural fit.  Other uses include squeezing in some "bare-metal" [hyper-optimized](https://nodesource.com/blog/why-the-new-v8-is-so-damn-fast/) (by V8) JavaScript into your Python projects, say as a stepping-stone to a full [node.js](https://nodejs.org/) port.
