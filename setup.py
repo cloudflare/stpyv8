@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import sys
 import os
 import subprocess
 import shutil
@@ -10,7 +9,7 @@ from distutils.command.build import build
 from distutils.command.install import install
 from distutils.core import setup, Extension
 
-from settings import *
+import settings
 
 log = logging.getLogger()
 
@@ -46,66 +45,67 @@ def exec_cmd(cmdline, *args, **kwargs):
 
 
 def install_depot():
-    if not os.path.exists(DEPOT_HOME):
+    if not os.path.exists(settings.DEPOT_HOME):
         exec_cmd("git clone",
-                 DEPOT_GIT_URL,
-                 DEPOT_HOME,
-                 cwd = os.path.dirname(DEPOT_HOME),
+                 settings.DEPOT_GIT_URL,
+                 settings.DEPOT_HOME,
+                 cwd = os.path.dirname(settings.DEPOT_HOME),
                  msg = "Cloning depot tools")
 
         return
 
     # depot_tools updates itself automatically when running gclient tool
-    if os.path.isfile(os.path.join(DEPOT_HOME, 'gclient')):
-        _, stdout, _ = exec_cmd(os.path.join(DEPOT_HOME, 'gclient'),
+    if os.path.isfile(os.path.join(settings.DEPOT_HOME, 'gclient')):
+        _, stdout, _ = exec_cmd(os.path.join(settings.DEPOT_HOME, 'gclient'),
                                 "--version",
-                                cwd    = DEPOT_HOME,
+                                cwd    = settings.DEPOT_HOME,
                                 output = True,
                                 msg    = "Found depot tools")
 
 
 def checkout_v8():
-    if not os.path.exists(V8_HOME):
-        exec_cmd(os.path.join(DEPOT_HOME, 'fetch'),
+    if not os.path.exists(settings.V8_HOME):
+        exec_cmd(os.path.join(settings.DEPOT_HOME, 'fetch'),
                  'v8',
-                 cwd = os.path.dirname(V8_HOME),
+                 cwd = os.path.dirname(settings.V8_HOME),
                  msg = "Fetching Google V8 code")
 
     exec_cmd('git fetch --tags',
-             cwd = V8_HOME,
+             cwd = settings.V8_HOME,
              msg = "Fetching the release tag information")
 
     exec_cmd('git checkout',
-             V8_GIT_TAG,
-             cwd = V8_HOME,
-             msg = "Checkout Google V8 v{}".format(V8_GIT_TAG))
+             settings.V8_GIT_TAG,
+             cwd = settings.V8_HOME,
+             msg = "Checkout Google V8 v{}".format(settings.V8_GIT_TAG))
 
-    exec_cmd(os.path.join(DEPOT_HOME, 'gclient'),
+    exec_cmd(os.path.join(settings.DEPOT_HOME, 'gclient'),
              'sync',
              '-D',
-             cwd = os.path.dirname(V8_HOME),
+             cwd = os.path.dirname(settings.V8_HOME),
              msg = "Syncing Google V8 code")
-    # On Linux, install additional dependencies, per
-    # https://v8.dev/docs/build step 4
-    if sys.platform in ("linux", "linux2", ):
+
+    # Linux Debian/Ubuntu platforms additional dependencies
+    # https://v8.dev/docs/build (step 4)
+    if settings.IS_DEBIAN_PLATFORM:
         exec_cmd('./v8/build/install-build-deps.sh',
-                 cwd = os.path.dirname(V8_HOME),
+                 cwd = os.path.dirname(settings.V8_HOME),
                  msg = "Installing additional linux dependencies")
 
 def build_v8():
-    exec_cmd(os.path.join(DEPOT_HOME, 'gn'),
-             "gen out.gn/x64.release.sample --args='{}'".format(GN_ARGS),
-             cwd = V8_HOME,
-             msg = "Generate build scripts for V8 (v{})".format(V8_GIT_TAG))
+    exec_cmd(os.path.join(settings.DEPOT_HOME, 'gn'),
+             "gen out.gn/x64.release.sample --args='{}'".format(settings.GN_ARGS),
+             cwd = settings.V8_HOME,
+             msg = "Generate build scripts for V8 (v{})".format(settings.V8_GIT_TAG))
 
-    exec_cmd(os.path.join(DEPOT_HOME, 'ninja'),
+    exec_cmd(os.path.join(settings.DEPOT_HOME, 'ninja'),
              "-C out.gn/x64.release.sample v8_monolith",
-             cwd = V8_HOME,
+             cwd = settings.V8_HOME,
              msg = "Build V8 with ninja")
 
 
 def clean_stpyv8():
-    build_folder = os.path.join(STPYV8_HOME, 'build')
+    build_folder = os.path.join(settings.STPYV8_HOME, 'build')
 
     if os.path.exists(os.path.join(build_folder)):
         shutil.rmtree(build_folder)
@@ -123,21 +123,21 @@ def prepare_v8():
 
 class stpyv8_build(build):
     def run(self):
-        V8_GIT_TAG = V8_GIT_TAG_STABLE
+        settings.V8_GIT_TAG = settings.V8_GIT_TAG_STABLE
         prepare_v8()
         build.run(self)
 
 
 class stpyv8_develop(build):
     def run(self):
-        V8_GIT_TAG = V8_GIT_TAG_MASTER
+        settings.V8_GIT_TAG = settings.V8_GIT_TAG_MASTER
         prepare_v8()
         build.run(self)
 
 
 class stpyv8_install_v8(build):
     def run(self):
-        V8_GIT_TAG = V8_GIT_TAG_MASTER
+        settings.V8_GIT_TAG = settings.V8_GIT_TAG_MASTER
         prepare_v8()
 
 
@@ -154,17 +154,17 @@ class stpyv8_install(install):
 
 
 stpyv8 = Extension(name               = "_STPyV8",
-                   sources            = [os.path.join("src", source) for source in source_files],
-                   define_macros      = macros,
-                   include_dirs       = include_dirs,
-                   library_dirs       = library_dirs,
-                   libraries          = libraries,
-                   extra_compile_args = extra_compile_args,
-                   extra_link_args    = extra_link_args,
+                   sources            = [os.path.join("src", source) for source in settings.source_files],
+                   define_macros      = settings.macros,
+                   include_dirs       = settings.include_dirs,
+                   library_dirs       = settings.library_dirs,
+                   libraries          = settings.libraries,
+                   extra_compile_args = settings.extra_compile_args,
+                   extra_link_args    = settings.extra_link_args,
                    )
 
 setup(name         = 'stpyv8',
-      version      = STPYV8_VERSION,
+      version      = settings.STPYV8_VERSION,
       description  = 'Python Wrapper for Google V8 Engine',
       platforms    = 'x86',
       author       = '',

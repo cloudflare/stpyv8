@@ -2,6 +2,10 @@ import sys
 import os
 import platform
 
+CURRENT_PLATFORM   = platform.platform().lower()
+DEBIAN_PLATFORMS   = ('debian', 'ubuntu', )
+IS_DEBIAN_PLATFORM = any(p in CURRENT_PLATFORM for p in DEBIAN_PLATFORMS)
+
 STPYV8_HOME = os.path.dirname(os.path.realpath(__file__))
 DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tools'))
 V8_HOME     = os.environ.get('V8_HOME', os.path.join(STPYV8_HOME, 'v8'))
@@ -53,13 +57,8 @@ include_dirs.append(os.path.join(V8_HOME, 'include'))
 library_dirs.append(os.path.join(V8_HOME, 'out.gn/x64.release.sample/obj/'))
 
 def get_libboost_python_name():
-    ubuntu_platforms = ('ubuntu', )
-    current_platform = platform.platform().lower()
-
-    if any(p in current_platform for p in ubuntu_platforms):
-        return "boost_python{}".format(sys.version_info.major)
-
-    return "boost_python{}{}".format(sys.version_info.major, sys.version_info.minor)
+    name = "boost_python{}".format(sys.version_info.major)
+    return name if IS_DEBIAN_PLATFORM else "{}{}".format(name, sys.version_info.minor)
 
 if os.name in ("nt", ):
     include_dirs       += os.environ["INCLUDE"].split(';')
