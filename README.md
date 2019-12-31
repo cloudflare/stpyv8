@@ -112,7 +112,7 @@ Building on Ubuntu 16.04 requires an external PPA addition for python3.  Buildin
 
 ### MacOS
 
-Building on MacOS requires full [XCode] (https://developer.apple.com/xcode/) (not just the command line tools) to compile V8.  The command line tools bundled with XCode are required (rather than the stand-alone command line tools, sometime requiring [drastic measures](https://bugs.chromium.org/p/chromium/issues/detail?id=729990#c1).
+Building on MacOS requires full [XCode](https://developer.apple.com/xcode/) (not just the command line tools) to compile V8.  The command line tools bundled with XCode are required (rather than the stand-alone command line tools, sometime requiring [drastic measures](https://bugs.chromium.org/p/chromium/issues/detail?id=729990#c1).
 
 Using [HomeBrew](https://brew.sh) makes the boost-python and related dependencies easier for STPyV8:
 
