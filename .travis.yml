@@ -5,9 +5,15 @@ python:
   - "3.6"
 before_install:
   - sudo apt-get update
-  - sudo apt-get install python python3 python3-dev python3-pytest build-essential libboost-dev libboost-system-dev libboost-python-dev
+  - sudo apt-get install python python3 python3-dev build-essential libboost-dev libboost-system-dev libboost-python-dev
+  - python --version
+  - pip install -U pip
+  - pip install -U pytest
+  # - pip install codecov
 install:
   - sudo ./install-ubuntu.sh
-script:
-  # - pytest tests
+  - rm -rf v8 depot_tools
+script: pytest
+after_success:
+  # - codecov
   - echo "Build done"
