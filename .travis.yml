@@ -1,0 +1,11 @@
+os: linux
+language: python
+dist: bionic
+python:
+  - "3.6"
+before_install:
+  - sudo apt-get install python python3 python3-dev build-essential libboost-dev libboost-system-dev libboost-python-dev
+install:
+  - travis_wait 240 sudo ./install-ubuntu.sh
+script:
+  - echo "Build done"
