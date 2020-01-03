@@ -4,16 +4,8 @@ dist: bionic
 python:
   - "3.6"
 before_install:
-  - sudo apt-get update
   - sudo apt-get install python python3 python3-dev build-essential libboost-dev libboost-system-dev libboost-python-dev
-  - python --version
-  - pip install -U pip
-  - pip install -U pytest
-  # - pip install codecov
 install:
   - sudo ./install-ubuntu.sh
-cache:
-  directories:
-    - v8
 script:
   - echo "Build done"
