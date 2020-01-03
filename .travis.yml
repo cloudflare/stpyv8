@@ -12,8 +12,10 @@ before_install:
   # - pip install codecov
 install:
   - sudo ./install-ubuntu.sh
-  - sudo rm -rf v8 depot_tools
-script: pytest
+cache:
+  directories:
+    - v8
+script: pytest tests
 after_success:
   # - codecov
   - echo "Build done"
