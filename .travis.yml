@@ -6,6 +6,6 @@ python:
 before_install:
   - sudo apt-get install python python3 python3-dev build-essential libboost-dev libboost-system-dev libboost-python-dev
 install:
-  - sudo ./install-ubuntu.sh
+  - travis_wait 240 sudo ./install-ubuntu.sh
 script:
   - echo "Build done"
