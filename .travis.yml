@@ -15,7 +15,5 @@ install:
 cache:
   directories:
     - v8
-script: pytest tests
-after_success:
-  # - codecov
+script:
   - echo "Build done"
