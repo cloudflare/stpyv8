@@ -1013,12 +1013,12 @@ void CJavascriptObject::SetAttr(const std::string& name, py::object value)
   v8::Handle<v8::String> attr_name = DecodeUtf8(name);
   v8::Handle<v8::Value> attr_obj = CPythonObject::Wrap(value);
 
-  if (Object()->Has(context, attr_name).ToChecked())
+  if (Object()->Has(context, attr_name).FromMaybe(false))
   {
     v8::Handle<v8::Value> UNUSED_VAR(attr_value) = Object()->Get(context, attr_name).ToLocalChecked();
   }
 
-  if (!Object()->Set(context, attr_name, attr_obj).ToChecked())
+  if (!Object()->Set(context, attr_name, attr_obj).FromMaybe(false))
     CJavascriptException::ThrowIf(isolate, try_catch);
 }
 
@@ -1037,7 +1037,7 @@ void CJavascriptObject::DelAttr(const std::string& name)
 
   CheckAttr(attr_name);
 
-  if (!Object()->Delete(context, attr_name).ToChecked())
+  if (!Object()->Delete(context, attr_name).FromMaybe(false))
     CJavascriptException::ThrowIf(isolate, try_catch);
 }
 
