@@ -8,7 +8,7 @@ import logging
 
 from distutils.command.build import build
 from distutils.command.install import install
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 
 from settings import *
 
