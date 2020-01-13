@@ -964,7 +964,7 @@ void CJavascriptObject::CheckAttr(v8::Handle<v8::String> name) const
   v8::HandleScope handle_scope(isolate);
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
-  if (!Object()->Has(context, name).ToChecked())
+  if (!Object()->Has(context, name).FromMaybe(false))
   {
     std::ostringstream msg;
 
@@ -990,9 +990,6 @@ py::object CJavascriptObject::GetAttr(const std::string& name)
   v8::Handle<v8::String> attr_name = DecodeUtf8(name);
 
   CheckAttr(attr_name);
-
-  if (!Object()->Has(context, attr_name).FromMaybe(false))
-    CJavascriptException::ThrowIf(isolate, try_catch);
 
   v8::Handle<v8::Value> attr_value = Object()->Get(context, attr_name).ToLocalChecked();
 
