@@ -964,7 +964,7 @@ void CJavascriptObject::CheckAttr(v8::Handle<v8::String> name) const
   v8::HandleScope handle_scope(isolate);
   v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
-  if (!Object()->Has(context, name).ToChecked())
+  if (!Object()->Has(context, name).FromMaybe(false))
   {
     std::ostringstream msg;
 
