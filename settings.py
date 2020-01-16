@@ -14,7 +14,7 @@ DEPOT_GIT_URL     = "https://chromium.googlesource.com/chromium/tools/depot_tool
 
 STPYV8_VERSION = V8_GIT_TAG_STABLE
 
-V8_DEPS_LINUX = os.environ.get('V8_DEPS_LINUX', '1') in ('1', )
+v8_deps_linux = os.environ.get('V8_DEPS_LINUX', '1') in ('1', )
 
 os.environ['PATH'] = "{}:{}".format(os.environ['PATH'], DEPOT_HOME)
 
