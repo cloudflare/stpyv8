@@ -92,7 +92,7 @@ def checkout_v8():
 
     # On Linux, install additional dependencies, per
     # https://v8.dev/docs/build step 4
-    if sys.platform in ("linux", "linux2", ) and V8_DEPS_LINUX:
+    if sys.platform in ("linux", "linux2", ) and v8_deps_linux:
         exec_cmd('./v8/build/install-build-deps.sh',
                  cwd = os.path.dirname(V8_HOME),
                  msg = "Installing additional linux dependencies")
