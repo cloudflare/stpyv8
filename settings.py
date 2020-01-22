@@ -16,6 +16,8 @@ STPYV8_VERSION = V8_GIT_TAG_STABLE
 
 v8_deps_linux = os.environ.get('V8_DEPS_LINUX', '1') in ('1', )
 
+ICU_DAT_FOLDER = '/usr/share/stpyv8'
+
 os.environ['PATH'] = "{}:{}".format(os.environ['PATH'], DEPOT_HOME)
 
 gn_args = {
