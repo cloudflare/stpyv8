@@ -155,6 +155,12 @@ class stpyv8_build_no_v8(build):
 class stpyv8_install(install):
     def run(self):
         self.skip_build = True
+
+        if icu_data_folder:
+            os.makedirs(icu_data_folder, exist_ok = True)
+            shutil.copy(os.path.join(V8_HOME, "out.gn/x64.release.sample/icudtl.dat"),
+                        icu_data_folder)
+
         install.run(self)
 
 
