@@ -22,12 +22,12 @@ void CLocker::leave(void)
 
 bool CLocker::IsLocked()
 {
-  return v8::Locker::IsLocked(v8::Isolate::GetCurrent());
+    return v8::Locker::IsLocked(v8::Isolate::GetCurrent());
 }
 
 void CLocker::Expose(void)
 {
-  py::class_<CLocker, boost::noncopyable>("JSLocker", py::no_init)
+    py::class_<CLocker, boost::noncopyable>("JSLocker", py::no_init)
     .def(py::init<>())
     .def(py::init<CIsolatePtr>((py::arg("isolate"))))
 
@@ -42,7 +42,7 @@ void CLocker::Expose(void)
     .def("leave", &CLocker::leave)
     ;
 
-  py::class_<CUnlocker, boost::noncopyable>("JSUnlocker")
+    py::class_<CUnlocker, boost::noncopyable>("JSUnlocker")
     .def("entered", &CUnlocker::entered)
     .def("enter", &CUnlocker::enter)
     .def("leave", &CUnlocker::leave)
