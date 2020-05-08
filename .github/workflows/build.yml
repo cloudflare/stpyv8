@@ -34,6 +34,8 @@ jobs:
         python -m cibuildwheel --output-dir wheelhouse
       env:
         CIBW_SKIP: cp27-* cp35-*
+        V8_DEPS_LINUX: 0
+        LDFLAGS: $LDFLAGS -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
     - uses: actions/upload-artifact@v1
       with:
