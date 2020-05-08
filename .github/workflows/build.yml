@@ -28,6 +28,8 @@ jobs:
 
     - name: Build wheel
       run: |
+        python2 setup.py build
+        python setup.py install
         python -m cibuildwheel --output-dir wheelhouse
       env:
         CIBW_SKIP: cp27-* cp35-*
