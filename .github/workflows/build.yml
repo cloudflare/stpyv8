@@ -28,7 +28,8 @@ jobs:
 
     - name: Build wheel
       run: |
-        python2 setup.py build
+        python2 setup.py v8
+        python setup.py stpyv8
         python setup.py install
         python -m cibuildwheel --output-dir wheelhouse
       env:
