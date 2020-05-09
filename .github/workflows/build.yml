@@ -25,7 +25,6 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install libboost-dev libboost-system-dev libboost-python-dev
-        find / -name *boost_python*
 
     - name: Build wheel
       run: |
@@ -36,6 +35,7 @@ jobs:
       env:
         CIBW_SKIP: cp27-* cp35-*
         V8_DEPS_LINUX: 0
+        STPYV8_BOOST_PYTHON: boost_python3
         LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
     - uses: actions/upload-artifact@v1

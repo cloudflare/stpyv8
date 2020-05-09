@@ -62,11 +62,14 @@ library_dirs.append(os.path.join(V8_HOME, 'out.gn/x64.release.sample/obj/'))
 def get_libboost_python_name():
     ubuntu_platforms = ('ubuntu', )
     current_platform = platform.platform().lower()
+    print(current_platform)
 
     if any(p in current_platform for p in ubuntu_platforms):
         return "boost_python{}".format(sys.version_info.major)
 
     return "boost_python{}{}".format(sys.version_info.major, sys.version_info.minor)
+
+STPYV8_BOOST_PYTHON = os.environ.get('STPYV8_BOOST_PYTHON', get_libboost_python_name())
 
 if os.name in ("nt", ):
     include_dirs       += os.environ["INCLUDE"].split(';')
@@ -75,7 +78,7 @@ if os.name in ("nt", ):
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
 elif os.name in ("posix", ):
-    libraries = ["boost_system", "v8_monolith", get_libboost_python_name()]
+    libraries = ["boost_system", "v8_monolith", STPYV8_BOOST_PYTHON]
     extra_compile_args.append('-std=c++11')
 
     if platform.system() in ('Linux', ):
