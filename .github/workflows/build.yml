@@ -28,15 +28,14 @@ jobs:
     - name: STEP 4. Build wheel
       run: |
         python2 setup.py v8
-        # python setup.py stpyv8
-        # python setup.py install
         python setup.py bdist_wheel -d ./wheelhouse
       env:
         V8_DEPS_LINUX: 0
         STPYV8_BOOST_PYTHON: boost_python3
         LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
-    - uses: actions/upload-artifact@v1
+    - name: STEP 5. Upload wheel
+      uses: actions/upload-artifact@v1
       with:
-        name: STEP 5. Upload wheel
+        name: wheels
         path: ./wheelhouse
