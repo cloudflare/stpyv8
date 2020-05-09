@@ -24,7 +24,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt-get install python python3 python3-dev build-essential libboost-dev libboost-system-dev libboost-python-dev
+        sudo apt-get install libboost-dev libboost-system-dev libboost-python-dev
+        ls -R /
 
     - name: Build wheel
       run: |
