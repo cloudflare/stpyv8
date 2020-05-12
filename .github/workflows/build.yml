@@ -41,10 +41,10 @@ jobs:
      #   path: ./wheelhouse
 
     - name: Build manylinux Python wheels
-      uses: RalfG/python-wheels-manylinux-build@v0.2.2-manylinux2010_x86_64
+      uses: RalfG/python-wheels-manylinux-build@v0.2.2-manylinux2014_x86_64
       with:
         python-versions: 'cp36-cp36m cp37-cp37m cp38-cp38m'
-        system-packages: 'python python3 python3-devel libboost-devel libboost-system-devel libboost-python-devel'
+        system-packages: 'python python3 python3-devel boost-devel boost-system boost-python'
         package-path: ''
         pip-wheel-args: '--no-deps'
 
