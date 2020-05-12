@@ -20,19 +20,19 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: STEP 3. Install dependencies
-      run: |
-        sudo apt-get install libboost-dev libboost-system-dev libboost-python-dev
-        pip install --upgrade pip setuptools wheel
+    # - name: STEP 3. Install dependencies
+    #  run: |
+    #    sudo apt-get install libboost-dev libboost-system-dev libboost-python-dev
+    #    pip install --upgrade pip setuptools wheel
 
-    - name: STEP 4. Build wheel
-      run: |
-        python2 setup.py v8
-        python setup.py sdist bdist_wheel
-      env:
-        V8_DEPS_LINUX: 0
-        STPYV8_BOOST_PYTHON: boost_python3
-        LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
+    # - name: STEP 4. Build wheel
+    #  run: |
+    #    python2 setup.py v8
+    #    python setup.py sdist bdist_wheel
+    #  env:
+    #    V8_DEPS_LINUX: 0
+    #    STPYV8_BOOST_PYTHON: boost_python3
+    #    LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
      # - name: STEP 5. Upload wheel
      # uses: actions/upload-artifact@v1
@@ -40,9 +40,17 @@ jobs:
      #   name: wheels
      #   path: ./wheelhouse
 
-    - name: STEP 6. Publish package to Test PyPI
-      uses: pypa/gh-action-pypi-publish@master
+    - name: Build manylinux Python wheels
+      uses: RalfG/python-wheels-manylinux-build@v0.2.2-manylinux2010_x86_64
       with:
-        user: __token__
-        password: ${{ secrets.test_pypi_password }}
-        repository_url: https://test.pypi.org/legacy/
+        python-versions: 'cp36-cp36m cp37-cp37m cp38-cp38m'
+        system-packages: 'python python3 python3-dev libboost-dev libboost-system-dev libboost-python-dev'
+        package-path: ''
+        pip-wheel-args: '--no-deps'
+
+    # - name: STEP 6. Publish package to Test PyPI
+    #  uses: pypa/gh-action-pypi-publish@master
+    #  with:
+    #    user: __token__
+    #    password: ${{ secrets.test_pypi_password }}
+    #    repository_url: https://test.pypi.org/legacy/
