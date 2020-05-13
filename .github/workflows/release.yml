@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+    branches:
+    - master
+
+jobs:
+  build:
+    name: Build wheel on ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8] 
+        os: [ubuntu-latest]
+
+    steps:
+    - name: STEP 1. Checkout repository
+      uses: actions/checkout@v2
+
+    - name: STEP 2. Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: STEP 3. Install dependencies
+      run: |
+         sudo apt-get install libboost-dev libboost-system-dev libboost-python-dev
+         pip install --upgrade pip setuptools wheel
+
+    - name: STEP 4. Build wheel
+      run: |
+         python2 setup.py v8
+         python setup.py sdist bdist_wheel -d wheelhouse
+      env:
+         V8_DEPS_LINUX: 0
+         STPYV8_BOOST_PYTHON: boost_python3
+         LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
+
+    - name: STEP 5. Upload to release
+      uses: AButler/upload-release-assets@v2.0
+      with:
+        files: 'wheelhouse/*'
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
