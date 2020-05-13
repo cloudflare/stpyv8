@@ -1,6 +1,7 @@
 build
 .cache
 .cipd
+*.egg-info
 .gclient
 .gclient_entries
 depot_tools
