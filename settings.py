@@ -68,6 +68,8 @@ def get_libboost_python_name():
 
     return "boost_python{}{}".format(sys.version_info.major, sys.version_info.minor)
 
+STPYV8_BOOST_PYTHON = os.environ.get('STPYV8_BOOST_PYTHON', get_libboost_python_name())
+
 if os.name in ("nt", ):
     include_dirs       += os.environ["INCLUDE"].split(';')
     library_dirs       += os.environ["LIB"].split(';')
@@ -75,7 +77,7 @@ if os.name in ("nt", ):
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
 elif os.name in ("posix", ):
-    libraries = ["boost_system", "v8_monolith", get_libboost_python_name()]
+    libraries = ["boost_system", "v8_monolith", STPYV8_BOOST_PYTHON]
     extra_compile_args.append('-std=c++11')
 
     if platform.system() in ('Linux', ):
