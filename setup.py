@@ -6,13 +6,13 @@ import subprocess
 import shutil
 import logging
 
-from distutils.command.build import build
-from distutils.command.install import install
-
 try:
     from setuptools import setup, Extension
 except ImportError:
     from distutils.core import setup, Extension
+
+from distutils.command.build import build
+from distutils.command.install import install
 
 from settings import *
 
