@@ -34,8 +34,10 @@ jobs:
          STPYV8_BOOST_PYTHON: boost_python3
          LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
-    - name: STEP 5. Upload wheel
+    - name: STEP 5. Upload wheels
       uses: actions/upload-artifact@v1
       with:
         name: wheels
-        path: ./wheelhouse
+        path: |
+          ./wheelhouse
+          ./v8/out.gn/x64.release.sample/icudtl.dat
