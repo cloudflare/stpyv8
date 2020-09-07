@@ -44,4 +44,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: wheels
-        path: ./src/icu/icudtl.dat
+        path: ./v8/out.gn/x64.release.sample/icudtl.dat
