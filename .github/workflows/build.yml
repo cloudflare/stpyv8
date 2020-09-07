@@ -35,9 +35,13 @@ jobs:
          LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
     - name: STEP 5. Upload wheels
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: wheels
-        path: |
-          ./wheelhouse
-          ./src/icu/icudtl.dat
+        path: ./wheelhouse
+
+    - name: STEP 6. Upload icu data file
+      uses: actions/upload-artifact@v2
+      with:
+        name: wheels
+        path: ./src/icu/icudtl.dat
