@@ -40,4 +40,4 @@ jobs:
         name: wheels
         path: |
           ./wheelhouse
-          ./v8/out.gn/x64.release.sample/icudtl.dat
+          ./src/icu/icudtl.dat
