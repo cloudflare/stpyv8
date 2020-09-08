@@ -41,5 +41,5 @@ jobs:
     - name: STEP 5. Upload to release
       uses: AButler/upload-release-assets@v2.0
       with:
-        files: 'wheelhouse/*'
+        files: 'wheelhouse/*;v8/out.gn/x64.release.sample/icudtl.dat'
         repo-token: ${{ secrets.GITHUB_TOKEN }}
