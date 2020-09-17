@@ -14,7 +14,7 @@ import json
 
 import _STPyV8
 
-__version__ = '0.1'
+__version__ = _STPyV8.JSEngine.version
 
 __all__ = ["ReadOnly",
            "DontEnum",
