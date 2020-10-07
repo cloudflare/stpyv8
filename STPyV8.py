@@ -4,13 +4,8 @@
 from __future__ import with_statement
 from __future__ import print_function
 
-import sys
-import os
 import re
-import logging
 import collections.abc
-import functools
-import json
 
 import _STPyV8
 
@@ -124,14 +119,14 @@ class JSLocker(_STPyV8.JSLocker):
 
         if JSContext.entered:
             self.leave()
-            raise RuntimeError("Lock should be acquired before enter the context")
+            raise RuntimeError("Lock should be acquired before entering the context")
 
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         if JSContext.entered:
             self.leave()
-            raise RuntimeError("Lock should be released after leave the context")
+            raise RuntimeError("Lock should be released after leaving the context")
 
         self.leave()
 
@@ -178,47 +173,75 @@ class JSClass(object):
         return object.__setattr__(self, name, value)
 
     def toString(self):
-        "Returns a string representation of an object."
+        """
+        Return the string representation of the object
+        """
         return "[object %s]" % self.__class__.__name__
 
     def toLocaleString(self):
-        "Returns a value as a string value appropriate to the host environment's current locale."
+        """
+        Return the string representation of the object as a string value
+        appropriate to the environment current locale
+        """
         return self.toString()
 
     def valueOf(self):
-        "Returns the primitive value of the specified object."
+        """
+        Return the primitive value of the object
+        """
         return self
 
     def hasOwnProperty(self, name):
-        "Returns a Boolean value indicating whether an object has a property with the specified name."
+        """
+        Return a boolean value indicating whether the object has a property
+        with the specified name
+        """
         return hasattr(self, name)
 
     def isPrototypeOf(self, obj):
-        "Returns a Boolean value indicating whether an object exists in the prototype chain of another object."
+        """
+        Return a boolean value indicating whether the object exists in the
+        prototype chain of another object
+        """
         raise NotImplementedError()
 
     def __defineGetter__(self, name, getter):
-        "Binds an object's property to a function to be called when that property is looked up."
+        """
+        Bind the object property to a function to be called when that property
+        is looked up
+        """
         self.__properties__[name] = (getter, self.__lookupSetter__(name))
 
     def __lookupGetter__(self, name):
-        "Return the function bound as a getter to the specified property."
+        """
+        Return the function bound as a getter to the specified property
+        """
         return self.__properties__.get(name, (None, None))[0]
 
     def __defineSetter__(self, name, setter):
-        "Binds an object's property to a function to be called when an attempt is made to set that property."
+        """
+        Bind the object property to a function to be called when an attempt
+        is made to set that property
+        """
         self.__properties__[name] = (self.__lookupGetter__(name), setter)
 
     def __lookupSetter__(self, name):
-        "Return the function bound as a setter to the specified property."
+        """
+        Return the function bound as setter to the specified property
+        """
         return self.__properties__.get(name, (None, None))[1]
 
     def watch(self, prop, handler):
-        "Watches for a property to be assigned a value and runs a function when that occurs."
+        """
+        Watch for a property to be assigned a value and runs a function when
+        such assignment occurs
+        """
         self.__watchpoints__[prop] = handler
 
     def unwatch(self, prop):
-        "Removes a watchpoint set with the watch method."
+        """
+        Remove a watchpoint set with the watch method
+        """
         del self.__watchpoints__[prop]
 
 
