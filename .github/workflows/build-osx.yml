@@ -23,6 +23,7 @@ jobs:
       - name: STEP 3. Install dependencies
         run: |
           pip install --upgrade pip setuptools wheel
+          brew update
           brew install boost boost-python3
 
       - name: STEP 4. Set up Pyenv
