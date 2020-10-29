@@ -27,11 +27,6 @@ jobs:
       - name: STEP 3. Install dependencies
         run: |
           pip install --upgrade pip setuptools wheel
-          brew uninstall openssl@1.0.2t
-          brew uninstall python@2.7.17
-          brew untap local/openssl
-          brew untap local/python2
-          brew update
           brew install boost boost-python3
 
       - name: STEP 4. Set up Pyenv
@@ -52,5 +47,5 @@ jobs:
       - name: STEP 6. Upload to release
         uses: AButler/upload-release-assets@v2.0
         with:
-          files: 'wheelhouse/*'
+          files: 'wheelhouse/*;v8/out.gn/x64.release.sample/icudtl.dat'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
