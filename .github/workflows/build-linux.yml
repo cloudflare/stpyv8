@@ -23,12 +23,14 @@ jobs:
       - name: STEP 3. Install dependencies
         run: |
           sudo apt install libboost-dev libboost-system-dev libboost-python-dev
-          pip install --upgrade pip setuptools wheel
+          pip install --upgrade pip setuptools wheel pytest
 
       - name: STEP 4. Build wheel
         run: |
           python2 setup.py v8
           python setup.py sdist bdist_wheel -d wheelhouse
+          python setup.py install
+          pytest -v tests/
         env:
           V8_DEPS_LINUX: 0
           STPYV8_BOOST_PYTHON: boost_python3
