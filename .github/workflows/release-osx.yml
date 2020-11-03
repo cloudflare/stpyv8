@@ -26,7 +26,7 @@ jobs:
 
       - name: STEP 3. Install dependencies
         run: |
-          pip install --upgrade pip setuptools wheel
+          pip install --upgrade pip setuptools wheel pytest
           brew install boost boost-python3
 
       - name: STEP 4. Set up Pyenv
@@ -41,6 +41,8 @@ jobs:
           python setup.py v8
           pyenv local system
           sudo python setup.py sdist bdist_wheel -d wheelhouse
+          sudo python setup.py install
+          pytest -v tests/
         env:
           STPYV8_BOOST_PYTHON: boost_python38
 
