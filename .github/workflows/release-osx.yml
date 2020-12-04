@@ -34,6 +34,8 @@ jobs:
         with:
           default: 3.7.6
           versions: 2.7.17
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
       - name: STEP 5. Build wheel
         run: |
