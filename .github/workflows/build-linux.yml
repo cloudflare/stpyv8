@@ -37,7 +37,7 @@ jobs:
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
       - name: STEP 5. Upload wheel
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
           path: |

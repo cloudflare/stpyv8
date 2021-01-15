@@ -45,7 +45,7 @@ jobs:
           STPYV8_BOOST_PYTHON: boost_python38
 
       - name: STEP 6. Upload wheel
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
           path: |
