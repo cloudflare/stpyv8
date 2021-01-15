@@ -38,16 +38,18 @@ jobs:
           pyenv local 2.7.17
           python setup.py v8
           pyenv local system
-          sudo python setup.py sdist bdist_wheel -d ${{ github.workspace }}/wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}
+          sudo python setup.py sdist bdist_wheel -d wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}
           sudo python setup.py install
-          pytest
+          sudo cp v8/out.gn/x64.release.sample/icudtl.dat wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
         env:
           STPYV8_BOOST_PYTHON: boost_python38
+
+      - name: STEP 6. Test wheel
+        run: |
+          pytest -v
 
       - name: STEP 6. Upload wheel
         uses: actions/upload-artifact@v2
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
-          path: |
-            ${{ github.workspace }}/wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}
-            v8/out.gn/x64.release.sample/icudtl.dat
+          path: ./wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}
