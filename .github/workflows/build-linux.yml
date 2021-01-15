@@ -5,11 +5,11 @@ on: [push, pull_request]
 jobs:
   build:
     name: Build wheel on ${{ matrix.os }}
-    runs-on: ubuntu-18.04
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
-        os: [ubuntu-latest]
+        os: [ubuntu-18.04]
 
     steps:
       - name: STEP 1. Checkout repository
@@ -30,7 +30,7 @@ jobs:
           python2 setup.py v8
           python setup.py sdist bdist_wheel -d wheelhouse
           python setup.py install
-          pytest -v tests/
+          pytest
         env:
           V8_DEPS_LINUX: 0
           STPYV8_BOOST_PYTHON: boost_python3

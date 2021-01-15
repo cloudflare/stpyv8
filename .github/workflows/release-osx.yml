@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build wheel on ${{ matrix.os }}
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         python-version: [3.9]
@@ -44,7 +44,7 @@ jobs:
           pyenv local system
           sudo python setup.py sdist bdist_wheel -d wheelhouse
           sudo python setup.py install
-          pytest -v tests/
+          pytest
         env:
           STPYV8_BOOST_PYTHON: boost_python38
 
