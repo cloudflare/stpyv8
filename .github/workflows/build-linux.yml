@@ -28,7 +28,7 @@ jobs:
       - name: STEP 4. Build wheel
         run: |
           python2 setup.py v8
-          python setup.py sdist bdist_wheel -d wheelhouse
+          python setup.py sdist bdist_wheel -d wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
           pytest
         env:
@@ -39,5 +39,7 @@ jobs:
       - name: STEP 5. Upload wheel
         uses: actions/upload-artifact@v1
         with:
-          name: wheels
-          path: ./wheelhouse
+          name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
+          path: |
+            ./wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}/*.whl
+            v8/out.gn/x64.release.sample/icudtl.dat
