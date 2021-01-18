@@ -8,7 +8,8 @@ try:
 except ImportError:
     LSB_RELEASE = False
 
-print("LSB_RELEASE:" + LSB_RELEASE)
+print("LSB_RELEASE:")
+print(LSB_RELEASE)
 
 STPYV8_HOME = os.path.dirname(os.path.realpath(__file__))
 DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tools'))
