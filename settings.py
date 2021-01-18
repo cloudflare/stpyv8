@@ -2,15 +2,6 @@ import sys
 import os
 import platform
 
-try:
-    import lsb_release
-    LSB_RELEASE = True
-except ImportError:
-    LSB_RELEASE = False
-
-print("LSB_RELEASE:")
-print(LSB_RELEASE)
-
 STPYV8_HOME = os.path.dirname(os.path.realpath(__file__))
 DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tools'))
 V8_HOME     = os.environ.get('V8_HOME', os.path.join(STPYV8_HOME, 'v8'))
@@ -83,29 +74,36 @@ BOOST_PYTHON_UBUNTU_MATRIX = {
 }
 
 def get_libboost_python_name():
-    print("get_libboost_python_name")
-
-    if not LSB_RELEASE:
+    if not os.path.exists("/etc/lsb-release"):
         return BOOST_PYTHON_UBUNTU_MATRIX['default']
 
-    info   = lsb_release.get_distro_information()
-    distro = info.get('ID', None)
-    print(distro)
+    platform_info = dict()
 
-    if distro is None or distro.lower() not in ('ubuntu', ):
+    with open("/etc/lsb-release", "r") as fd:
+        for line in fd.readlines():
+            s = line.strip()
+            p = s.split("=")
+
+            if len(p) < 2:
+                continue
+
+            platform_info[p[0]] = p[1]
+
+    print(platform_info)
+
+    if 'DISTRIB_ID' not in platform_info:
         return BOOST_PYTHON_UBUNTU_MATRIX['default']
 
-    release = info['RELEASE']
+    if platform_info['DISTRIB_ID'].lower() not in ('ubuntu', ):
+        return BOOST_PYTHON_UBUNTU_MATRIX['default']
+
+    release = platform_info['DISTRIB_RELEASE']
     print(release)
 
     if release not in BOOST_PYTHON_UBUNTU_MATRIX:
         return BOOST_PYTHON_UBUNTU_MATRIX['default']
 
     return BOOST_PYTHON_UBUNTU_MATRIX[release]
-
-with open("/etc/lsb-release") as fd:
-    data = fd.read()
-    print(data)
 
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 print(STPYV8_BOOST_PYTHON)
