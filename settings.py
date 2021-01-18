@@ -2,6 +2,12 @@ import sys
 import os
 import platform
 
+try:
+    import lsb_release
+    LSB_RELEASE = True
+except ImportError:
+    LSB_RELEASE = False
+
 STPYV8_HOME = os.path.dirname(os.path.realpath(__file__))
 DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tools'))
 V8_HOME     = os.environ.get('V8_HOME', os.path.join(STPYV8_HOME, 'v8'))
@@ -68,18 +74,22 @@ BOOST_PYTHON_LIB_SHORT = "boost_python{}".format(sys.version_info.major)
 BOOST_PYTHON_LIB_LONG  = "boost_python{}{}".format(sys.version_info.major, sys.version_info.minor)
 
 BOOST_PYTHON_UBUNTU_MATRIX = {
-    'default' : BOOST_PYTHON_LIB_SHORT,
+    'default' : BOOST_PYTHON_LIB_LONG,
     '18.04'   : BOOST_PYTHON_LIB_SHORT,
     '20.04'   : BOOST_PYTHON_LIB_LONG
 }
 
-def get_libboost_python_name_ubuntu():
-    try:
-        import lsb_release
-    except ImportError:
+def get_libboost_python_name():
+    if not LSB_RELEASE:
         return BOOST_PYTHON_UBUNTU_MATRIX['default']
 
-    info = lsb_release.get_distro_information()
+    info   = lsb_release.get_distro_information()
+    distro = info.get('ID', None)
+    print(distro)
+
+    if distro is None or distro.lower() not in ('ubuntu', ):
+        return BOOST_PYTHON_UBUNTU_MATRIX['default']
+
     release = info['RELEASE']
     print(release)
 
@@ -87,15 +97,6 @@ def get_libboost_python_name_ubuntu():
         return BOOST_PYTHON_UBUNTU_MATRIX['default']
 
     return BOOST_PYTHON_UBUNTU_MATRIX[release]
-
-def get_libboost_python_name():
-    ubuntu_platforms = ('ubuntu', )
-    current_platform = platform.platform().lower()
-
-    if any(p in current_platform for p in ubuntu_platforms):
-        return get_libboost_python_name_ubuntu()
-
-    return BOOST_PYTHON_LIB_LONG
 
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 print(STPYV8_BOOST_PYTHON)
