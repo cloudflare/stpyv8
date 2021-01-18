@@ -103,6 +103,10 @@ def get_libboost_python_name():
 
     return BOOST_PYTHON_UBUNTU_MATRIX[release]
 
+with open("/etc/lsb-release") as fd:
+    data = fd.read()
+    print(data)
+
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 print(STPYV8_BOOST_PYTHON)
 
