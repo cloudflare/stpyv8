@@ -81,6 +81,7 @@ def get_libboost_python_name_ubuntu():
 
     info = lsb_release.get_distro_information()
     release = info['RELEASE']
+    print(release)
 
     if release not in BOOST_PYTHON_UBUNTU_MATRIX:
         return BOOST_PYTHON_UBUNTU_MATRIX['default']
