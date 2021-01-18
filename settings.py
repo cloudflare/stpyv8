@@ -8,6 +8,8 @@ try:
 except ImportError:
     LSB_RELEASE = False
 
+print("LSB_RELEASE:" + LSB_RELEASE)
+
 STPYV8_HOME = os.path.dirname(os.path.realpath(__file__))
 DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tools'))
 V8_HOME     = os.environ.get('V8_HOME', os.path.join(STPYV8_HOME, 'v8'))
@@ -80,6 +82,8 @@ BOOST_PYTHON_UBUNTU_MATRIX = {
 }
 
 def get_libboost_python_name():
+    print("get_libboost_python_name")
+
     if not LSB_RELEASE:
         return BOOST_PYTHON_UBUNTU_MATRIX['default']
 
