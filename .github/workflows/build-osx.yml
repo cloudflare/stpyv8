@@ -41,8 +41,6 @@ jobs:
           sudo python setup.py sdist bdist_wheel -d wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}
           sudo python setup.py install
           sudo cp v8/out.gn/x64.release.sample/icudtl.dat wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
-        env:
-          STPYV8_BOOST_PYTHON: boost_python38
 
       - name: STEP 6. Test wheel
         run: |

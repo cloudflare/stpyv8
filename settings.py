@@ -64,16 +64,40 @@ extra_link_args    = []
 include_dirs.append(os.path.join(V8_HOME, 'include'))
 library_dirs.append(os.path.join(V8_HOME, 'out.gn/x64.release.sample/obj/'))
 
+BOOST_PYTHON_LIB_SHORT = "boost_python{}".format(sys.version_info.major)
+BOOST_PYTHON_LIB_LONG  = "boost_python{}{}".format(sys.version_info.major, sys.version_info.minor)
+
+BOOST_PYTHON_UBUNTU_MATRIX = {
+    'default' : BOOST_PYTHON_LIB_SHORT,
+    '18.04'   : BOOST_PYTHON_LIB_SHORT,
+    '20.04'   : BOOST_PYTHON_LIB_LONG
+}
+
+def get_libboost_python_name_ubuntu():
+    try:
+        import lsb_release
+    except ImportError:
+        return BOOST_PYTHON_UBUNTU_MATRIX['default']
+
+    info = lsb_release.get_distro_information()
+    release = info['RELEASE']
+
+    if release not in BOOST_PYTHON_UBUNTU_MATRIX:
+        return BOOST_PYTHON_UBUNTU_MATRIX['default']
+
+    return BOOST_PYTHON_UBUNTU_MATRIX[release]
+
 def get_libboost_python_name():
     ubuntu_platforms = ('ubuntu', )
     current_platform = platform.platform().lower()
 
     if any(p in current_platform for p in ubuntu_platforms):
-        return "boost_python{}".format(sys.version_info.major)
+        return get_libboost_python_name_ubuntu()
 
-    return "boost_python{}{}".format(sys.version_info.major, sys.version_info.minor)
+    return BOOST_PYTHON_LIB_LONG
 
-STPYV8_BOOST_PYTHON = os.environ.get('STPYV8_BOOST_PYTHON', get_libboost_python_name())
+STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
+print(STPYV8_BOOST_PYTHON)
 
 if os.name in ("nt", ):
     include_dirs       += os.environ["INCLUDE"].split(';')

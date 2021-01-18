@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
-        os: [ubuntu-18.04,ubuntu-20.04]
+        os: [ubuntu-18.04, ubuntu-20.04]
 
     steps:
       - name: STEP 1. Checkout repository
@@ -33,7 +33,6 @@ jobs:
           cp v8/out.gn/x64.release.sample/icudtl.dat wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
         env:
           V8_DEPS_LINUX: 0
-          STPYV8_BOOST_PYTHON: boost_python3
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
       - name: STEP 5. Test wheel
