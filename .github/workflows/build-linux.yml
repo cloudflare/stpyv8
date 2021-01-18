@@ -27,7 +27,7 @@ jobs:
 
       - name: STEP 4. Build wheel
         run: |
-          python2 setup.py v8
+          python setup.py v8
           python setup.py sdist bdist_wheel -d wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
           cp v8/out.gn/x64.release.sample/icudtl.dat wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
