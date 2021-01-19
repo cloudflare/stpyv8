@@ -56,5 +56,5 @@ jobs:
       - name: STEP 7. Upload wheel zip
         uses: actions/upload-artifact@v2
         with:
-          name: ./wheels
+          name: wheels
           path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
