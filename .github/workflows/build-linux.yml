@@ -35,9 +35,9 @@ jobs:
       - name: STEP 4. Build wheel
         run: |
           python setup.py v8
-          python setup.py sdist bdist_wheel -d wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}
+          python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
-          cp v8/out.gn/x64.release.sample/icudtl.dat wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
+          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
         env:
           V8_DEPS_LINUX: 0
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
@@ -46,8 +46,15 @@ jobs:
         run: |
           pytest -v
 
-      - name: STEP 6. Upload wheel
+      - name: STEP 6. Create wheel zip
+        uses: papeloto/action-zip@v1
+        with:
+          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
+          recursive: false
+          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+
+      - name: STEP 7. Upload wheel zip
         uses: actions/upload-artifact@v2
         with:
-          name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
-          path: ./wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}
+          name: wheels
+          path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
