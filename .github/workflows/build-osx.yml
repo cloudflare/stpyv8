@@ -8,8 +8,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [macos-10.15]
         python-version: [3.9]
-        os: [macos-latest]
 
     steps:
       - name: STEP 1. Checkout repository
@@ -38,16 +38,23 @@ jobs:
           pyenv local 2.7.17
           python setup.py v8
           pyenv local system
-          sudo python setup.py sdist bdist_wheel -d wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}
+          sudo python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           sudo python setup.py install
-          sudo cp v8/out.gn/x64.release.sample/icudtl.dat wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
+          sudo cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
 
       - name: STEP 6. Test wheel
         run: |
           pytest -v
 
-      - name: STEP 6. Upload wheel
+      - name: STEP 7. Create wheel zip
+        uses: papeloto/action-zip@v1
+        with:
+          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
+          recursive: false
+          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+
+      - name: STEP 8. Upload wheel zip
         uses: actions/upload-artifact@v2
         with:
-          name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
-          path: ./wheelhouse-${{ matrix.os }}-${{ matrix.python-version }}
+          name: wheels
+          path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
