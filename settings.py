@@ -89,8 +89,6 @@ def get_libboost_python_name():
 
             platform_info[p[0]] = p[1]
 
-    print(platform_info)
-
     if 'DISTRIB_ID' not in platform_info:
         return BOOST_PYTHON_UBUNTU_MATRIX['default']
 
@@ -98,7 +96,6 @@ def get_libboost_python_name():
         return BOOST_PYTHON_UBUNTU_MATRIX['default']
 
     release = platform_info['DISTRIB_RELEASE']
-    print(release)
 
     if release not in BOOST_PYTHON_UBUNTU_MATRIX:
         return BOOST_PYTHON_UBUNTU_MATRIX['default']
@@ -106,7 +103,6 @@ def get_libboost_python_name():
     return BOOST_PYTHON_UBUNTU_MATRIX[release]
 
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
-print(STPYV8_BOOST_PYTHON)
 
 if os.name in ("nt", ):
     include_dirs       += os.environ["INCLUDE"].split(';')
