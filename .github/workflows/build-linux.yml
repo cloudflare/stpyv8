@@ -8,8 +8,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
         python-version: [3.6, 3.7, 3.8, 3.9]
-        os: [ubuntu-18.04]
+        exclude:
+          - os: ubuntu-20.04
+            python-version: '3.6'
+          - os: ubuntu-20.04
+            python-version: '3.7'
+          - os: ubuntu-20.04
+            python-version: '3.9'
 
     steps:
       - name: STEP 1. Checkout repository
@@ -27,17 +34,27 @@ jobs:
 
       - name: STEP 4. Build wheel
         run: |
-          python2 setup.py v8
-          python setup.py sdist bdist_wheel -d wheelhouse
+          python setup.py v8
+          python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
-          pytest
+          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
         env:
           V8_DEPS_LINUX: 0
-          STPYV8_BOOST_PYTHON: boost_python3
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
-      - name: STEP 5. Upload wheel
-        uses: actions/upload-artifact@v1
+      - name: STEP 5. Test wheel
+        run: |
+          pytest -v
+
+      - name: STEP 6. Create wheel zip
+        uses: papeloto/action-zip@v1
+        with:
+          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
+          recursive: false
+          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+
+      - name: STEP 7. Upload wheel zip
+        uses: actions/upload-artifact@v2
         with:
           name: wheels
-          path: ./wheelhouse
+          path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
