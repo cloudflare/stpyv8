@@ -12,8 +12,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [macos-10.15]
         python-version: [3.9]
-        os: [macos-latest]
 
     steps:
       - name: STEP 1. Checkout repository
@@ -42,14 +42,23 @@ jobs:
           pyenv local 2.7.17
           python setup.py v8
           pyenv local system
-          sudo python setup.py sdist bdist_wheel -d wheelhouse
+          sudo python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           sudo python setup.py install
-          pytest
-        env:
-          STPYV8_BOOST_PYTHON: boost_python38
+          sudo cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
 
-      - name: STEP 6. Upload to release
+      - name: STEP 6. Test wheel
+        run: |
+          pytest -v
+
+      - name: STEP 7. Create wheel zip
+        uses: papeloto/action-zip@v1
+        with:
+          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
+          recursive: false
+          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+
+      - name: STEP 8. Upload to release
         uses: AButler/upload-release-assets@v2.0
         with:
-          files: 'wheelhouse/*;v8/out.gn/x64.release.sample/icudtl.dat'
+          files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
