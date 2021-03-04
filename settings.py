@@ -7,7 +7,7 @@ DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tool
 V8_HOME     = os.environ.get('V8_HOME', os.path.join(STPYV8_HOME, 'v8'))
 
 V8_GIT_URL        = "https://chromium.googlesource.com/v8/v8.git"
-V8_GIT_TAG_STABLE = "8.8.278.17"
+V8_GIT_TAG_STABLE = "8.9.255.20"
 V8_GIT_TAG_MASTER = "master"
 V8_GIT_TAG        = V8_GIT_TAG_STABLE
 DEPOT_GIT_URL     = "https://chromium.googlesource.com/chromium/tools/depot_tools.git"
@@ -28,7 +28,8 @@ os.environ['PATH'] = "{}:{}".format(os.environ['PATH'], DEPOT_HOME)
 
 gn_args = {
 # "v8_use_snapshot"                    : "true",
-  "v8_use_external_startup_data"       : "true",
+  "v8_deprecation_warnings"            : "true",
+  "v8_imminent_deprecation_warnings"   : "true",
   "v8_enable_disassembler"             : "false",
   "v8_enable_i18n_support"             : "true",
   "is_component_build"                 : "false",

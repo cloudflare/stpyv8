@@ -163,7 +163,7 @@ py::object CContext::GetEntered(void)
     v8::Isolate* isolate = v8::Isolate::GetCurrent();
     v8::HandleScope handle_scope(isolate);
 
-    v8::Handle<v8::Context> entered = isolate->GetEnteredContext();
+    v8::Handle<v8::Context> entered = isolate->GetEnteredOrMicrotaskContext();
 
     return (!isolate->InContext() || entered.IsEmpty()) ? py::object() :
            py::object(py::handle<>(boost::python::converter::shared_ptr_to_python<CContext>(CContextPtr(new CContext(entered)))));
