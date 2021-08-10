@@ -3,10 +3,8 @@
 
 import sys
 import os
-import unittest
-import logging
-
 import datetime
+import unittest
 
 import STPyV8
 
@@ -313,13 +311,13 @@ class TestWrapper(unittest.TestCase):
     def testStackTrace(self):
         class Global(STPyV8.JSClass):
             def GetCurrentStackTrace(self, limit):
-                return STPyV8.JSStackTrace.GetCurrentStackTrace(4, STPyV8.JSStackTrace.Options.Detailed)
+                return STPyV8.JSStackTrace.GetCurrentStackTrace(limit, STPyV8.JSStackTrace.Options.Detailed)
 
         with STPyV8.JSContext(Global()) as ctxt:
             st = ctxt.eval("""
                 function a()
                 {
-                    return GetCurrentStackTrace(10);
+                    return GetCurrentStackTrace(4);
                 }
                 function b()
                 {
@@ -944,9 +942,3 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue(ctxt.eval('null == returnNull()'))
             self.assertTrue(ctxt.eval('undefined == returnUndefined()'))
             self.assertTrue(ctxt.eval('null == returnNone()'))
-
-
-if __name__ == '__main__':
-    level = logging.DEBUG if "-v" in sys.argv else logging.WARN
-    logging.basicConfig(level = level, format = '%(asctime)s %(levelname)s %(message)s')
-    unittest.main()
