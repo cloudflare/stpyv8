@@ -1,6 +1,7 @@
-import sys
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import unittest
-import logging
 
 import STPyV8
 
@@ -41,8 +42,3 @@ class TestLocker(unittest.TestCase):
             self.assertRaises(RuntimeError, locker.__exit__, None, None, None)
 
         del locker
-
-if __name__ == '__main__':
-    level = logging.DEBUG if "-v" in sys.argv else logging.WARN
-    logging.basicConfig(level = level, format = '%(asctime)s %(levelname)s %(message)s')
-    unittest.main()

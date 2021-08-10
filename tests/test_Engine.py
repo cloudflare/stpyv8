@@ -1,10 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-import os
 import unittest
-import logging
 
 import STPyV8
 
@@ -113,9 +110,14 @@ class TestEngine(unittest.TestCase):
             version = 1.0
 
         with STPyV8.JSContext(Global()) as ctxt:
-            self.assertEqual("[object Global]", str(ctxt.eval("this.toString()")))
-            self.assertEqual("[object Global]", str(ctxt.eval("this.toLocaleString()")))
-            self.assertEqual(Global.version, float(ctxt.eval("this.valueOf()").version))
+            self.assertEqual("[object Global]",
+                             str(ctxt.eval("this.toString()")))
+
+            self.assertEqual("[object Global]",
+                             str(ctxt.eval("this.toLocaleString()")))
+
+            self.assertEqual(Global.version,
+                             float(ctxt.eval("this.valueOf()").version))
 
             self.assertTrue(bool(ctxt.eval("this.hasOwnProperty(\"version\")")))
 
@@ -163,7 +165,8 @@ class TestEngine(unittest.TestCase):
 
     def _testOutOfMemory(self):
         with STPyV8.JSIsolate():
-            STPyV8.JSEngine.setMemoryLimit(max_young_space_size=16 * 1024, max_old_space_size=4 * 1024 * 1024)
+            STPyV8.JSEngine.setMemoryLimit(max_young_space_size = 16 * 1024,
+                                           max_old_space_size = 4 * 1024 * 1024)
 
             with STPyV8.JSContext() as ctxt:
                 STPyV8.JSEngine.ignoreOutOfMemoryException()
@@ -190,9 +193,3 @@ class TestEngine(unittest.TestCase):
                 newStackSize = ctxt.eval("var maxStackSize = function(i){try{(function m(){++i&&m()}())}catch(e){return i}}(0); maxStackSize")
 
         self.assertTrue(newStackSize > oldStackSize * 2)
-
-
-if __name__ == '__main__':
-    level = logging.DEBUG if "-v" in sys.argv else logging.WARN
-    logging.basicConfig(level = level, format = '%(asctime)s %(levelname)s %(message)s')
-    unittest.main()

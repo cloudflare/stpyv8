@@ -1,14 +1,15 @@
-import sys
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import threading
+import time
 import unittest
-import logging
 
 import STPyV8
 
 
 class TestMultiPythonThread(unittest.TestCase):
     def testMultiPythonThread(self):
-        import time, threading
-
         class Global:
             count = 0
             started = threading.Event()
@@ -47,9 +48,3 @@ class TestMultiPythonThread(unittest.TestCase):
         self.assertEqual(10, g.count)
 
         self.assertTrue((time.time() - now) >= 1)
-
-
-if __name__ == '__main__':
-    level = logging.DEBUG if "-v" in sys.argv else logging.WARN
-    logging.basicConfig(level = level, format = '%(asctime)s %(levelname)s %(message)s')
-    unittest.main()
