@@ -334,6 +334,9 @@ void CPythonObject::NamedSetter(v8::Local<v8::Name> prop, v8::Local<v8::Value> v
     py::object obj = CJavascriptObject::Wrap(info.Holder());
 
     v8::String::Utf8Value name(info.GetIsolate(), prop);
+
+    if (*name == nullptr) CALLBACK_RETURN(v8::Undefined(info.GetIsolate()));
+
     py::object newval = CJavascriptObject::Wrap(value);
 
     bool found = 1 == ::PyObject_HasAttrString(obj.ptr(), *name);
@@ -395,8 +398,11 @@ void CPythonObject::NamedQuery(v8::Local<v8::Name> prop, const v8::PropertyCallb
 
     v8::String::Utf8Value name(info.GetIsolate(), prop);
 
-    bool exists = PyGen_Check(obj.ptr()) || ::PyObject_HasAttrString(obj.ptr(), *name) ||
-                  (::PyMapping_Check(obj.ptr()) && ::PyMapping_HasKeyString(obj.ptr(), *name));
+    bool exists = false;
+
+    if (*name)
+        exists = PyGen_Check(obj.ptr()) || ::PyObject_HasAttrString(obj.ptr(), *name) ||
+                 (::PyMapping_Check(obj.ptr()) && ::PyMapping_HasKeyString(obj.ptr(), *name));
 
     if (exists) CALLBACK_RETURN(v8::Integer::New(info.GetIsolate(), v8::None));
 
