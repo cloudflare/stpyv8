@@ -8,6 +8,11 @@ class CIsolate
     v8::Isolate *m_isolate;
     bool m_owner;
     void Init(bool owner);
+
+    static constexpr int KB = 1024;
+    static constexpr int MB = KB * 1024;
+    static constexpr size_t heap_increase = 5 * MB;
+    static constexpr size_t heap_max_increase = 64 * MB;
 public:
     CIsolate();
     CIsolate(bool owner);
@@ -20,6 +25,8 @@ public:
             v8::StackTrace::StackTraceOptions options);
 
     static py::object GetCurrent(void);
+    static size_t NearHeapLimitCallback(void* data, size_t current_heap_limit,
+                                        size_t initial_heap_limit);
 
     void Enter(void) {
         m_isolate->Enter();
