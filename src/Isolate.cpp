@@ -14,7 +14,6 @@ size_t CIsolate::NearHeapLimitCallback(void *data,
     if (current_heap_limit - initial_heap_limit > heap_max_increase)
         return current_heap_limit;
 
-    isolate->LowMemoryNotification();
     return current_heap_limit + heap_increase;
 }
 

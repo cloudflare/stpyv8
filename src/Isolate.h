@@ -11,7 +11,7 @@ class CIsolate
 
     static constexpr int KB = 1024;
     static constexpr int MB = KB * 1024;
-    static constexpr size_t heap_increase = 5 * MB;
+    static constexpr size_t heap_increase = 8 * MB;
     static constexpr size_t heap_max_increase = 64 * MB;
 public:
     CIsolate();
