@@ -34,7 +34,7 @@ gn_args = {
   "v8_enable_i18n_support"             : "true",
   "is_component_build"                 : "false",
   "is_debug"                           : "true" if os.environ.get("STPYV8_DEBUG") else "false",
-  "use_custom_libcxx"                  : "false",
+# "use_custom_libcxx"                  : "false",
   "v8_monolithic"                      : "true",
   "v8_use_external_startup_data"       : "false",
   "v8_enable_pointer_compression"      : "false",
