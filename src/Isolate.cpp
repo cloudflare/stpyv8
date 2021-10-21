@@ -5,6 +5,18 @@
 
 #include "libplatform/libplatform.h"
 
+
+size_t CIsolate::NearHeapLimitCallback(void *data,
+                                       size_t current_heap_limit, size_t initial_heap_limit)
+{
+    v8::Isolate *isolate = (v8::Isolate *)data;
+
+    if (current_heap_limit - initial_heap_limit > heap_max_increase)
+        return current_heap_limit;
+
+    return current_heap_limit + heap_increase;
+}
+
 void CIsolate::Init(bool owner)
 {
     m_owner = owner;
@@ -12,6 +24,7 @@ void CIsolate::Init(bool owner)
     v8::Isolate::CreateParams create_params;
     create_params.array_buffer_allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
     m_isolate = v8::Isolate::New(create_params);
+    m_isolate->AddNearHeapLimitCallback(NearHeapLimitCallback, m_isolate);
 }
 
 CIsolate::CIsolate(bool owner)
