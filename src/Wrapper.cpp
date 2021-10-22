@@ -122,8 +122,6 @@ void CWrapper::Expose(void)
     .add_property("colnum", &CJavascriptFunction::GetColumnNumber, "The column number of function in the script")
     .add_property("resname", &CJavascriptFunction::GetResourceName, "The resource name of script")
     .add_property("inferredname", &CJavascriptFunction::GetInferredName, "Name inferred from variable or property assignment of this function")
-    .add_property("lineoff", &CJavascriptFunction::GetLineOffset, "The line offset of function in the script")
-    .add_property("coloff", &CJavascriptFunction::GetColumnOffset, "The column offset of function in the script")
     ;
     py::objects::class_value_wrapper<std::shared_ptr<CJavascriptObject>,
     py::objects::make_ptr_instance<CJavascriptObject,
@@ -1810,26 +1808,6 @@ const std::string CJavascriptFunction::GetInferredName(void) const
     v8::String::Utf8Value name(isolate, v8::Handle<v8::String>::Cast(func->GetInferredName()));
 
     return std::string(*name, name.length());
-}
-
-int CJavascriptFunction::GetLineOffset(void) const
-{
-    v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
-    CHECK_V8_CONTEXT();
-
-    v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
-
-    return func->GetScriptOrigin().ResourceLineOffset()->Value();
-}
-
-int CJavascriptFunction::GetColumnOffset(void) const
-{
-    v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
-    CHECK_V8_CONTEXT();
-
-    v8::Handle<v8::Function> func = v8::Handle<v8::Function>::Cast(Object());
-
-    return func->GetScriptOrigin().ResourceColumnOffset()->Value();
 }
 
 py::object CJavascriptFunction::GetOwner(void) const
