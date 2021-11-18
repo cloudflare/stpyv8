@@ -17,6 +17,8 @@ jobs:
             python-version: '3.7'
           - os: ubuntu-20.04
             python-version: '3.9'
+          - os: ubuntu-20.04
+            python-version: '3.10'
 
     steps:
       - name: STEP 1. Checkout repository
