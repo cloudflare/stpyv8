@@ -278,7 +278,7 @@ void CPythonObject::NamedGetter(v8::Local<v8::Name> prop, const v8::PropertyCall
 
     if (!value)
     {
-        if (_PyErr_OCCURRED())
+        if (PyErr_OCCURRED())
         {
             if (::PyErr_ExceptionMatches(::PyExc_AttributeError))
             {

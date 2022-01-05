@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04, ubuntu-20.04]
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: ['3.6', '3.7', '3.8', '3.9']
         exclude:
           - os: ubuntu-20.04
             python-version: '3.6'
@@ -48,7 +48,7 @@ jobs:
           pytest -v
 
       - name: STEP 6. Create wheel zip
-        uses: papeloto/action-zip@v1
+        uses: vimtor/action-zip@v1
         with:
           files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/
           recursive: false
