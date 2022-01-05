@@ -49,7 +49,7 @@ jobs:
           pytest -v
 
       - name: STEP 7. Create wheel zip
-        uses: papeloto/action-zip@v1
+        uses: vimtor/action-zip@v1
         with:
           files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/
           recursive: false
