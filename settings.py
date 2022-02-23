@@ -113,7 +113,7 @@ if os.name in ("nt", ):
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
 elif os.name in ("posix", ):
-    libraries = ["boost_system", "v8_monolith", STPYV8_BOOST_PYTHON]
+    libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]
     extra_compile_args.append('-std=c++14')
 
     if platform.system() in ('Linux', ):

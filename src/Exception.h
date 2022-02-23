@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <memory>
 
+#include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/iostreams/stream.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
 #include "Config.h"
