@@ -33,12 +33,12 @@ __all__ = ["ReadOnly",
            "JSPlatform"]
 
 
-class JSAttribute(object):
+class JSAttribute:
     def __init__(self, name):
         self.name = name
 
     def __call__(self, func):
-        setattr(func, "__%s__" % self.name, True)
+        setattr(func, f"__{self.name}__", True)
 
         return func
 
@@ -58,12 +58,12 @@ class JSError(Exception):
         return str(self._impl)
 
     def __getattribute__(self, attr):
-        impl = super(JSError, self).__getattribute__("_impl")
+        impl = super().__getattribute__("_impl")
 
         try:
             return getattr(impl, attr)
         except AttributeError:
-            return super(JSError, self).__getattribute__(attr)
+            return super().__getattribute__(attr)
 
     RE_FRAME = re.compile(r"\s+at\s(?:new\s)?(?P<func>.+)\s\((?P<file>[^:]+):?(?P<row>\d+)?:?(?P<col>\d+)?\)")
     RE_FUNC  = re.compile(r"\s+at\s(?:new\s)?(?P<func>.+)\s\((?P<file>[^\)]+)\)")
@@ -146,7 +146,7 @@ class JSUnlocker(_STPyV8.JSUnlocker):
         return self.entered()
 
 
-class JSClass(object):
+class JSClass:
     __properties__ = {}
     __watchpoints__ = {}
 
@@ -176,7 +176,7 @@ class JSClass(object):
         """
         Return the string representation of the object
         """
-        return "[object %s]" % self.__class__.__name__
+        return f"[object {self.__class__.__name__}]"
 
     def toLocaleString(self):
         """
@@ -254,7 +254,7 @@ class JSClassConstructor(JSClass):
         return self.cls.__name__
 
     def toString(self):
-        return "function %s() {\n  [native code]\n}" % self.name
+        return f"function {self.name}() {{\n  [native code]\n}}"
 
     def __call__(self, *args, **kwds):
         return self.cls(*args, **kwds)
