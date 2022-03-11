@@ -72,7 +72,7 @@ BOOST_PYTHON_LIB_LONG  = "boost_python{}{}".format(sys.version_info.major, sys.v
 BOOST_PYTHON_UBUNTU_MATRIX = {
     'default' : BOOST_PYTHON_LIB_LONG,
     '18.04'   : BOOST_PYTHON_LIB_SHORT,
-    '20.04'   : f"{BOOST_PYTHON_LIB_SHORT}.8"
+    '20.04'   : "{}.8".format(BOOST_PYTHON_LIB_SHORT)
 }
 
 def get_libboost_python_name():
