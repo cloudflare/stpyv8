@@ -24,7 +24,7 @@ if os.name in ("posix", ):
 else:
     icu_data_folder = None
 
-os.environ['PATH'] = "{}:{}".format(os.environ['PATH'], DEPOT_HOME)
+os.environ['PATH'] = f"{os.environ['PATH']}:{DEPOT_HOME}"
 
 gn_args = {
   "dcheck_always_on"                   : "true" if os.environ.get("STPYV8_DEBUG") else "false",
@@ -42,7 +42,7 @@ gn_args = {
   "v8_use_external_startup_data"       : "false"
 }
 
-GN_ARGS = ' '.join("{}={}".format(key, gn_args[key]) for key in gn_args)
+GN_ARGS = ' '.join("{key}={gn_args[key]}" for key in gn_args)
 
 
 source_files = ["Exception.cpp",
@@ -66,8 +66,8 @@ extra_link_args    = []
 include_dirs.append(os.path.join(V8_HOME, 'include'))
 library_dirs.append(os.path.join(V8_HOME, 'out.gn/x64.release.sample/obj/'))
 
-BOOST_PYTHON_LIB_SHORT = "boost_python{}".format(sys.version_info.major)
-BOOST_PYTHON_LIB_LONG  = "boost_python{}{}".format(sys.version_info.major, sys.version_info.minor)
+BOOST_PYTHON_LIB_SHORT = f"boost_python{sys.version_info.major}"
+BOOST_PYTHON_LIB_LONG  = f"boost_python{sys.version_info.major}{sys.version_info.minor}"
 
 BOOST_PYTHON_UBUNTU_MATRIX = {
     'default' : BOOST_PYTHON_LIB_LONG,
@@ -79,9 +79,9 @@ def get_libboost_python_name():
     if not os.path.exists("/etc/lsb-release"):
         return BOOST_PYTHON_UBUNTU_MATRIX['default']
 
-    platform_info = dict()
+    platform_info = {}
 
-    with open("/etc/lsb-release", "r") as fd:
+    with open('/etc/lsb-release', encoding = 'utf-8', mode = 'r') as fd:
         for line in fd.readlines():
             s = line.strip()
             p = s.split("=")
