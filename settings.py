@@ -42,7 +42,7 @@ gn_args = {
   "v8_use_external_startup_data"       : "false"
 }
 
-GN_ARGS = ' '.join(f"{key}={gn_args[key]}" for key in gn_args)
+GN_ARGS = ' '.join("{}={}".format(key, gn_args[key]) for key in gn_args)
 
 
 source_files = ["Exception.cpp",
@@ -66,8 +66,8 @@ extra_link_args    = []
 include_dirs.append(os.path.join(V8_HOME, 'include'))
 library_dirs.append(os.path.join(V8_HOME, 'out.gn/x64.release.sample/obj/'))
 
-BOOST_PYTHON_LIB_SHORT = f"boost_python{sys.version_info.major}"
-BOOST_PYTHON_LIB_LONG  = f"boost_python{sys.version_info.major}{sys.version_info.minor}"
+BOOST_PYTHON_LIB_SHORT = "boost_python{}".format(sys.version_info.major)
+BOOST_PYTHON_LIB_LONG  = "boost_python{}{}".format(sys.version_info.major, sys.version_info.minor)
 
 BOOST_PYTHON_UBUNTU_MATRIX = {
     'default' : BOOST_PYTHON_LIB_LONG,

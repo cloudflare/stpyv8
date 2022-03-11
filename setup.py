@@ -82,7 +82,7 @@ def checkout_v8():
     exec_cmd('git checkout',
              V8_GIT_TAG,
              cwd = V8_HOME,
-             msg = f"Checkout Google V8 v{V8_GIT_TAG}")
+             msg = "Checkout Google V8 v{}".format(V8_GIT_TAG))
 
     exec_cmd(os.path.join(DEPOT_HOME, 'gclient'),
              'sync',
@@ -99,9 +99,9 @@ def checkout_v8():
 
 def build_v8():
     exec_cmd(os.path.join(DEPOT_HOME, 'gn'),
-             f"gen out.gn/x64.release.sample --args='{GN_ARGS}'",
+             "gen out.gn/x64.release.sample --args='{}'".format(GN_ARGS),
              cwd = V8_HOME,
-             msg = f"Generate build scripts for V8 (v{V8_GIT_TAG})")
+             msg = "Generate build scripts for V8 (v{})".format(V8_GIT_TAG))
 
     exec_cmd(os.path.join(DEPOT_HOME, 'ninja'),
              "-C out.gn/x64.release.sample v8_monolith",
