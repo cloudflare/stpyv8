@@ -42,7 +42,7 @@ gn_args = {
   "v8_use_external_startup_data"       : "false"
 }
 
-GN_ARGS = ' '.join("{key}={gn_args[key]}" for key in gn_args)
+GN_ARGS = ' '.join(f"{key}={gn_args[key]}" for key in gn_args)
 
 
 source_files = ["Exception.cpp",
