@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04, ubuntu-20.04]
-        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.6', '3.7', '3.8', '3.9']
         exclude:
           - os: ubuntu-20.04
             python-version: '3.6'
@@ -48,7 +48,6 @@ jobs:
       - name: STEP 5. Test wheel
         run: |
           pytest -v
-        if: ${{ matrix.python-version != '3.10' }}
 
       - name: STEP 6. Create wheel zip
         uses: vimtor/action-zip@v1
