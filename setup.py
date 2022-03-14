@@ -14,7 +14,7 @@ except ImportError:
 from distutils.command.build import build
 from distutils.command.install import install
 
-from settings import *
+from settings import * # pylint:disable=wildcard-import,unused-wildcard-import
 
 log = logging.getLogger()
 
@@ -29,7 +29,7 @@ def exec_cmd(cmdline, *args, **kwargs):
 
     cmdline = ' '.join([cmdline] + list(args))
 
-    proc = subprocess.Popen(cmdline,
+    proc = subprocess.Popen(cmdline, # pylint:disable=consider-using-with
                             shell  = kwargs.get('shell', True),
                             cwd    = cwd,
                             env    = kwargs.get('env'),
@@ -61,7 +61,7 @@ def install_depot():
 
     # depot_tools updates itself automatically when running gclient tool
     if os.path.isfile(os.path.join(DEPOT_HOME, 'gclient')):
-        _, stdout, _ = exec_cmd(os.path.join(DEPOT_HOME, 'gclient'),
+        _, stdout, _ = exec_cmd(os.path.join(DEPOT_HOME, 'gclient'), # pylint:disable=unused-variable
                                 "--version",
                                 cwd    = DEPOT_HOME,
                                 output = True,
@@ -122,27 +122,27 @@ def prepare_v8():
         checkout_v8()
         build_v8()
         clean_stpyv8()
-    except Exception as e:
+    except Exception as e: # pylint:disable=broad-except
         log.error("Fail to checkout and build v8, %s", str(e))
 
 
 class stpyv8_build(build):
     def run(self):
-        V8_GIT_TAG = V8_GIT_TAG_STABLE
+        V8_GIT_TAG = V8_GIT_TAG_STABLE # pylint:disable=redefined-outer-name,unused-variable
         prepare_v8()
         build.run(self)
 
 
 class stpyv8_develop(build):
     def run(self):
-        V8_GIT_TAG = V8_GIT_TAG_MASTER
+        V8_GIT_TAG = V8_GIT_TAG_MASTER # pylint:disable=redefined-outer-name,unused-variable
         prepare_v8()
         build.run(self)
 
 
 class stpyv8_install_v8(build):
     def run(self):
-        V8_GIT_TAG = V8_GIT_TAG_MASTER
+        V8_GIT_TAG = V8_GIT_TAG_MASTER # pylint:disable=redefined-outer-name,unused-variable
         prepare_v8()
 
 

@@ -103,7 +103,7 @@ class JSError(Exception):
     def frames(self):
         return self.parse_stack(self.stackTrace)
 
-_STPyV8._JSError._jsclass = JSError
+_STPyV8._JSError._jsclass = JSError # pylint:disable=protected-access
 
 JSObject    = _STPyV8.JSObject
 JSNull      = _STPyV8.JSNull
@@ -245,7 +245,7 @@ class JSClass:
         del self.__watchpoints__[prop]
 
 
-class JSClassConstructor(JSClass):
+class JSClassConstructor(JSClass): # pylint:disable=abstract-method
     def __init__(self, cls):
         self.cls = cls
 
@@ -260,7 +260,7 @@ class JSClassConstructor(JSClass):
         return self.cls(*args, **kwds)
 
 
-class JSClassPrototype(JSClass):
+class JSClassPrototype(JSClass): # pylint:disable=abstract-method
     def __init__(self, cls):
         self.cls = cls
 
@@ -287,7 +287,8 @@ class JSEngine(_STPyV8.JSEngine):
 JSScript = _STPyV8.JSScript
 JSStackTrace = _STPyV8.JSStackTrace
 JSStackTrace.Options = _STPyV8.JSStackTraceOptions
-JSStackTrace.GetCurrentStackTrace = staticmethod(lambda frame_limit, options: _STPyV8.JSIsolate.current.GetCurrentStackTrace(frame_limit, options))
+JSStackTrace.GetCurrentStackTrace = staticmethod(lambda frame_limit, # pylint:disable=unnecessary-lambda
+                                                 options: _STPyV8.JSIsolate.current.GetCurrentStackTrace(frame_limit, options))
 JSStackFrame = _STPyV8.JSStackFrame
 
 
