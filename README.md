@@ -100,9 +100,9 @@ The easiest way to install STPyV8 is to use one of the Python wheels provided at
 generated using Github Actions and multiple platforms and Python versions are already
 supported, with others planned for the future.
 
-Be aware that boost-python and some other boost dependencies are needed. Most Linux
-distributions and MacOS provide easy to install Boost packages and this is the suggested
-way to install the library.
+Be aware that boost-python and some other boost dependencies are needed (see later for
+details). Most Linux distributions and MacOS provide easy to install Boost packages and
+this is the suggested way to install the library.
 
 Each zip file contains the ICU data file icudtl.dat and the wheel itself. First of all you
 should copy icudtl.data to the STPyV8 ICU data folder (Linux: /usr/share/stpyv8, MacOS:
@@ -130,11 +130,7 @@ STPyV8.
 # Building
 
 GCC/clang or equivalent and Python3 headers are needed to build the main STPyV8 source
-code, as well as boost-python and some other boost dependencies. For a short while, Python
-2.7 is still needed by Google's toolchain to build a local library version of V8.
-
-A Python3 virtual environment is recommended. (Google's build tools will establish their
-own Python2 virtual environment during the compilation of V8, but this can be ignored)
+code, as well as boost-python and some other boost dependencies.
 
 ## Build Examples
 
@@ -142,18 +138,13 @@ own Python2 virtual environment during the compilation of V8, but this can be ig
 Building on Ubuntu 18.04, 19.10, 20.04 and Debian distros:
 
 ```Shell
-$ sudo apt install python python3 python3-venv python3-dev build-essential libboost-dev libboost-system-dev libboost-python-dev
-$ # This step will take some time, install other packages (with sudo), to build V8 as a static library
-$ python2 setup.py v8 
-$ python3 -m venv env
-$ source env/bin/activate
-$ python setup.py stpyv8
-$ python setup.py install
+$ sudo apt install python3 python3-dev build-essential libboost-dev libboost-system-dev libboost-python-dev
+$ python setup.py build
+$ sudo python setup.py install
 ```
 
-Building on Ubuntu 16.04 requires an external PPA addition for python3. Building on other
-Linux distributions requires appropriate use of their package managers for these external
-dependencies, and some gymnastics for the V8 build dependencies.
+Building on other Linux distributions requires appropriate use of their package managers
+for these external dependencies, and some gymnastics for the V8 build dependencies.
 
 ### MacOS
 
@@ -167,12 +158,8 @@ STPyV8:
 
 ```Shell
 $ brew install boost-python3
-$ # This step will take some time, to build V8 as a static library
-$ python2 setup.py v8 
-$ python3 -m venv env
-$ source env/bin/activate
-$ python setup.py stpyv8
-$ python setup.py install
+$ python setup.py build
+$ sudo python setup.py install
 ```
 
 More detailed build instructions are in the [docs](docs/source/build.rst) folder.

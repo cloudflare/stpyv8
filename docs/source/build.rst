@@ -16,51 +16,51 @@ If packages are not available for your distribution download or install `the lat
 <http://www.boost.org/users/download/>`_ of Boost and follow `the getting started guide 
 <http://www.boost.org/doc/libs/release/more/getting_started/>`_ to build the library.
 
+Python wheels
+^^^^^^^^^^^^^
+
+The easiest way to install STPyV8 is a Python wheel provided at `STPyV8 Releases <https://github.com/area1/stpyv8/releases>`_.
+Such wheels are automatically generated using Github Actions and multiple platforms and Python versions are already
+supported, with others planned for the future.
+
+Each zip file contains the ICU data file icudtl.dat and the wheel itself.
+
+First of all you should copy icudtl.data to the STPyV8 ICU data folder (Linux: /usr/share/stpyv8, MacOS:
+/Library/Application Support/STPyV8/) and then install/upgrade STPyV8 using pip.
+
+For instance, the following steps show how to install on MacOS
+
+.. code-block:: sh
+
+    $ unzip stpyv8-macos-10.15-python-3.9.zip
+        Archive:  stpyv8-macos-10.15-python-3.9.zip
+        inflating: stpyv8-macos-10.15-3.9/icudtl.dat
+        inflating: stpyv8-macos-10.15-3.9/stpyv8-9.9.115.8-cp39-cp39-macosx_10_15_x86_64.whl
+    $ cd stpyv8-macos-10.15-3.9
+    $ sudo mv icudtl.dat /Library/Application\ Support/STPyV8
+    $ sudo pip install --upgrade stpyv8-9.9.115.8-cp39-cp39-macosx_10_15_x86_64.whl
+        Processing ./stpyv8-9.9.115.8-cp39-cp39-macosx_10_15_x86_64.whl
+        Installing collected packages: stpyv8
+        Successfully installed stpyv8-9.9.115.8
+
+If no wheels are provided for your platform and Python version you are required to build STPyV8.
+
 Build Steps
 -----------
 
-STPyV8 build system attempts to automate all the required installation steps but at the moment it is not entirely possible
-because Google depot_tools requires Python 2.7. For this reason some extra steps are currently required. Hopefully these
-additional steps will not be required in the next future and this documentation will be update accordingly. Meanwhile
-both Python 2.7 and Python 3.6+ have to be installed on your system. 
-
-Note: if installing STPyV8 on a Ubuntu/Debian Linux distribution the provided helper script *install-ubuntu.sh* will take
-care of all the installation details. In such case just execute the script and skip the following sections.
-
-Build V8
-^^^^^^^^
-
-First of all set the default Python version to Python 2.7. The steps required to do that are beyond the scope of this
-documentation being different on almost every platform and distribution. A suggested approach is to use a Python version
-management tool like `pyenv <https://github.com/pyenv/pyenv>`_ which could help easily switching between multiple versions
-of Python.
-
-Running setup.py with the v8 command will build and install the latest stable version of Google V8
-
 .. code-block:: sh
 
-    $ python setup.py v8  # build and install Google V8
-
-
-Build STPyV8
-^^^^^^^^^^^^
-
-Set the default Python version to Python 3.6+ and run the following commands to install STPyV8
-
-.. code-block:: sh
-
-    $ python setup.py stpyv8        # build STPyV8
-    $ sudo python setup.py install  # install STPyV8
-
+    $ python setup.py build
+    $ sudo python setup.py install
 
 Optionally you can run STPyV8 tests (pytest is required)
 
 .. code-block:: sh
 
-    $ pytest tests/ # run STPyV8 tests
+    $ pytest tests
 
 If you want to build a distribution package for Linux/Mac run setup.py with the bdist command
 
 .. code-block:: sh
 
-    $ python setup.py bdist  # build the distribution package for Linux/Mac
+    $ python setup.py bdist
