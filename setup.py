@@ -82,7 +82,7 @@ def checkout_v8():
     exec_cmd('git checkout',
              V8_GIT_TAG,
              cwd = V8_HOME,
-             msg = "Checkout Google V8 v{}".format(V8_GIT_TAG))
+             msg = f"Checkout Google V8 v{V8_GIT_TAG}")
 
     exec_cmd(os.path.join(DEPOT_HOME, 'gclient'),
              'sync',
@@ -99,9 +99,9 @@ def checkout_v8():
 
 def build_v8():
     exec_cmd(os.path.join(DEPOT_HOME, 'gn'),
-             "gen out.gn/x64.release.sample --args='{}'".format(GN_ARGS),
+             f"gen out.gn/x64.release.sample --args='{GN_ARGS}'",
              cwd = V8_HOME,
-             msg = "Generate build scripts for V8 (v{})".format(V8_GIT_TAG))
+             msg = f"Generate build scripts for V8 (v{V8_GIT_TAG})")
 
     exec_cmd(os.path.join(DEPOT_HOME, 'ninja'),
              "-C out.gn/x64.release.sample v8_monolith",
@@ -154,7 +154,7 @@ class stpyv8_build_no_v8(build):
 
 class stpyv8_install(install):
     def run(self):
-        self.skip_build = True
+        self.skip_build = True # pylint:disable=attribute-defined-outside-init
 
         if icu_data_folder:
             os.makedirs(icu_data_folder, exist_ok = True)
