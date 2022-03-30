@@ -29,37 +29,27 @@ jobs:
           pip install --upgrade pip setuptools wheel pytest
           brew install boost boost-python3
 
-      - name: STEP 4. Set up Pyenv
-        uses: gabrielfalcao/pyenv-action@v6
-        with:
-          default: 3.7.6
-          versions: 2.7.17
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-
-      - name: STEP 5. Build wheel
+      - name: STEP 4. Build wheel
         run: |
-          pyenv local 2.7.17
           python setup.py v8
-          pyenv local system
           sudo python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
           sudo python setup.py install
           sudo cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
         env:
           STPYV8_DEBUG: 1
 
-      - name: STEP 6. Test wheel
+      - name: STEP 5. Test wheel
         run: |
           pytest -v
 
-      - name: STEP 7. Create wheel zip
+      - name: STEP 6. Create wheel zip
         uses: vimtor/action-zip@v1
         with:
           files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/
           recursive: false
           dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip
 
-      - name: STEP 8. Upload to release
+      - name: STEP 7. Upload to release
         uses: AButler/upload-release-assets@v2.0
         with:
           files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip'
