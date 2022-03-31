@@ -7,7 +7,7 @@ DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tool
 V8_HOME     = os.environ.get('V8_HOME', os.path.join(STPYV8_HOME, 'v8'))
 
 V8_GIT_URL        = "https://chromium.googlesource.com/v8/v8.git"
-V8_GIT_TAG_STABLE = "9.9.115.10"
+V8_GIT_TAG_STABLE = "10.0.139.8"
 V8_GIT_TAG_MASTER = "master"
 V8_GIT_TAG        = V8_GIT_TAG_STABLE
 DEPOT_GIT_URL     = "https://chromium.googlesource.com/chromium/tools/depot_tools.git"
@@ -112,7 +112,7 @@ if os.name in ("nt", ):
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
 elif os.name in ("posix", ):
-    libraries = ["boost_system", "v8_monolith", STPYV8_BOOST_PYTHON]
+    libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]
     extra_compile_args.append('-std=c++14')
 
     if platform.system() in ('Linux', ):

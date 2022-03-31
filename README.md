@@ -138,7 +138,7 @@ code, as well as boost-python and some other boost dependencies.
 Building on Ubuntu 18.04, 19.10, 20.04 and Debian distros:
 
 ```Shell
-$ sudo apt install python3 python3-dev build-essential libboost-dev libboost-system-dev libboost-python-dev
+$ sudo apt install python3 python3-dev build-essential libboost-dev libboost-system-dev libboost-python-dev libboost-iostreams-dev
 $ python setup.py build
 $ sudo python setup.py install
 ```

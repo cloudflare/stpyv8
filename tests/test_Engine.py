@@ -9,7 +9,7 @@ import STPyV8
 class TestEngine(unittest.TestCase):
     def testClassProperties(self):
         with STPyV8.JSContext():
-            self.assertTrue(str(STPyV8.JSEngine.version).startswith("9."))
+            self.assertTrue(str(STPyV8.JSEngine.version).startswith("10."))
             self.assertFalse(STPyV8.JSEngine.dead)
 
     def testCompile(self):

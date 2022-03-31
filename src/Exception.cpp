@@ -452,5 +452,10 @@ void CJavascriptException::PrintCallStack(py::object file)
 
     int fd = ::PyObject_AsFileDescriptor(out);
 
-    Message()->PrintCurrentStackTrace(m_isolate, fdopen(fd, "w+"));
+    boost::iostreams::stream_buffer<boost::iostreams::file_descriptor_source> fpstream(
+		fileno(fdopen(fd, "w+")), boost::iostreams::never_close_handle);
+
+    std::ostream outstream(&fpstream);
+
+    Message()->PrintCurrentStackTrace(m_isolate, outstream);
 }
