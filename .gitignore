@@ -6,5 +6,6 @@ build
 .gclient_entries
 depot_tools
 v8
+switch_repo*
 *.pyc
 *.cmake
