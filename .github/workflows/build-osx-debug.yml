@@ -28,9 +28,9 @@ jobs:
       - name: STEP 4. Build wheel
         run: |
           python setup.py v8
-          sudo python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
-          sudo python setup.py install
-          sudo cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
+          python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
+          python setup.py install
+          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
         env:
           STPYV8_DEBUG: 1
 
