@@ -1875,8 +1875,13 @@ LivingMap * ObjectTracer::GetLivingMapping(void)
 
     v8::Local<v8::String> key = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "__living__").ToLocalChecked();
     v8::Local<v8::Private> privateKey = v8::Private::ForApi(v8::Isolate::GetCurrent(), key);
+    v8::Maybe<bool> result = ctxt->Global()->HasPrivate(ctxt, privateKey);
+    v8::MaybeLocal<v8::Value> value;
 
-    v8::MaybeLocal<v8::Value> value = ctxt->Global()->GetPrivate(ctxt, privateKey);
+    if (!(result.IsJust() && result.FromJust()))
+        value = v8::MaybeLocal<v8::Value>();
+    else
+        value = ctxt->Global()->GetPrivate(ctxt, privateKey);
 
     if (!value.IsEmpty())
     {

@@ -378,11 +378,23 @@ void ExceptionTranslator::Translate(CJavascriptException const& ex)
 
             v8::Local<v8::String> key_type = v8::String::NewFromUtf8(isolate, "exc_type").ToLocalChecked();
             v8::Local<v8::Private> privateKey_type = v8::Private::ForApi(isolate, key_type);
-            v8::MaybeLocal<v8::Value> exc_type = obj->GetPrivate(isolate->GetCurrentContext(), privateKey_type);
+            v8::Maybe<bool> type_result = obj->HasPrivate(isolate->GetCurrentContext(), privateKey_type);
+            v8::MaybeLocal<v8::Value> exc_type;
+
+            if (!(type_result.IsJust() && type_result.FromJust()))
+                exc_type = v8::MaybeLocal<v8::Value>();
+            else
+                exc_type = obj->GetPrivate(isolate->GetCurrentContext(), privateKey_type);
 
             v8::Local<v8::String> key_value = v8::String::NewFromUtf8(isolate, "exc_value").ToLocalChecked();
             v8::Local<v8::Private> privateKey_value = v8::Private::ForApi(isolate, key_value);
-            v8::MaybeLocal<v8::Value> exc_value = obj->GetPrivate(isolate->GetCurrentContext(), privateKey_value);
+            v8::Maybe<bool> value_result = obj->HasPrivate(isolate->GetCurrentContext(), privateKey_value);
+            v8::MaybeLocal<v8::Value> exc_value;
+
+            if (!(value_result.IsJust() && value_result.FromJust()))
+                exc_value = v8::MaybeLocal<v8::Value>();
+            else
+                exc_value = obj->GetPrivate(isolate->GetCurrentContext(), privateKey_value);
 
             if (!exc_type.IsEmpty() && !exc_value.IsEmpty())
             {
