@@ -96,7 +96,7 @@ Find more in the [tests](tests) directory.
 # Installing
 
 The easiest way to install STPyV8 is to use one of the Python wheels provided at
-[Releases](https://github.com/area1/stpyv8/releases). The wheels are automatically
+[Releases](https://github.com/cloudflare/stpyv8/releases). The wheels are automatically
 generated using Github Actions and multiple platforms and Python versions are already
 supported, with others planned for the future.
 

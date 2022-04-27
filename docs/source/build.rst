@@ -19,7 +19,7 @@ If packages are not available for your distribution download or install `the lat
 Python wheels
 ^^^^^^^^^^^^^
 
-The easiest way to install STPyV8 is a Python wheel provided at `STPyV8 Releases <https://github.com/area1/stpyv8/releases>`_.
+The easiest way to install STPyV8 is a Python wheel provided at `STPyV8 Releases <https://github.com/cloudflare/stpyv8/releases>`_.
 Such wheels are automatically generated using Github Actions and multiple platforms and Python versions are already
 supported, with others planned for the future.
 
