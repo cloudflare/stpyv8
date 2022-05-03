@@ -19,7 +19,7 @@ class TestContext(unittest.TestCase):
         self.assertTrue(not bool(STPyV8.JSContext.inContext))
         self.assertTrue(not bool(STPyV8.JSContext.entered))
 
-        class Global(object):
+        class Global:
             name = "global"
 
         g = Global()
@@ -30,7 +30,7 @@ class TestContext(unittest.TestCase):
             self.assertEqual(g.name,
                              str(STPyV8.JSContext.entered.locals.name))
 
-            class Local(object):
+            class Local:
                 name = "local"
 
             l = Local()
