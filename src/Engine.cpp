@@ -108,6 +108,7 @@ void CEngine::ReportMessage(v8::Handle<v8::Message> message, v8::Handle<v8::Valu
     std::cerr << *filename << ":" << lineno << " -> " << *sourceline << std::endl;
 }
 
+/*
 bool CEngine::SetMemoryLimit(int max_young_space_size, int max_old_space_size, int max_executable_size)
 {
     v8::ResourceConstraints limit;
@@ -121,6 +122,7 @@ bool CEngine::SetMemoryLimit(int max_young_space_size, int max_old_space_size, i
     //return v8::SetResourceConstraints(v8::Isolate::GetCurrent(), &limit);
     return false;
 }
+*/
 
 void CEngine::SetStackLimit(uintptr_t stack_limit_size)
 {

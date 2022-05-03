@@ -140,6 +140,33 @@ const std::string EncodeUtf8(const std::wstring& str)
     return std::string((const char *) &data[0], data.size());
 }
 
+int64_t AmountOfPhysicalMemory() {
+#ifdef __APPLE__
+  int mib[2] = {CTL_HW, HW_MEMSIZE};
+  int64_t memsize = 0;
+  size_t len = sizeof(memsize);
+  if (sysctl(mib, arraysize(mib), &memsize, &len, NULL, 0) != 0) {
+    return 0;
+  }
+  return memsize;
+#else
+  long pages = sysconf(_SC_PHYS_PAGES);
+  long page_size = sysconf(_SC_PAGESIZE);
+  if (pages == -1 || page_size == -1) {
+    return 0;
+  }
+  return static_cast<int64_t>(pages) * page_size;
+#endif
+}
+
+int64_t AmountOfVirtualMemory() {
+  struct rlimit rlim;
+  int result = getrlimit(RLIMIT_DATA, &rlim);
+  if (result != 0) {
+    return 0;
+  }
+  return (rlim.rlim_cur == RLIM_INFINITY) ? 0 : rlim.rlim_cur;
+}
 
 CPythonGIL::CPythonGIL()
 {

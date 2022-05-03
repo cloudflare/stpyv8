@@ -20,6 +20,10 @@ void CIsolate::Init(bool owner)
 
     v8::Isolate::CreateParams create_params;
     create_params.array_buffer_allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
+    create_params.constraints.ConfigureDefaults(
+        AmountOfPhysicalMemory(),
+        AmountOfVirtualMemory());
+
     m_isolate = v8::Isolate::New(create_params);
     m_isolate->AddNearHeapLimitCallback(NearHeapLimitCallback, m_isolate);
 }

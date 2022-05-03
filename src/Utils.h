@@ -94,12 +94,24 @@ namespace py = boost::python;
 #define PyErr_OCCURRED() (PyThreadState_GET()->curexc_type)
 #endif
 
+#ifndef _WIN32
+#ifdef __APPLE__
+#include <sys/sysctl.h>
+#else
+#include <unistd.h>
+#include <sys/resource.h>
+#endif
+#endif
+
 v8::Handle<v8::String> ToString(const std::string& str);
 v8::Handle<v8::String> ToString(const std::wstring& str);
 v8::Handle<v8::String> ToString(py::object str);
 
 v8::Handle<v8::String> DecodeUtf8(const std::string& str);
 const std::string EncodeUtf8(const std::wstring& str);
+
+int64_t AmountOfPhysicalMemory();
+int64_t AmountOfVirtualMemory();
 
 struct CPythonGIL
 {

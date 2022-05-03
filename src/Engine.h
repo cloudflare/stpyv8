@@ -49,7 +49,8 @@ public:
     static const std::string GetVersion(void) {
         return v8::V8::GetVersion();
     }
-    static bool SetMemoryLimit(int max_young_space_size, int max_old_space_size, int max_executable_size);
+
+    // static bool SetMemoryLimit(int max_young_space_size, int max_old_space_size, int max_executable_size);
     static void SetStackLimit(uintptr_t stack_limit_size);
 
     py::object ExecuteScript(v8::Handle<v8::Script> script);
