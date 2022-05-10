@@ -394,7 +394,11 @@ class TestWrapper(unittest.TestCase):
 
             ctxt.eval("try { this.raiseTypeError(); } catch (e) { msg = e; }")
 
-            self.assertEqual("TypeError: int() argument must be a string, a bytes-like object or a number, not 'module'", str(ctxt.locals.msg))
+            if sys.version_info.major >= 3:
+                if sys.version_info.minor > 9:
+                    self.assertEqual("TypeError: int() argument must be a string, a bytes-like object or a real number, not 'module'", str(ctxt.locals.msg))
+                else:
+                    self.assertEqual("TypeError: int() argument must be a string, a bytes-like object or a number, not 'module'", str(ctxt.locals.msg))
 
             ctxt.eval("try { this.raiseNotImplementedError(); } catch (e) { msg = e; }")
 
@@ -755,11 +759,18 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual('foobar', ctxt.eval("name"))
             self.assertTrue(ctxt.eval("delete name"))
 
-            # FIXME replace the global object with Python object
-            #
-            # self.assertEqual('deleted', ctxt.eval("name"))
-            # ctxt.eval("__defineGetter__('name', function() { return 'fixed'; });")
-            # self.assertEqual('fixed', ctxt.eval("name"))
+        with STPyV8.JSContext() as ctxt:
+            self.assertEqual('world', ctxt.eval("name = 'world';"))
+            self.assertTrue(ctxt.eval("delete name;"))
+            self.assertRaises(ReferenceError, ctxt.eval, 'name')
+
+            ctxt.eval("""
+                let obj = {};
+                obj.__defineGetter__('name', function() {
+                    return 'test';
+                });
+            """)
+            self.assertEqual('test', ctxt.eval("obj.name"))
 
     def testGetterAndSetter(self):
         class Global(STPyV8.JSClass):
