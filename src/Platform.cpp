@@ -7,7 +7,8 @@ bool CPlatform::inited = false;
 
 void CPlatform::Init()
 {
-    if(inited) return;
+    if(inited)
+        return;
 
     v8::V8::InitializeICUDefaultLocation(argv.c_str(), GetICUDataFile());
     v8::V8::InitializeExternalStartupData(argv.c_str());

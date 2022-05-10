@@ -98,6 +98,7 @@ public:
     v8::Handle<v8::String> Source() const {
         return v8::Local<v8::String>::New(m_isolate, m_source);
     }
+
     v8::Handle<v8::Script> Script() const {
         return v8::Local<v8::Script>::New(m_isolate, m_script);
     }
