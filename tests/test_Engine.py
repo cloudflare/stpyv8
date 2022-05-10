@@ -26,7 +26,7 @@ class TestEngine(unittest.TestCase):
 
     def testUnicodeSource(self):
         class Global(STPyV8.JSClass):
-            var = u'测试'
+            var = '测试'
 
             def __getattr__(self, name):
                 if name:
@@ -38,7 +38,7 @@ class TestEngine(unittest.TestCase):
 
         with STPyV8.JSContext(g) as ctxt:
             with STPyV8.JSEngine() as engine:
-                src = u"""
+                src = """
                 function 函数() { return 变量.length; }
 
                 函数();
@@ -53,7 +53,7 @@ class TestEngine(unittest.TestCase):
                 self.assertEqual(src, s.source)
                 self.assertEqual(2, s.run())
 
-                func_name = u'函数'
+                func_name = '函数'
 
                 self.assertTrue(hasattr(ctxt.locals, func_name))
 
@@ -65,9 +65,9 @@ class TestEngine(unittest.TestCase):
                 self.assertEqual("", func.resname)
                 self.assertEqual(1, func.linenum)
 
-                var_name = u'变量'
+                var_name = '变量'
 
-                setattr(ctxt.locals, var_name, u'测试长字符串')
+                setattr(ctxt.locals, var_name, '测试长字符串')
 
                 self.assertEqual(6, func())
 
@@ -108,17 +108,10 @@ class TestEngine(unittest.TestCase):
             version = 1.0
 
         with STPyV8.JSContext(Global()) as ctxt:
-            self.assertEqual("[object Global]",
-                             str(ctxt.eval("this.toString()")))
-
-            self.assertEqual("[object Global]",
-                             str(ctxt.eval("this.toLocaleString()")))
-
-            self.assertEqual(Global.version,
-                             float(ctxt.eval("this.valueOf()").version))
-
+            self.assertEqual("[object Global]", str(ctxt.eval("this.toString()")))
+            self.assertEqual("[object Global]", str(ctxt.eval("this.toLocaleString()")))
+            self.assertEqual(Global.version, float(ctxt.eval("this.valueOf()").version))
             self.assertTrue(bool(ctxt.eval("this.hasOwnProperty(\"version\")")))
-
             self.assertFalse(ctxt.eval("this.hasOwnProperty(\"nonexistent\")"))
 
     def testPythonWrapper(self):

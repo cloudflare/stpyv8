@@ -146,7 +146,6 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual('number', typeof(123))
             self.assertEqual('number', typeof(3.14))
             self.assertEqual('string', typeof('test'))
-            self.assertEqual('string', typeof(u'test'))
 
             self.assertEqual('[object Date]', protoof(datetime.datetime.now()))
             self.assertEqual('[object Date]', protoof(datetime.date.today()))
@@ -175,8 +174,8 @@ class TestWrapper(unittest.TestCase):
                 """)
 
             self.assertEqual("abc", str(func()))
-            self.assertTrue(func != None)
-            self.assertFalse(func == None)
+            self.assertTrue(func is not None)
+            self.assertFalse(func is None)
 
             func = ctxt.eval("(function test() {})")
 
@@ -195,7 +194,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual("hello", func.name)
 
     def testCall(self):
-        class Hello(object):
+        class Hello:
             def __call__(self, name):
                 return "hello " + name
 
@@ -242,22 +241,22 @@ class TestWrapper(unittest.TestCase):
             test = STPyV8.JSObject.create(ctx.locals.Test)
 
             self.assertTrue(isinstance(ctx.locals.Test, STPyV8.JSObject))
-            self.assertEqual("soirv8", test.name);
+            self.assertEqual("soirv8", test.name)
 
             test2 = STPyV8.JSObject.create(ctx.locals.Test2, ('John', 'Doe'))
 
-            self.assertEqual("John Doe", test2.name);
+            self.assertEqual("John Doe", test2.name)
 
             test3 = STPyV8.JSObject.create(ctx.locals.Test2, ('John', 'Doe'), { 'email': 'john.doe@randommail.com' })
 
-            self.assertEqual("john.doe@randommail.com", test3.email);
+            self.assertEqual("john.doe@randommail.com", test3.email)
 
     def testJSError(self):
         with STPyV8.JSContext() as ctxt:
             try:
                 ctxt.eval('throw "test"')
                 self.fail()
-            except Exception:
+            except Exception: # pylint:disable=broad-except
                 self.assertTrue(STPyV8.JSError, sys.exc_info()[0])
 
     def testErrorInfo(self):
@@ -308,7 +307,7 @@ class TestWrapper(unittest.TestCase):
 
     def testStackTrace(self):
         class Global(STPyV8.JSClass):
-            def GetCurrentStackTrace(self, limit):
+            def GetCurrentStackTrace(self, limit): # pylint:disable=no-self-use
                 return STPyV8.JSStackTrace.GetCurrentStackTrace(limit, STPyV8.JSStackTrace.Options.Detailed)
 
         with STPyV8.JSContext(Global()) as ctxt:
@@ -337,7 +336,7 @@ class TestWrapper(unittest.TestCase):
 
     def testPythonException(self):
         class Global(STPyV8.JSClass):
-            def raiseException(self):
+            def raiseException(self): # pylint:disable=no-self-use
                 raise RuntimeError("Hello")
 
         with STPyV8.JSContext(Global()) as ctxt:
@@ -362,19 +361,19 @@ class TestWrapper(unittest.TestCase):
             pass
 
         class Global(STPyV8.JSClass):
-            def raiseIndexError(self):
+            def raiseIndexError(self): # pylint:disable=no-self-use
                 return [1, 2, 3][5]
 
-            def raiseAttributeError(self):
+            def raiseAttributeError(self): # pylint:disable=no-self-use
                 None.hello()
 
-            def raiseSyntaxError(self):
-                eval("???")
+            def raiseSyntaxError(self): # pylint:disable=no-self-use
+                eval("???") # pylint:disable=eval-used
 
-            def raiseTypeError(self):
+            def raiseTypeError(self): # pylint:disable=no-self-use
                 int(sys)
 
-            def raiseNotImplementedError(self):
+            def raiseNotImplementedError(self): # pylint:disable=no-self-use
                 raise NotImplementedError("Not supported")
 
             def raiseExceptions(self):
@@ -599,17 +598,17 @@ class TestWrapper(unittest.TestCase):
     def testLazyConstructor(self):
         class Globals(STPyV8.JSClass):
             def __init__(self):
-                self.array=STPyV8.JSArray([1,2,3])
+                self.array = STPyV8.JSArray([1,2,3])
 
         with STPyV8.JSContext(Globals()) as ctxt:
             self.assertEqual(2, ctxt.eval("""array[1]"""))
 
     def testForEach(self):
         class NamedClass(object):
-            foo = 1
+            foo = 1 # pylint:disable=disallowed-name
 
             def __init__(self):
-                self.bar = 2
+                self.bar = 2 # pylint:disable=disallowed-name
 
             @property
             def foobar(self):
@@ -685,12 +684,12 @@ class TestWrapper(unittest.TestCase):
 
     def testUnicode(self):
         with STPyV8.JSContext() as ctxt:
-            self.assertEqual(u"人", ctxt.eval(u"\"人\""))
-            self.assertEqual(u"é", ctxt.eval(u"\"é\""))
+            self.assertEqual("人", ctxt.eval("\"人\""))
+            self.assertEqual("é", ctxt.eval("\"é\""))
 
             func = ctxt.eval("(function (msg) { return msg.length; })")
 
-            self.assertEqual(2, func(u"测试"))
+            self.assertEqual(2, func("测试"))
 
     def testClassicStyleObject(self):
         class FileSystemWrapper:
@@ -764,12 +763,12 @@ class TestWrapper(unittest.TestCase):
 
     def testGetterAndSetter(self):
         class Global(STPyV8.JSClass):
-           def __init__(self, testval):
-               self.testval = testval
+            def __init__(self, testval):
+                self.testval = testval
 
         with STPyV8.JSContext(Global("Test Value A")) as ctxt:
-           self.assertEqual("Test Value A", ctxt.locals.testval)
-           ctxt.eval("""
+            self.assertEqual("Test Value A", ctxt.locals.testval)
+            ctxt.eval("""
                this.__defineGetter__("test", function() {
                    return this.testval;
                });
@@ -777,19 +776,19 @@ class TestWrapper(unittest.TestCase):
                    this.testval = val;
                });
            """)
-           self.assertEqual("Test Value A",  ctxt.locals.test)
+            self.assertEqual("Test Value A",  ctxt.locals.test)
 
-           ctxt.eval("test = 'Test Value B';")
+            ctxt.eval("test = 'Test Value B';")
 
-           self.assertEqual("Test Value B",  ctxt.locals.test)
+            self.assertEqual("Test Value B",  ctxt.locals.test)
 
     def testReferenceCount(self):
-        class Hello(object):
+        class Hello:
             def say(self):
                 pass
 
             def __del__(self):
-                owner.deleted = True
+                owner.deleted = True # pylint:disable=undefined-variable
 
         def test():
             with STPyV8.JSContext() as ctxt:
@@ -921,13 +920,13 @@ class TestWrapper(unittest.TestCase):
 
     def testUndefined(self):
         class Global(STPyV8.JSClass):
-            def returnNull(self):
+            def returnNull(self): # pylint:disable=no-self-use
                 return STPyV8.JSNull()
 
-            def returnUndefined(self):
+            def returnUndefined(self): # pylint:disable=no-self-use
                 return STPyV8.JSUndefined()
 
-            def returnNone(self):
+            def returnNone(self): # pylint:disable=no-self-use
                 return None
 
         with STPyV8.JSContext(Global()) as ctxt:
