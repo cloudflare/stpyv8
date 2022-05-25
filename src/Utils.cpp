@@ -150,5 +150,3 @@ CPythonGIL::~CPythonGIL()
 {
     ::PyGILState_Release(m_state);
 }
-
-

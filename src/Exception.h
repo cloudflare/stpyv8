@@ -60,6 +60,7 @@ public:
         v8::HandleScope handle_scope(m_isolate);
         return Handle()->GetFrameCount();
     }
+
     CJavascriptStackFramePtr GetFrame(size_t idx) const;
 
     static CJavascriptStackTracePtr GetCurrentStackTrace(v8::Isolate *isolate, int frame_limit,
@@ -94,6 +95,7 @@ public:
     FrameIterator begin(void) {
         return FrameIterator(this, 0);
     }
+
     FrameIterator end(void) {
         return FrameIterator(this, GetFrameCount());
     }
@@ -126,16 +128,20 @@ public:
         v8::HandleScope handle_scope(m_isolate);
         return Handle()->GetLineNumber();
     }
+
     int GetColumn() const {
         v8::HandleScope handle_scope(m_isolate);
         return Handle()->GetColumn();
     }
+
     const std::string GetScriptName() const;
     const std::string GetFunctionName() const;
+
     bool IsEval() const {
         v8::HandleScope handle_scope(m_isolate);
         return Handle()->IsEval();
     }
+
     bool IsConstructor() const {
         v8::HandleScope handle_scope(m_isolate);
         return Handle()->IsConstructor();
@@ -193,9 +199,11 @@ public:
     v8::Handle<v8::Value> Exception() const {
         return v8::Local<v8::Value>::New(m_isolate, m_exc);
     }
+
     v8::Handle<v8::Value> Stack() const {
         return v8::Local<v8::Value>::New(m_isolate, m_stack);
     }
+
     v8::Handle<v8::Message> Message() const {
         return v8::Local<v8::Message>::New(m_isolate, m_msg);
     }
@@ -217,4 +225,3 @@ public:
 
     static void Expose(void);
 };
-

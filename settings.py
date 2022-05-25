@@ -7,7 +7,7 @@ DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tool
 V8_HOME     = os.environ.get('V8_HOME', os.path.join(STPYV8_HOME, 'v8'))
 
 V8_GIT_URL        = "https://chromium.googlesource.com/v8/v8.git"
-V8_GIT_TAG_STABLE = "10.1.124.12"
+V8_GIT_TAG_STABLE = "10.2.154.4"
 V8_GIT_TAG_MASTER = "master"
 V8_GIT_TAG        = V8_GIT_TAG_STABLE
 DEPOT_GIT_URL     = "https://chromium.googlesource.com/chromium/tools/depot_tools.git"
@@ -71,7 +71,8 @@ BOOST_PYTHON_LIB_LONG  = f"boost_python{sys.version_info.major}{sys.version_info
 BOOST_PYTHON_UBUNTU_MATRIX = {
     'default' : BOOST_PYTHON_LIB_LONG,
     '18.04'   : BOOST_PYTHON_LIB_SHORT,
-    '20.04'   : f"{BOOST_PYTHON_LIB_SHORT}8"
+    '20.04'   : f"{BOOST_PYTHON_LIB_SHORT}8",
+    '22.04'   : f"{BOOST_PYTHON_LIB_SHORT}10"
 }
 
 def get_libboost_python_name():
