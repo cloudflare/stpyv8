@@ -202,7 +202,7 @@ py::object CContext::Evaluate(const std::string& src,
     boost::python::api::object result = script->Run();
 
     while (v8::platform::PumpMessageLoop(
-        CPlatform::platform.get(),
+        CPlatform::GetPlatform(),
         v8::Isolate::GetCurrent(),
         v8::platform::MessageLoopBehavior::kDoNotWait
     )) {
@@ -223,7 +223,7 @@ py::object CContext::EvaluateW(const std::wstring& src,
     boost::python::api::object result = script->Run();
 
     while (v8::platform::PumpMessageLoop(
-        CPlatform::platform.get(),
+        CPlatform::GetPlatform(),
         v8::Isolate::GetCurrent(),
         v8::platform::MessageLoopBehavior::kDoNotWait
     )) {

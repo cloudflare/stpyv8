@@ -10,6 +10,7 @@ class CPlatform
 {
 private:
     static bool inited;
+    static std::unique_ptr<v8::Platform> platform;
     constexpr static const char *icu_data = ICU_DATA;
 
     const char *GetICUDataFile()
@@ -28,5 +29,5 @@ public:
     CPlatform(std::string argv0) : argv(argv0) {};
     ~CPlatform() {};
     void Init();
-    static std::unique_ptr<v8::Platform> platform;
+    static v8::Platform *GetPlatform(void);
 };
