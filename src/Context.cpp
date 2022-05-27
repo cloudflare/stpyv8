@@ -199,7 +199,17 @@ py::object CContext::Evaluate(const std::string& src,
 
     CScriptPtr script = engine.Compile(src, name, line, col);
 
-    return script->Run();
+    boost::python::api::object result = script->Run();
+
+    while (v8::platform::PumpMessageLoop(
+        CPlatform::platform.get(),
+        v8::Isolate::GetCurrent(),
+        v8::platform::MessageLoopBehavior::kDoNotWait
+    )) {
+        v8::Isolate::GetCurrent()->PerformMicrotaskCheckpoint();
+    }
+
+    return result;
 }
 
 py::object CContext::EvaluateW(const std::wstring& src,
@@ -210,5 +220,15 @@ py::object CContext::EvaluateW(const std::wstring& src,
 
     CScriptPtr script = engine.CompileW(src, name, line, col);
 
-    return script->Run();
+    boost::python::api::object result = script->Run();
+
+    while (v8::platform::PumpMessageLoop(
+            CPlatform::platform.get(),
+            v8::Isolate::GetCurrent(),
+            v8::platform::MessageLoopBehavior::kDoNotWait
+    )) {
+        v8::Isolate::GetCurrent()->PerformMicrotaskCheckpoint();
+    }
+
+    return result;
 }
