@@ -1953,7 +1953,7 @@ void ContextTracer::Trace(v8::Handle<v8::Context> ctxt, LivingMap *living)
 
 void ContextTracer::Trace(void)
 {
-    m_ctxt.SetWeak(this, WeakCallback, v8::WeakCallbackType::kFinalizer);
+    m_ctxt.SetWeak(this, WeakCallback, v8::WeakCallbackType::kParameter);
 }
 
 #endif // SUPPORT_TRACE_LIFECYCLE
