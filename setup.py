@@ -114,10 +114,10 @@ def clean_stpyv8():
 
 def prepare_v8():
     try:
+        clean_stpyv8()
         install_depot()
         checkout_v8()
         build_v8()
-        # clean_stpyv8()
     except Exception as e: # pylint:disable=broad-except
         log.error("Fail to checkout and build v8, %s", str(e))
 
