@@ -6,13 +6,9 @@ import subprocess
 import shutil
 import logging
 
-try:
-    from setuptools import setup, Extension
-except ImportError:
-    from distutils.core import setup, Extension
-
-from distutils.command.build import build
-from distutils.command.install import install
+from setuptools import setup, Extension
+from setuptools.command.build_ext import build_ext
+from setuptools.command.install import install
 
 from settings import * # pylint:disable=wildcard-import,unused-wildcard-import
 
@@ -121,35 +117,35 @@ def prepare_v8():
         install_depot()
         checkout_v8()
         build_v8()
-        clean_stpyv8()
+        # clean_stpyv8()
     except Exception as e: # pylint:disable=broad-except
         log.error("Fail to checkout and build v8, %s", str(e))
 
 
-class stpyv8_build(build):
+class stpyv8_build(build_ext):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_STABLE # pylint:disable=redefined-outer-name,unused-variable
         prepare_v8()
-        build.run(self)
+        build_ext.run(self)
 
 
-class stpyv8_develop(build):
+class stpyv8_develop(build_ext):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_MASTER # pylint:disable=redefined-outer-name,unused-variable
         prepare_v8()
-        build.run(self)
+        build_ext.run(self)
 
 
-class stpyv8_install_v8(build):
+class stpyv8_install_v8(build_ext):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_MASTER # pylint:disable=redefined-outer-name,unused-variable
         prepare_v8()
 
 
-class stpyv8_build_no_v8(build):
+class stpyv8_build_no_v8(build_ext):
     def run(self):
         clean_stpyv8()
-        build.run(self)
+        build_ext.run(self)
 
 
 class stpyv8_install(install):
@@ -207,9 +203,9 @@ setup(name         = "stpyv8",
         "Programming Language :: Python :: 3.10",
       ],
       cmdclass = dict(
-          build   = stpyv8_build,
-          develop = stpyv8_develop,
-          v8      = stpyv8_install_v8,
-          stpyv8  = stpyv8_build_no_v8,
-          install = stpyv8_install),
+          build_ext = stpyv8_build,
+          develop   = stpyv8_develop,
+          v8        = stpyv8_install_v8,
+          stpyv8    = stpyv8_build_no_v8,
+          install   = stpyv8_install),
 )
