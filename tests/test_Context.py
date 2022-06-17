@@ -61,6 +61,64 @@ class TestContext(unittest.TestCase):
 
                 self.assertEqual(1234, int(global1.custom))
 
+    def testPromiseResolved(self):
+        with STPyV8.JSContext() as ctxt:
+            ctxt.eval("""
+                var message;
+                let done = true;
+
+                const isItDoneYet = new Promise((resolve, reject) => {
+                    if (done) {
+                        const workDone = 'Here is the thing I built'
+                        resolve(workDone)
+                    } else {
+                        const why = 'Still working on something else'
+                        reject(why)
+                    }
+                })
+
+                const checkIfItsDone = () => {
+                    isItDoneYet.then(ok => {
+                        message = ok;
+                    }).catch(err => {
+                        message = err;
+                    })
+                }
+
+                checkIfItsDone()
+            """)
+
+            self.assertEqual('Here is the thing I built', ctxt.locals.message)
+
+    def testPromiseRejected(self):
+        with STPyV8.JSContext() as ctxt:
+            ctxt.eval("""
+                var message;
+                let done = false;
+
+                const isItDoneYet = new Promise((resolve, reject) => {
+                    if (done) {
+                        const workDone = 'Here is the thing I built'
+                        resolve(workDone)
+                    } else {
+                        const why = 'Still working on something else'
+                        reject(why)
+                    }
+                })
+
+                const checkIfItsDone = () => {
+                    isItDoneYet.then(ok => {
+                        message = ok;
+                    }).catch(err => {
+                        message = err;
+                    })
+                }
+
+                checkIfItsDone()
+            """)
+
+            self.assertEqual('Still working on something else', ctxt.locals.message)
+
     def testSecurityChecks(self):
         with STPyV8.JSContext() as env1:
             env1.securityToken = "foo"
