@@ -77,18 +77,18 @@ v8::Handle<v8::String> ToString(py::object str)
         return scope.Escape(
                    v8::String::NewFromTwoByte(
                        v8::Isolate::GetCurrent(),
-                       reinterpret_cast<const uint16_t *>(PyUnicode_AS_UNICODE(str.ptr())))
+                       reinterpret_cast<const uint16_t *>(PyUnicode_2BYTE_DATA(str.ptr())))
                    .ToLocalChecked());
 
 #else
-        Py_ssize_t len = PyUnicode_GET_SIZE(str.ptr());
-        const uint32_t *p = reinterpret_cast<const uint32_t *>(PyUnicode_AS_UNICODE(str.ptr()));
+        int kind = PyUnicode_KIND(str.ptr());
+        void *dp = PyUnicode_DATA(str.ptr());
 
-        std::vector<uint16_t> data(len+1);
+        Py_ssize_t len = PyUnicode_GET_LENGTH(str.ptr());
+        std::vector<uint16_t> data(len + 1);
 
-        for(Py_ssize_t i=0; i<len; i++)
-        {
-            data[i] = (uint16_t) (p[i]);
+        for (Py_ssize_t i = 0; i < len; i++) {
+            data[i] = (uint16_t) PyUnicode_READ(kind, dp, i);
         }
 
         data[len] = 0;
