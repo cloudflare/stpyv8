@@ -1251,13 +1251,16 @@ py::object CJavascriptObject::Wrap(v8::Handle<v8::Value> value, v8::Handle<v8::O
     {
         double n = v8::Handle<v8::Date>::Cast(value)->NumberValue(isolate->GetCurrentContext()).ToChecked();
 
-        time_t ts = (time_t) floor(n / 1000);
+        if (!std::isnan(n))
+        {
+            time_t ts = (time_t) floor(n / 1000);
 
-        tm *t = localtime(&ts);
+            tm *t = localtime(&ts);
 
-        return py::object(py::handle<>(::PyDateTime_FromDateAndTime(
-                                           t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec,
-                                           ((long long) floor(n)) % 1000 * 1000)));
+            return py::object(py::handle<>(::PyDateTime_FromDateAndTime(
+                                               t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec,
+                                               ((long long) floor(n)) % 1000 * 1000)));
+        }
     }
 
     return Wrap(value->ToObject(isolate->GetCurrentContext()).ToLocalChecked(), self);
@@ -1953,7 +1956,7 @@ void ContextTracer::Trace(v8::Handle<v8::Context> ctxt, LivingMap *living)
 
 void ContextTracer::Trace(void)
 {
-    m_ctxt.SetWeak(this, WeakCallback, v8::WeakCallbackType::kFinalizer);
+    m_ctxt.SetWeak(this, WeakCallback, v8::WeakCallbackType::kParameter);
 }
 
 #endif // SUPPORT_TRACE_LIFECYCLE
