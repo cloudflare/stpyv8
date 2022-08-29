@@ -304,9 +304,8 @@ class JSIsolate(_STPyV8.JSIsolate):
 
 class JSContext(_STPyV8.JSContext):
     def __init__(self, obj = None, ctxt = None):
-        if JSLocker.active:
-            self.lock = JSLocker()
-            self.lock.enter()
+        self.lock = JSLocker()
+        self.lock.enter()
 
         if ctxt:
             _STPyV8.JSContext.__init__(self, ctxt)
