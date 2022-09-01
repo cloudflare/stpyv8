@@ -92,9 +92,12 @@ def build_boost():
         tar = tarfile.open(save_path, "r:gz")
         tar.extractall(BOOST_HOME)
 
-    exec_cmd("./bootstrap.sh", cwd=os.path.dirname(bootstrap_path), msg="Run boost bootstrap")
+    args = ""
+    if sys.platform == "darwin":
+        args += " compiler.balcklist clang --with-toolset=clang"
+    exec_cmd("./bootstrap.sh" + args, cwd=os.path.dirname(bootstrap_path), msg="Run boost bootstrap")
     exec_cmd(
-        "./b2 --with-system --with-iostreams --with-python cxxflags=-fPIC threading=multi",
+        './b2 --with-system --with-iostreams --with-python cxxflags="-fPIC $(python3-config --includes)" threading=multi',
         cwd=os.path.dirname(bootstrap_path),
         msg="Build boost static libraries",
     )
