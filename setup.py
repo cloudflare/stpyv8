@@ -189,6 +189,12 @@ class stpyv8_build(build_ext):
             V8_GIT_TAG_STABLE  # pylint:disable=redefined-outer-name,unused-variable
         )
         build_boost()
+        if sys.platform == "darwin":
+            lib_root = os.path.join(BOOST_ROOT, "stage", "lib")
+            for it in os.listdir(lib_root):
+                if it.endswith(".dylib"):
+                    print(f"Remove file {it}")
+                    os.remove(os.path.join(lib_root, it))
         prepare_v8()
         build_ext.run(self)
 

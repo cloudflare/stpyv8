@@ -67,15 +67,16 @@ include_dirs = []
 library_dirs = []
 libraries = []
 extra_compile_args = ["-I%s" % BOOST_ROOT]
-extra_link_args = [
-    "-L/usr/lib/x86_64-linux-gnu",
-    "-l:libstdc++.a",
-    "-L%s" % os.path.join(BOOST_ROOT, "stage", "lib"),
-    "-l:libboost_system.a",
-    "-l:libboost_iostreams.a",
-    "-l:libboost_python37.a",
-    "-l:libv8_monolith.a",
-]
+extra_link_args = ["-L%s" % os.path.join(BOOST_ROOT, "stage", "lib")]
+if sys.platform == "linux":
+    extra_link_args += [
+        "-L/usr/lib/x86_64-linux-gnu",
+        "-l:libstdc++.a",
+        "-l:libboost_system.a",
+        "-l:libboost_iostreams.a",
+        "-l:libboost_python37.a",
+        "-l:libv8_monolith.a",
+    ]
 
 include_dirs.append(os.path.join(V8_HOME, "include"))
 library_dirs.append(os.path.join(V8_HOME, "out.gn/x64.release.sample/obj/"))
@@ -132,7 +133,8 @@ if os.name in ("nt",):
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
     extra_link_args += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
 elif os.name in ("posix",):
-    #libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]
+    if sys.platform == "darwin":
+        libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]
     extra_compile_args.append("-std=c++17")
 
     if platform.system() in ("Linux",):
