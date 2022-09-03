@@ -97,7 +97,7 @@ def build_boost():
         args += " compiler.balcklist clang --with-toolset=clang"
     exec_cmd("./bootstrap.sh" + args, cwd=os.path.dirname(bootstrap_path), msg="Run boost bootstrap")
     exec_cmd(
-        './b2 --with-system --with-iostreams --with-python cxxflags="-fPIC $(python3-config --includes)" threading=multi',
+        f'./b2 --with-system --with-iostreams --with-python cxxflags="-fPIC $(python{sys.version_info[0]}.{sys.version_info[1]}-config --includes)" threading=multi',
         cwd=os.path.dirname(bootstrap_path),
         msg="Build boost static libraries",
     )
