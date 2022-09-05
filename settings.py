@@ -74,7 +74,7 @@ if sys.platform == "linux":
         "-l:libstdc++.a",
         "-l:libboost_system.a",
         "-l:libboost_iostreams.a",
-        "-l:libboost_python37.a",
+        f"-l:libboost_python{sys.version_info[0]}{sys.version_info[1]}.a",
         "-l:libv8_monolith.a",
     ]
 
