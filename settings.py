@@ -12,7 +12,7 @@ V8_GIT_TAG_STABLE = "10.5.218.7"
 V8_GIT_TAG_MASTER = "master"
 V8_GIT_TAG = V8_GIT_TAG_STABLE
 DEPOT_GIT_URL = "https://chromium.googlesource.com/chromium/tools/depot_tools.git"
-BOOST_VERSION = "1.67.0"
+BOOST_VERSION = "1.76.0"
 BOOST_ROOT = os.path.join(BOOST_HOME, "boost_%s" % BOOST_VERSION.replace(".", "_"))
 
 STPYV8_VERSION = V8_GIT_TAG_STABLE
