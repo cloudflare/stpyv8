@@ -95,33 +95,11 @@ Find more in the [tests](tests) directory.
 
 # Installing
 
-The easiest way to install STPyV8 is to use one of the Python wheels provided at
-[Releases](https://github.com/cloudflare/stpyv8/releases). The wheels are automatically
-generated using Github Actions and multiple platforms and Python versions are already
-supported, with others planned for the future.
-
-Be aware that boost-python and some other boost dependencies are needed (see later for
-details). Most Linux distributions and MacOS provide easy to install Boost packages and
-this is the suggested way to install the library.
-
-Each zip file contains the ICU data file icudtl.dat and the wheel itself. First of all you
-should copy icudtl.data to the STPyV8 ICU data folder (Linux: /usr/share/stpyv8, MacOS:
-/Library/Application Support/STPyV8/) and then install/upgrade STPyV8 using pip.
-
-Installing on MacOS
+Installing on Linux/MacOS
 
 ```
 Shell
-$ unzip stpyv8-macos-10.15-python-3.9.zip
-Archive:  stpyv8-macos-10.15-python-3.9.zip
-  inflating: stpyv8-macos-10.15-3.9/icudtl.dat
-  inflating: stpyv8-macos-10.15-3.9/stpyv8-9.9.115.8-cp39-cp39-macosx_10_15_x86_64.whl
-$ cd stpyv8-macos-10.15-3.9
-$ sudo mv icudtl.dat /Library/Application\ Support/STPyV8
-$ sudo pip install --upgrade stpyv8-9.9.115.8-cp39-cp39-macosx_10_15_x86_64.whl
-Processing ./stpyv8-9.9.115.8-cp39-cp39-macosx_10_15_x86_64.whl
-Installing collected packages: stpyv8
-Successfully installed stpyv8-9.9.115.8
+$ python3 -m pip install st-pyv8
 ```
 
 If no wheels are provided for your platform and Python version you are required to build
@@ -134,17 +112,22 @@ code, as well as boost-python and some other boost dependencies.
 
 ## Build Examples
 
-### Ubuntu
-Building on Ubuntu 18.04, 19.10, 20.04 and Debian distros:
+### Linux
 
 ```Shell
-$ sudo apt install python3 python3-dev build-essential libboost-dev libboost-system-dev libboost-python-dev libboost-iostreams-dev
-$ python setup.py build
-$ sudo python setup.py install
-```
+python_version=3.7
+echo Build with python $python_version
 
-Building on other Linux distributions requires appropriate use of their package managers
-for these external dependencies, and some gymnastics for the V8 build dependencies.
+dirpath=$(dirname $(realpath $0))
+
+cd docker
+
+sudo docker build -t stpyv8-$python_version --build-arg ARG_PYTHON_VERSION=$python_version .
+
+cd ../
+
+sudo docker run -it -v $dirpath:/stpyv8 --entrypoint /bin/bash stpyv8-$python_version -c 'cd /stpyv8 && python setup.py bdist_wheel --plat-name=manylinux1_x86_64'
+```
 
 ### MacOS
 
@@ -153,13 +136,8 @@ command line tools) to compile Google V8. The command line tools bundled with XC
 required (rather than the stand-alone command line tools, sometimes requiring
 [drastic measures](https://bugs.chromium.org/p/chromium/issues/detail?id=729990#c1) .)
 
-Using [HomeBrew](https://brew.sh) makes the boost-python and related dependencies easier for
-STPyV8:
-
 ```Shell
-$ brew install boost-python3
-$ python setup.py build
-$ sudo python setup.py install
+$ python3 setup.py bdist_wheel --plat-name macosx_10_10_x86_64
 ```
 
 More detailed build instructions are in the [docs](docs/source/build.rst) folder.
