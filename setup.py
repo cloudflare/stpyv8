@@ -96,8 +96,11 @@ def build_boost():
     if sys.platform == "darwin":
         args += " compiler.balcklist clang --with-toolset=clang"
     exec_cmd("./bootstrap.sh" + args, cwd=os.path.dirname(bootstrap_path), msg="Run boost bootstrap")
+    cxxflags = f"-fPIC $(python{sys.version_info[0]}.{sys.version_info[1]}-config --includes)"
+    if sys.platform == "darwin":
+        cxxflags += " -stdlib=libc++"
     exec_cmd(
-        f'./b2 --with-system --with-iostreams --with-python cxxflags="-fPIC $(python{sys.version_info[0]}.{sys.version_info[1]}-config --includes)" threading=multi',
+        f'./b2 --with-system --with-iostreams --with-python cxxflags="{cxxflags}" threading=multi',
         cwd=os.path.dirname(bootstrap_path),
         msg="Build boost static libraries",
     )
