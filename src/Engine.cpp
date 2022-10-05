@@ -124,19 +124,16 @@ bool CEngine::SetMemoryLimit(int max_young_space_size, int max_old_space_size, i
 
 void CEngine::SetStackLimit(uintptr_t stack_limit_size)
 {
-    // This function uses a local stack variable to determine the isolate's
-    // stack limit
+    // This function uses a local stack variable to determine the isolate's stack limit
     uint32_t here;
     uintptr_t stack_limit = reinterpret_cast<uintptr_t>(&here) - stack_limit_size;
 
-    // If the size is very large and the stack is near the bottom of memory
-    // then the calculation above may wrap around and give an address that is
-    // above the (downwards-growing) stack. In such case we alert the user
-    // that the new stack limit is not going to be set and return
-    if (stack_limit > reinterpret_cast<uintptr_t>(&here)) {
-        std::cerr << "[ERROR] Attempted to set a stack limit greater than available memory" << std::endl;
-        return;
-    }
+    // If the size is very large and the stack is very near the bottom of
+    // memory then the calculation above may wrap around and give an address
+    // that is above the (downwards-growing) stack. In that case we use a
+    // very low address.
+    if (stack_limit > reinterpret_cast<uintptr_t>(&here))
+        stack_limit = stack_limit_size;
 
     v8::Isolate::GetCurrent()->SetStackLimit(stack_limit);
 }

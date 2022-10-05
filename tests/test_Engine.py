@@ -172,15 +172,13 @@ class TestEngine(unittest.TestCase):
 
     def testStackLimit(self):
         with STPyV8.JSIsolate():
-            STPyV8.JSEngine.setStackLimit(256 * 1024)
-
             with STPyV8.JSContext() as ctxt:
+                STPyV8.JSEngine.setStackLimit(256 * 1024)
                 oldStackSize = ctxt.eval("var maxStackSize = function(i){try{(function m(){++i&&m()}())}catch(e){return i}}(0); maxStackSize")
 
         with STPyV8.JSIsolate():
-            STPyV8.JSEngine.setStackLimit(512 * 1024)
-
             with STPyV8.JSContext() as ctxt:
+                STPyV8.JSEngine.setStackLimit(512 * 1024)
                 newStackSize = ctxt.eval("var maxStackSize = function(i){try{(function m(){++i&&m()}())}catch(e){return i}}(0); maxStackSize")
 
         self.assertTrue(newStackSize > oldStackSize * 2)
