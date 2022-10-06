@@ -27,7 +27,7 @@ else:
 os.environ['PATH'] = f"{os.environ['PATH']}:{DEPOT_HOME}"
 
 gn_args = {
-  "dcheck_always_on"                   : "true" if os.environ.get("STPYV8_DEBUG") else "false",
+  "dcheck_always_on"                   : "false",
   "is_component_build"                 : "false",
   "is_debug"                           : "true" if os.environ.get("STPYV8_DEBUG") else "false",
   "treat_warnings_as_errors"           : "false",
