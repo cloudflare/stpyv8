@@ -7,7 +7,7 @@ DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tool
 V8_HOME     = os.environ.get('V8_HOME', os.path.join(STPYV8_HOME, 'v8'))
 
 V8_GIT_URL        = "https://chromium.googlesource.com/v8/v8.git"
-V8_GIT_TAG_STABLE = "10.5.218.7"
+V8_GIT_TAG_STABLE = "10.6.194.17"
 V8_GIT_TAG_MASTER = "master"
 V8_GIT_TAG        = V8_GIT_TAG_STABLE
 DEPOT_GIT_URL     = "https://chromium.googlesource.com/chromium/tools/depot_tools.git"
@@ -27,7 +27,7 @@ else:
 os.environ['PATH'] = f"{os.environ['PATH']}:{DEPOT_HOME}"
 
 gn_args = {
-  "dcheck_always_on"                   : "true" if os.environ.get("STPYV8_DEBUG") else "false",
+  "dcheck_always_on"                   : "false",
   "is_component_build"                 : "false",
   "is_debug"                           : "true" if os.environ.get("STPYV8_DEBUG") else "false",
   "treat_warnings_as_errors"           : "false",

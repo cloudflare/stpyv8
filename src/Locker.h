@@ -14,6 +14,11 @@ class CLocker
 public:
     CLocker() {}
     CLocker(CIsolatePtr isolate) : m_isolate(isolate) {}
+    ~CLocker()
+    {
+        if (NULL != m_locker.get())
+            m_locker.release();
+    }
 
     bool entered(void)
     {
