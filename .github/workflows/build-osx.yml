@@ -45,7 +45,7 @@ jobs:
           dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
 
       - name: STEP 7. Upload wheel zip
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: wheels
           path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
