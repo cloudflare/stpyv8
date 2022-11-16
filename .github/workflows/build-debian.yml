@@ -8,7 +8,7 @@ jobs:
     runs-on: self-hosted
     strategy:
       matrix:
-        python-version: ['3.9']
+        python-version: ['3.9.15']
 
     steps:
       - name: STEP 1. Checkout repository
