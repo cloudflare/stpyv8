@@ -1,0 +1,52 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build wheel on Debian 11
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        python-version: ['3.9']
+
+    steps:
+      - name: STEP 1. Checkout repository
+        uses: actions/checkout@v3
+
+      - name: STEP 2. Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: STEP 3. Install dependencies
+        run: |
+          sudo apt install libboost-dev libboost-system-dev libboost-iostreams-dev libboost-python-dev
+          pip install --upgrade pip setuptools wheel pytest
+
+      - name: STEP 4. Build wheel
+        run: |
+          python setup.py v8
+          python setup.py sdist bdist_wheel -d stpyv8-debian11-${{ matrix.python-version }}
+          python setup.py install
+          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-debian11-${{ matrix.python-version }}/icudtl.dat
+        env:
+          V8_DEPS_LINUX: 0
+          LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
+
+      - name: STEP 5. Test wheel
+        run: |
+          pytest -v
+
+      - name: STEP 6. Create wheel zip
+        uses: vimtor/action-zip@v1
+        with:
+          files: stpyv8-debian11-${{ matrix.python-version }}/
+          recursive: false
+          dest: stpyv8-debian11-python-${{ matrix.python-version }}.zip
+
+      - name: STEP 7. Upload wheel zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: stpyv8-debian11-python-${{ matrix.python-version }}.zip
