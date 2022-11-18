@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    name: Build wheel on Debian 11
+    name: Build wheel on debian-11.5
     runs-on: self-hosted
     strategy:
       matrix:
@@ -27,16 +27,16 @@ jobs:
       - name: STEP 4. Build wheel
         run: |
           python setup.py v8
-          python setup.py sdist bdist_wheel -d stpyv8-debian11-${{ matrix.python-version }}
-          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-debian11-${{ matrix.python-version }}/icudtl.dat
+          python setup.py sdist bdist_wheel -d stpyv8-debian-11-${{ matrix.python-version }}
+          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-debian-11-${{ matrix.python-version }}/icudtl.dat
         env:
           V8_DEPS_LINUX: 0
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
       - name: STEP 5. Install wheel
         run : |
-          cp stpyv8-debian11-${{ matrix.python-version }}/icudtl.dat /usr/share/stpyv8
-          pip install --upgrade stpyv8-debian11-${{ matrix.python-version }}/stpyv8*.whl
+          cp stpyv8-debian-11-${{ matrix.python-version }}/icudtl.dat /usr/share/stpyv8
+          pip install --upgrade stpyv8-debian-11-${{ matrix.python-version }}/stpyv8*.whl
 
       - name: STEP 6. Test wheel
         run: |
@@ -45,12 +45,12 @@ jobs:
       - name: STEP 7. Create wheel zip
         uses: vimtor/action-zip@v1
         with:
-          files: stpyv8-debian11-${{ matrix.python-version }}/
+          files: stpyv8-debian-11-${{ matrix.python-version }}/
           recursive: false
-          dest: stpyv8-debian11-python-${{ matrix.python-version }}.zip
+          dest: stpyv8-debian-11-python-${{ matrix.python-version }}.zip
 
       - name: STEP 8. Upload wheel zip
         uses: actions/upload-artifact@v3
         with:
           name: wheels
-          path: stpyv8-debian11-python-${{ matrix.python-version }}.zip
+          path: stpyv8-debian-11-python-${{ matrix.python-version }}.zip
