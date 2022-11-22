@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-11, macos-12]
-        python-version: ['3.10']
+        python-version: ['3.11']
 
     steps:
       - name: STEP 1. Checkout repository
@@ -24,7 +24,11 @@ jobs:
         run: |
           pip install --upgrade pip setuptools wheel pytest
           brew update
-          brew install boost boost-python3
+          brew install boost
+          # The option --ignore-dependencies is a workaround required to
+          # avoid boost-python3 installing python@3.11. This option will
+          # be removed when Python default Mac OSX version will be v3.11
+          brew install boost-python3 --ignore-dependencies
 
       - name: STEP 4. Build wheel
         run: |
