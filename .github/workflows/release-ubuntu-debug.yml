@@ -34,10 +34,10 @@ jobs:
 
     steps:
       - name: STEP 1. Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: STEP 2. Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -49,10 +49,11 @@ jobs:
       - name: STEP 4. Build wheel
         run: |
           python setup.py v8
-          python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
+          python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
           python setup.py install
-          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
+          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
         env:
+          STPYV8_DEBUG: 1
           V8_DEPS_LINUX: 0
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
@@ -63,12 +64,12 @@ jobs:
       - name: STEP 6. Create wheel zip
         uses: vimtor/action-zip@v1
         with:
-          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
+          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/
           recursive: false
-          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip
 
       - name: STEP 7. Upload to release
         uses: AButler/upload-release-assets@v2.0
         with:
-          files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip'
+          files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip'
           repo-token: ${{ secrets.GITHUB_TOKEN }}

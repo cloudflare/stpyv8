@@ -13,10 +13,10 @@ jobs:
 
     steps:
       - name: STEP 1. Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: STEP 2. Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -24,7 +24,11 @@ jobs:
         run: |
           pip install --upgrade pip setuptools wheel pytest
           brew update
-          brew install boost boost-python3
+          brew install boost
+          # The option --ignore-dependencies is a workaround required to
+          # avoid boost-python3 installing python@3.11. This option will
+          # be removed when Python default Mac OSX version will be v3.11
+          brew install boost-python3 --ignore-dependencies
 
       - name: STEP 4. Build wheel
         run: |
@@ -47,7 +51,7 @@ jobs:
           dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip
 
       - name: STEP 7. Upload wheel zip
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: wheels
           path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip

@@ -1,10 +1,6 @@
-name: Release
+name: Build
 
-on:
-  release:
-    types: [published]
-    branches:
-      - master
+on: [push, pull_request]
 
 jobs:
   build:
@@ -34,10 +30,10 @@ jobs:
 
     steps:
       - name: STEP 1. Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: STEP 2. Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -68,8 +64,8 @@ jobs:
           recursive: false
           dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip
 
-      - name: STEP 7. Upload to release
-        uses: AButler/upload-release-assets@v2.0
+      - name: STEP 7. Upload wheel zip
+        uses: actions/upload-artifact@v3
         with:
-          files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          name: wheels
+          path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip
