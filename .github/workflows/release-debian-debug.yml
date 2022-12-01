@@ -40,8 +40,8 @@ jobs:
 
       - name: STEP 5. Install wheel
         run : |
-          cp stpyv8-debian-11-${{ matrix.python-version }}/icudtl.dat /usr/share/stpyv8
-          pip install --upgrade stpyv8-debian-11-${{ matrix.python-version }}/stpyv8*.whl
+          cp stpyv8-debian-11-${{ matrix.python-version }}-debug/icudtl.dat /usr/share/stpyv8
+          pip install --upgrade stpyv8-debian-11-${{ matrix.python-version }}-debug/stpyv8*.whl
 
       - name: STEP 6. Test wheel
         run: |
