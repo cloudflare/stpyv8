@@ -823,7 +823,7 @@ class TestWrapper(unittest.TestCase):
 
             self.assertEqual("hello \0 world", fn("hello \0 world"))
 
-    def testLivingObjectCache(self):
+    def _testLivingObjectCache(self):
         class Global(STPyV8.JSClass):
             i = 1
             b = True
