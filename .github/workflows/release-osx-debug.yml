@@ -56,8 +56,8 @@ jobs:
           recursive: false
           dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip
 
-      - name: STEP 7. Upload to release
-        uses: AButler/upload-release-assets@v2.0
+      - name: STEP 7. Release
+        uses: softprops/action-gh-release@v1
         with:
           files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}

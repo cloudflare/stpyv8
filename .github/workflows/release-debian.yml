@@ -53,8 +53,8 @@ jobs:
           recursive: false
           dest: stpyv8-debian-11-python-${{ matrix.python-version }}.zip
 
-      - name: STEP 8. Upload to release
-        uses: AButler/upload-release-assets@v2.0
+      - name: STEP 8. Release
+        uses: softprops/action-gh-release@v1
         with:
           files: 'stpyv8-debian-11-python-${{ matrix.python-version }}.zip'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
