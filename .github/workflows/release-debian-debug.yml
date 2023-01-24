@@ -48,14 +48,14 @@ jobs:
           pytest -v
 
       - name: STEP 7. Create wheel zip
-        uses: vimtor/action-zip@v1
+        uses: vimtor/action-zip@v1.1
         with:
           files: stpyv8-debian-11-${{ matrix.python-version }}-debug/
           recursive: false
           dest: stpyv8-debian-11-python-${{ matrix.python-version }}-debug.zip
 
-      - name: STEP 8. Upload to release
-        uses: AButler/upload-release-assets@v2.0
+      - name: STEP 8. Release
+        uses: softprops/action-gh-release@v1
         with:
           files: 'stpyv8-debian-11-python-${{ matrix.python-version }}-debug.zip'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}

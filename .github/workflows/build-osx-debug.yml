@@ -29,6 +29,8 @@ jobs:
           # avoid boost-python3 installing python@3.11. This option will
           # be removed when Python default Mac OSX version will be v3.11
           brew install boost-python3 --ignore-dependencies
+        env:
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
 
       - name: STEP 4. Build wheel
         run: |
@@ -44,7 +46,7 @@ jobs:
           pytest -v
 
       - name: STEP 6. Create wheel zip
-        uses: vimtor/action-zip@v1
+        uses: vimtor/action-zip@v1.1
         with:
           files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/
           recursive: false
