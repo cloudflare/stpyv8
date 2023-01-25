@@ -837,7 +837,7 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue(ctxt.eval("b == b"))
             self.assertTrue(ctxt.eval("o == o"))
 
-    @pytest.skipif(STPYV8_DEBUG, reason = "Not a test for debug mode")
+    @pytest.mark.skipif(STPYV8_DEBUG, reason = "Not a test for debug mode")
     def testMemoryLeak(self):
         with STPyV8.JSIsolate() as isolate:
             with STPyV8.JSContext() as ctxt:
