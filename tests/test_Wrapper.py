@@ -834,6 +834,17 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue(ctxt.eval("b == b"))
             self.assertTrue(ctxt.eval("o == o"))
 
+    def testMemoryLeak(self):
+        with STPyV8.JSIsolate() as isolate:
+            with STPyV8.JSContext() as ctxt:
+                inner = ctxt.eval("i => Array(1<<20).fill(i)")
+                outer = ctxt.eval("o => o[0]")
+
+                for i in range(1000):
+                    ret = outer(inner(i))
+
+                self.assertEqual(999, i)
+
     def testNamedSetter(self):
         class Obj(STPyV8.JSClass):
             @property
