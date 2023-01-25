@@ -611,7 +611,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(2, ctxt.eval("""array[1]"""))
 
     def testForEach(self):
-        class NamedClass(object):
+        class NamedClass:
             foo = 1 # pylint:disable=disallowed-name
 
             def __init__(self):
@@ -839,13 +839,13 @@ class TestWrapper(unittest.TestCase):
 
     @pytest.mark.skipif(STPYV8_DEBUG, reason = "Not a test for debug mode")
     def testMemoryLeak(self):
-        with STPyV8.JSIsolate() as isolate:
+        with STPyV8.JSIsolate():
             with STPyV8.JSContext() as ctxt:
                 inner = ctxt.eval("i => Array(1<<20).fill(i)")
                 outer = ctxt.eval("o => o[0]")
 
                 for i in range(1000):
-                    ret = outer(inner(i))
+                    outer(inner(i))
 
                 self.assertEqual(999, i)
 
