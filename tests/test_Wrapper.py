@@ -5,8 +5,11 @@ import sys
 import os
 import datetime
 import unittest
+import pytest
 
 import STPyV8
+
+STPYV8_DEBUG = os.getenv("STPYV8_DEBUG") is not None
 
 
 def convert(obj):
@@ -834,6 +837,7 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue(ctxt.eval("b == b"))
             self.assertTrue(ctxt.eval("o == o"))
 
+    @pytest.skipif(STPYV8_DEBUG, reason = "Not a test for debug mode")
     def testMemoryLeak(self):
         with STPyV8.JSIsolate() as isolate:
             with STPyV8.JSContext() as ctxt:
