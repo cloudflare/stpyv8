@@ -8,9 +8,12 @@
 size_t CIsolate::NearHeapLimitCallback(void *data,
                                        size_t current_heap_limit, size_t initial_heap_limit)
 {
+    v8::Isolate *isolate = (v8::Isolate *)data;
+
     if (current_heap_limit - initial_heap_limit > heap_max_increase)
         return current_heap_limit;
 
+    isolate->AdjustAmountOfExternalAllocatedMemory(heap_increase);
     return current_heap_limit + heap_increase;
 }
 

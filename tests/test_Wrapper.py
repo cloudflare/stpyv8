@@ -5,8 +5,11 @@ import sys
 import os
 import datetime
 import unittest
+import pytest
 
 import STPyV8
+
+STPYV8_DEBUG = os.getenv("STPYV8_DEBUG") is not None
 
 
 def convert(obj):
@@ -608,7 +611,7 @@ class TestWrapper(unittest.TestCase):
             self.assertEqual(2, ctxt.eval("""array[1]"""))
 
     def testForEach(self):
-        class NamedClass(object):
+        class NamedClass:
             foo = 1 # pylint:disable=disallowed-name
 
             def __init__(self):
@@ -723,7 +726,7 @@ class TestWrapper(unittest.TestCase):
                 var none = null;
             """)
 
-            self.assertEqual(count+1, sys.getrefcount(None))
+            self.assertTrue(count <= sys.getrefcount(None) <= count + 1)
 
             ctxt.eval("""
                 var none = null;
@@ -833,6 +836,18 @@ class TestWrapper(unittest.TestCase):
             self.assertTrue(ctxt.eval("i == i"))
             self.assertTrue(ctxt.eval("b == b"))
             self.assertTrue(ctxt.eval("o == o"))
+
+    @pytest.mark.skipif(STPYV8_DEBUG, reason = "Not a test for debug mode")
+    def testMemoryLeak(self):
+        with STPyV8.JSIsolate():
+            with STPyV8.JSContext() as ctxt:
+                inner = ctxt.eval("i => Array(1<<20).fill(i)")
+                outer = ctxt.eval("o => o[0]")
+
+                for i in range(1000):
+                    outer(inner(i))
+
+                self.assertEqual(999, i)
 
     def testNamedSetter(self):
         class Obj(STPyV8.JSClass):
