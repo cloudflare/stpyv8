@@ -46,6 +46,8 @@ jobs:
       - name: STEP 6. Test wheel
         run: |
           pytest -v
+        env:
+          STPYV8_DEBUG: 1
 
       - name: STEP 7. Create wheel zip
         uses: vimtor/action-zip@v1.1
