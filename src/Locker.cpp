@@ -31,9 +31,6 @@ void CLocker::Expose(void)
     .def(py::init<>())
     .def(py::init<CIsolatePtr>((py::arg("isolate"))))
 
-    .add_static_property("active", &v8::Locker::WasEverUsed,
-                         "whether Locker is being used by this V8 instance.")
-
     .add_static_property("locked", &CLocker::IsLocked,
                          "whether or not the locker is locked by the current thread.")
 

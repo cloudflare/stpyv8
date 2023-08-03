@@ -857,9 +857,21 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
         }
 
 #ifdef SUPPORT_TRACE_LIFECYCLE
-        py::object *object = new py::object(obj);
+        static v8::Persistent<v8::ObjectTemplate> s_template(isolate, CreateObjectTemplate(isolate));
 
-        ObjectTracer::Trace(jsobj.Object(), object);
+        v8::MaybeLocal<v8::Object> instance = v8::Local<v8::ObjectTemplate>::New(
+                isolate, s_template)->NewInstance(
+                        isolate->GetCurrentContext());
+
+        if (!instance.IsEmpty())
+        {
+            py::object *object = new py::object(obj);
+
+            v8::Handle<v8::Object> realInstance = instance.ToLocalChecked();
+            realInstance->SetInternalField(0, v8::External::New(isolate, object));
+
+            ObjectTracer::Trace(instance.ToLocalChecked(), object);
+        }
 #endif
 
         return handle_scope.Escape(jsobj.Object());
@@ -1841,7 +1853,7 @@ ObjectTracer::~ObjectTracer()
 
 void ObjectTracer::Dispose(void)
 {
-    // m_handle.ClearWeak();
+    m_handle.ClearWeak();
     m_handle.Reset();
 }
 
@@ -1856,19 +1868,18 @@ ObjectTracer& ObjectTracer::Trace(v8::Handle<v8::Value> handle, py::object *obje
 
 void ObjectTracer::Trace(void)
 {
-    // m_handle.SetWeak(this, WeakCallback, v8::WeakCallbackType::kParameter);
+    m_handle.SetWeak(this, WeakCallback, v8::WeakCallbackType::kParameter);
 
     m_living->insert(std::make_pair(m_object->ptr(), this));
 }
 
-/*
+
 void ObjectTracer::WeakCallback(const v8::WeakCallbackInfo<ObjectTracer>& info)
 {
-  std::unique_ptr<ObjectTracer> tracer(info.GetParameter());
+    CPythonGIL python_gil;
 
-  // assert(info.GetValue() == tracer->m_handle);
+    std::unique_ptr<ObjectTracer> tracer(info.GetParameter());
 }
-*/
 
 LivingMap * ObjectTracer::GetLivingMapping(void)
 {

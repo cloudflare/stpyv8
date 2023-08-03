@@ -31,9 +31,11 @@ public:
     void Enter(void) {
         m_isolate->Enter();
     }
+
     void Leave(void) {
         m_isolate->Exit();
     }
+
     void Dispose(void) {
         m_isolate->Dispose();
     }

@@ -7,8 +7,8 @@ DEPOT_HOME = os.environ.get("DEPOT_HOME", os.path.join(STPYV8_HOME, "depot_tools
 V8_HOME = os.environ.get("V8_HOME", os.path.join(STPYV8_HOME, "v8"))
 BOOST_HOME = os.environ.get("BOOST_HOME", os.path.join(STPYV8_HOME, "boost"))
 
-V8_GIT_URL = "https://chromium.googlesource.com/v8/v8.git"
-V8_GIT_TAG_STABLE = "10.5.218.7"
+V8_GIT_URL        = "https://chromium.googlesource.com/v8/v8.git"
+V8_GIT_TAG_STABLE = "11.5.150.22"
 V8_GIT_TAG_MASTER = "master"
 V8_GIT_TAG = V8_GIT_TAG_STABLE
 DEPOT_GIT_URL = "https://chromium.googlesource.com/chromium/tools/depot_tools.git"
@@ -32,19 +32,19 @@ else:
 os.environ["PATH"] = f"{os.environ['PATH']}:{DEPOT_HOME}"
 
 gn_args = {
-    "dcheck_always_on": "true" if os.environ.get("STPYV8_DEBUG") else "false",
-    "is_component_build": "false",
-    "is_debug": "true" if os.environ.get("STPYV8_DEBUG") else "false",
-    "treat_warnings_as_errors": "false",
-    "use_custom_libcxx": "false",
-    "v8_deprecation_warnings": "true",
-    "v8_enable_disassembler": "false",
-    "v8_enable_i18n_support": "true",
-    "v8_enable_pointer_compression": "false",
-    "v8_enable_31bit_smis_on_64bit_arch": "false",
-    "v8_imminent_deprecation_warnings": "true",
-    "v8_monolithic": "true",
-    "v8_use_external_startup_data": "false",
+  "dcheck_always_on"                   : "false",
+  "is_component_build"                 : "false",
+  "is_debug"                           : "true" if os.environ.get("STPYV8_DEBUG") else "false",
+  "treat_warnings_as_errors"           : "false",
+  "use_custom_libcxx"                  : "false",
+  "v8_deprecation_warnings"            : "true",
+  "v8_enable_disassembler"             : "false",
+  "v8_enable_i18n_support"             : "true",
+  "v8_enable_pointer_compression"      : "false",
+  "v8_enable_31bit_smis_on_64bit_arch" : "false",
+  "v8_imminent_deprecation_warnings"   : "true",
+  "v8_monolithic"                      : "true",
+  "v8_use_external_startup_data"       : "false"
 }
 
 GN_ARGS = " ".join(f"{key}={value}" for key, value in gn_args.items())

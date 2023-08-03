@@ -12,15 +12,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-11, macos-12]
-        python-version: ['3.10']
+        os: [macos-11, macos-12, macos-13]
+        python-version: ['3.11']
 
     steps:
       - name: STEP 1. Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: STEP 2. Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -28,7 +28,13 @@ jobs:
         run: |
           pip install --upgrade pip setuptools wheel pytest
           brew update
-          brew install boost boost-python3
+          brew install boost
+          # The option --ignore-dependencies is a workaround required to
+          # avoid boost-python3 installing python@3.11. This option will
+          # be removed when Python default Mac OSX version will be v3.11
+          brew install boost-python3 --ignore-dependencies
+        env:
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
 
       - name: STEP 4. Build wheel
         run: |
@@ -42,14 +48,14 @@ jobs:
           pytest -v
 
       - name: STEP 6. Create wheel zip
-        uses: vimtor/action-zip@v1
+        uses: vimtor/action-zip@v1.1
         with:
           files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
           recursive: false
           dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
 
-      - name: STEP 7. Upload to release
-        uses: AButler/upload-release-assets@v2.0
+      - name: STEP 7. Release
+        uses: softprops/action-gh-release@v1
         with:
           files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
