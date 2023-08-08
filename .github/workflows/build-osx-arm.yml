@@ -9,7 +9,6 @@ jobs:
     strategy:
       matrix:
         os: [macos-11, macos-12, macos-13]
-        python-version: ['3.11']
 
     steps:
       - name: STEP 1. Checkout repository
@@ -17,12 +16,10 @@ jobs:
 
       - name: STEP 2. Set up Python
         uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
 
       - name: STEP 3. Install dependencies
         run: |
-          pip install --upgrade pip setuptools wheel pytest
+          pip install --upgrade pip setuptools wheel cibuildwheel pytest
           brew update
           brew install boost
           # The option --ignore-dependencies is a workaround required to
