@@ -13,13 +13,12 @@ jobs:
 
       - name: STEP 2. Install dependencies
         run: |
-          pip install --upgrade pip setuptools wheel cibuildwheel pytest
-          brew update
-          brew install boost boost-python3
+          pip install --upgrade pip setuptools wheel pytest
 
       - name: STEP 3. Build wheels
         uses: pypa/cibuildwheel@v2.15.0
         env:
+          CIBW_BEFORE_ALL_MACOS: "brew update && brew install boost boost-python3"
           CIBW_ARCHS_MACOS: arm64
 
       - name: STEP 4. Test wheel
