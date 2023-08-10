@@ -11,29 +11,23 @@ jobs:
       - name: STEP 1. Checkout repository
         uses: actions/checkout@v3
 
-      - name: STEP 2. Install dependencies
-        run: |
-          pip install --upgrade pip setuptools wheel pytest
-
-      - name: STEP 3. Build wheels
+      - name: STEP 2. Build wheels
         uses: pypa/cibuildwheel@v2.15.0
         env:
-          CIBW_BEFORE_ALL_MACOS: "brew update && brew install boost boost-python3"
+          CIBW_BUILD: cp311-*
+          CIBW_SKIP: *-win32 *-musllinux_x86_64 *_i686
+          CIBW_BEFORE_ALL: python -m pip install --upgrade pip setuptools wheel
+          CIBW_BEFORE_BUILD_MACOS: >
+            brew update && 
+            brew install boost boost-python3"
           CIBW_ARCHS_MACOS: arm64
-
-      - name: STEP 4. Test wheel
-        run: |
-          pytest -v
-
-      - name: STEP 5. Create wheel zip
-        uses: vimtor/action-zip@v1.1
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_TEST_COMMAND: python -m pytest -v
         with:
-          files: stpyv8-${{ matrix.os }}-arm64-${{ matrix.python-version }}/
-          recursive: false
-          dest: stpyv8-${{ matrix.os }}-arm64-python-${{ matrix.python-version }}.zip
+          output-dir: wheelhouse
 
-      - name: STEP 6. Upload wheel zip
+      - name: STEP 3. Upload wheel zip
         uses: actions/upload-artifact@v3
         with:
           name: wheels
-          path: stpyv8-${{ matrix.os }}-arm64-python-${{ matrix.python-version }}.zip
+          path: ./wheelhouse/*.whl
