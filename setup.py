@@ -208,4 +208,5 @@ setup(name         = "stpyv8",
           v8        = stpyv8_install_v8,
           stpyv8    = stpyv8_build_no_v8,
           install   = stpyv8_install),
+      install_requires = [ "appdirs", ],
 )
