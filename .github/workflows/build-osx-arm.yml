@@ -16,7 +16,7 @@ jobs:
         env:
           CIBW_BUILD: cp311-*
           CIBW_SKIP: "*-win32 *-musllinux_x86_64 *_i686"
-          CIBW_BEFORE_ALL: python -m pip install --upgrade pip setuptools wheel
+          CIBW_BEFORE_ALL: python -m pip install --upgrade pip setuptools wheel appdirs
           CIBW_BEFORE_BUILD_MACOS: >
             brew update && 
             brew install boost boost-python3
