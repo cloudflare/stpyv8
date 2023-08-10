@@ -4,8 +4,8 @@ on: [push, pull_request]
 
 jobs:
   build_wheels_macos:
-    name: Build wheels on ARM64 {{ matrix.os }}
-    runs-on: {{ matrix.os }}
+    name: Build wheels on ARM64 ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-11, macos-12, macos-13]
