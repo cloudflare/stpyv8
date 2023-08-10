@@ -1,7 +1,6 @@
 import sys
 import os
 import platform
-import appdirs
 
 STPYV8_HOME = os.path.dirname(os.path.realpath(__file__))
 DEPOT_HOME  = os.environ.get('DEPOT_HOME', os.path.join(STPYV8_HOME, 'depot_tools'))
@@ -23,12 +22,16 @@ ICU_DATA_FOLDER_OSX  = "/Library/Application Support/"
 icu_data_folder = None
 
 if os.name in ("posix", ):
-    ICU_DATA_FOLDER = ICU_DATA_FOLDER_OSX if sys.platform in ("darwin", ) else ICU_DATA_FOLDER_UNIX
+    if sys.platform in ("darwin", ):
+      icu_data_folder_root = ICU_DATA_FOLDER_OSX
+      if not os.access(icu_data_folder_root, os.W_OK):
+        icu_data_folder_root = os.path.expanduser('~/Library/Application Support/')
+    else:
+      icu_data_folder_root = ICU_DATA_FOLDER_UNIX
+      if not os.access(icu_data_folder_root, os.W_OK):
+        icu_data_folder_root = os.path.expanduser("~/.local/share")
 
-    if not os.access(ICU_DATA_FOLDER, os.W_OK):
-      ICU_DATA_FOLDER = appdirs.user_config_dir()
-
-    icu_data_folder = os.path.join(ICU_DATA_FOLDER, "STPyV8")
+    icu_data_folder = os.path.join(icu_data_folder_root, "STPyV8")
 
 os.environ['PATH'] = f"{os.environ['PATH']}:{DEPOT_HOME}"
 
