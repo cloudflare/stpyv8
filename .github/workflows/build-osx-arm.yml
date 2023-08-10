@@ -19,7 +19,7 @@ jobs:
           CIBW_BEFORE_ALL: python -m pip install --upgrade pip setuptools wheel
           CIBW_BEFORE_BUILD_MACOS: >
             brew update && 
-            brew install boost boost-python3"
+            brew install boost boost-python3
           CIBW_ARCHS_MACOS: arm64
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: python -m pytest -v
