@@ -48,7 +48,6 @@ jobs:
         uses: MarkusJx/install-boost@main
         with:
           boost_version: 1.74.0
-          toolset: msvc
           platform_version: 2019
 
       - name: STEP 4. Build Boost.Python
