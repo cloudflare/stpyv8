@@ -26,8 +26,6 @@ jobs:
       - name: STEP 3. Install Boost
         id: install-boost
         uses: MarkusJx/install-boost@v2.4.1
-        env:
-          BUILD_TYPE: Debug
         with:
           boost_version: 1.74.0
           platform_version: 2019
