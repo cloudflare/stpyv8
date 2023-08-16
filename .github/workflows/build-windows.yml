@@ -32,9 +32,11 @@ jobs:
       - name: Install Boost
         id: install-boost
         run: |
+          dir
+          $BOOST_ROOT=D:\boost
           mkdir D:\boost
-          ${{ steps.download-boost.outputs.filename }} /SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="D:\boost"
-          echo "BOOST_ROOT=D:\boost" >> "$GITHUB_OUTPUT"
+          .\${{ steps.download-boost.outputs.filename }} /SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="$BOOST_ROOT"
+          echo "BOOST_ROOT=$BOOST_ROOT" >> "$GITHUB_OUTPUT"
 
 # No MSVC version
 #      - name: STEP 3. Install Boost
