@@ -33,7 +33,7 @@ jobs:
         id: install-boost
         run: |
           dir
-          $BOOST_ROOT=D:\boost
+          $BOOST_ROOT="D:\boost"
           mkdir D:\boost
           .\${{ steps.download-boost.outputs.filename }} /SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="$BOOST_ROOT"
           echo "BOOST_ROOT=$BOOST_ROOT" >> "$GITHUB_OUTPUT"
