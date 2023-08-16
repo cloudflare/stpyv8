@@ -14,6 +14,10 @@ jobs:
         python-version: ['3.10']
 
     steps:
+      - uses: ilammy/msvc-dev-cmd@master
+        with:
+          toolset: 14.2
+          
       - name: STEP 1. Checkout repository
         uses: actions/checkout@v3
 
@@ -50,7 +54,6 @@ jobs:
           platform_version: 2019
 
       - name: STEP 4. Build Boost.Python
-        uses: ilammy/msvc-dev-cmd@master
         run: |
           ls $env
           cd ${{ steps.install-boost.outputs.BOOST_ROOT }}
