@@ -51,7 +51,7 @@ jobs:
 
       - name: STEP 4. Build Boost.Python
         env:
-          BOOST_HOME="${{ steps.install-boost.outputs.BOOST_ROOT }}"
+          BOOST_HOME: "${{ steps.install-boost.outputs.BOOST_ROOT }}"
         run: |
           cd ${{ steps.install-boost.outputs.BOOST_ROOT }}
           .\bootstrap.bat
