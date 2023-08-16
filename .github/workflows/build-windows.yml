@@ -23,12 +23,26 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: STEP 3. Install Boost
-        id: install-boost
-        uses: MarkusJx/install-boost@v2.4.1
+      - name: Download Boost
+        id: download-boost
+        uses: suisei-cn/actions-download-file@v1.4.0
         with:
-          boost_version: 1.74.0
-          platform_version: 2019
+          url: https://downloads.sourceforge.net/project/boost/boost-binaries/1.74.0/boost_1_74_0-msvc-14.0-32.exe
+
+      - name: Install Boost
+        id: install-boost
+        run: |
+          mkdir D:\boost
+          ${{ steps.download-boost.outputs.filename }} /SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="D:\boost"
+          echo "BOOST_ROOT=D:\boost" >> "$GITHUB_OUTPUT"
+
+# No MSVC version
+#      - name: STEP 3. Install Boost
+#        id: install-boost
+#        uses: MarkusJx/install-boost@v2.4.1
+#        with:
+#          boost_version: 1.74.0
+#          platform_version: 2019
 
       - name: STEP 4. Build Boost.Python
         run: |
