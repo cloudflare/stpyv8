@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [windows-2019]
         python-version: ['3.10']
 
     steps:
@@ -49,6 +49,7 @@ jobs:
         run: |
           cd ${{ steps.install-boost.outputs.BOOST_ROOT }}
           .\bootstrap.bat
+          if (-not $?) { type bootstrap.log }
           $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
           echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
           (Get-Content libs\python\src\exec.cpp).replace('_Py_fopen', 'fopen') | Set-Content libs\python\src\exec.cpp
