@@ -31,7 +31,7 @@ jobs:
         id: download-boost
         uses: suisei-cn/actions-download-file@v1.4.0
         with:
-          url: https://boostorg.jfrog.io/artifactory/main/release/1.74.0/binaries/boost_1_74_0-msvc-14.2-32.exe
+          url: https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip
 
 #      - name: Install Boost
 #        id: install-boost
