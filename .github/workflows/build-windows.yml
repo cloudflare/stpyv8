@@ -1,6 +1,8 @@
 name: Build
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
 
 jobs:
   build:
@@ -8,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [windows-2019]
         python-version: ['3.10']
 
     steps:
@@ -26,9 +28,9 @@ jobs:
         uses: MarkusJx/install-boost@v2.4.1
         with:
           boost_version: 1.74.0
-          toolset: msvc
           platform_version: 2019
-          link: static+shared
+          toolset: msvc
+#          link: static+shared
 
       - name: STEP 4. Build Boost.Python
         run: |
