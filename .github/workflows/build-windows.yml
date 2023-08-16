@@ -57,7 +57,7 @@ jobs:
           .\bootstrap.bat
           $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
           echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
-          .\b2.exe stage include=${{ steps.install-boost.outputs.BOOST_ROOT }}\include link=static runtime-link=static --with-python
+          .\b2.exe stage link=static runtime-link=static --with-python
 
       - name: STEP 5. Build wheel
         run: |
