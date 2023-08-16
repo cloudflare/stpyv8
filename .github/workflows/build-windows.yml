@@ -50,15 +50,14 @@ jobs:
       - name: Install Boost
         id: install-boost
         run: |
+          $BOOST_ROOT="D:\boost"
           $INSTALL_LOG="install.log"
-          Expand-Archive ${{ steps.download-boost.outputs.filename }} -Verbose -Force *>&1  | % {
-              if ($_.message -match "Created '(.*)'.*") {
-                  $BOOST_ROOT=$Matches[1]
-              }
-          }
-          echo "BOOST_ROOT=$BOOST_ROOT" >> $env:GITHUB_OUTPUT
-          echo "BOOST_ROOT=$BOOST_ROOT" >> $env:GITHUB_ENV
-          echo "BOOST_LIBRARYDIR=$BOOST_ROOT\stage\lib" >> $env:GITHUB_ENV
+          mkdir $BOOST_ROOT
+          Expand-Archive ${{ steps.download-boost.outputs.filename }} -DestinationPath $BOOST_ROOT
+          cd $BOOST_ROOT\*
+          echo "BOOST_ROOT=$pwd" >> $env:GITHUB_OUTPUT
+          echo "BOOST_ROOT=$pwd" >> $env:GITHUB_ENV
+          echo "BOOST_LIBRARYDIR=$pwd\stage\lib" >> $env:GITHUB_ENV
 
 # Missing python files in boost directory. b2 tries to mklink them unsuccessfully
 #      - name: STEP 3. Install Boost
