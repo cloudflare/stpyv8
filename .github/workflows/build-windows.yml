@@ -27,18 +27,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-#      - name: Download Boost
-#        id: download-boost
-#        uses: suisei-cn/actions-download-file@v1.4.0
-#        with:
-#          url: https://downloads.sourceforge.net/project/boost/boost-binaries/1.74.0/boost_1_74_0-msvc-14.0-32.exe
-#
+      - name: Download Boost
+        id: download-boost
+        uses: suisei-cn/actions-download-file@v1.4.0
+        with:
+          url: https://boostorg.jfrog.io/artifactory/main/release/1.74.0/binaries/boost_1_74_0-msvc-14.2-32.exe
+
 #      - name: Install Boost
 #        id: install-boost
 #        run: |
 #          $BOOST_ROOT="D:\boost"
 #          $INSTALL_LOG="install.log"
 #          mkdir $BOOST_ROOT
+#          Expand-Archive ${{ steps.download-boost.outputs.filename }} -DestinationPath $BOOST_ROOT
 #          echo "::debug::Installing..."
 #          .\${{ steps.download-boost.outputs.filename }} /SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="$BOOST_ROOT" /LOG="$INSTALL_LOG"
 #          echo "::debug::Installer finished with code $LASTEXITCODE"
@@ -46,23 +47,35 @@ jobs:
 #          dir $BOOST_ROOT
 #          echo "BOOST_ROOT=$BOOST_ROOT" >> $env:GITHUB_OUTPUT
 
-      - name: STEP 3. Install Boost
+      - name: Install Boost
         id: install-boost
-        uses: MarkusJx/install-boost@main
-        with:
-          boost_version: 1.74.0
-          platform_version: 2019
+        run: |
+          $BOOST_ROOT="D:\boost"
+          $INSTALL_LOG="install.log"
+          mkdir $BOOST_ROOT
+          Expand-Archive ${{ steps.download-boost.outputs.filename }} -DestinationPath $BOOST_ROOT
+          echo "BOOST_ROOT=$BOOST_ROOT" >> $env:GITHUB_OUTPUT
+          echo "BOOST_ROOT=$BOOST_ROOT" >> $env:GITHUB_ENV
+          echo "BOOST_LIBRARYDIR=$BOOST_ROOT\stage\lib" >> $env:GITHUB_ENV
+
+# Missing python files in boost directory. b2 tries to mklink them unsuccessfully
+#      - name: STEP 3. Install Boost
+#        id: install-boost
+#        uses: MarkusJx/install-boost@main
+#        with:
+#          boost_version: 1.74.0
+#          platform_version: 2019
 
       - name: STEP 4. Build Boost.Python
         run: |
           ls $env
           cd ${{ steps.install-boost.outputs.BOOST_ROOT }}
           ls
-          ls boost
           .\bootstrap.bat
           $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
           echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
-          .\b2.exe stage link=static runtime-link=static --with-python
+          type project-config.jam
+          .\b2.exe stage link=static runtime-link=static --with-python --debug-configuration
 
       - name: STEP 5. Build wheel
         run: |
