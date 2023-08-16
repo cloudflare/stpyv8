@@ -34,7 +34,9 @@ jobs:
         run: |
           $BOOST_ROOT="D:\boost"
           mkdir $BOOST_ROOT
+          echo "::debug::Installing..."
           .\${{ steps.download-boost.outputs.filename }} /SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="$BOOST_ROOT"
+          echo "::debug::Installer finished with code $LASTEXITCODE"
           dir $BOOST_ROOT
           echo "BOOST_ROOT=$BOOST_ROOT" >> $env:GITHUB_OUTPUT
 
