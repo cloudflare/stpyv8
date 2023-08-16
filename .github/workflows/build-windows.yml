@@ -29,8 +29,7 @@ jobs:
         with:
           boost_version: 1.74.0
           platform_version: 2019
-          toolset: msvc
-#          link: static+shared
+          link: static+shared
 
       - name: STEP 4. Build Boost.Python
         run: |
