@@ -1,4 +1,4 @@
-name: Build
+name: Build Windows
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019]
+        os: [windows-latest]
         python-version: ['3.10']
 
     steps:
@@ -33,20 +33,6 @@ jobs:
         with:
           url: https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip
 
-#      - name: Install Boost
-#        id: install-boost
-#        run: |
-#          $BOOST_ROOT="D:\boost"
-#          $INSTALL_LOG="install.log"
-#          mkdir $BOOST_ROOT
-#          Expand-Archive ${{ steps.download-boost.outputs.filename }} -DestinationPath $BOOST_ROOT
-#          echo "::debug::Installing..."
-#          .\${{ steps.download-boost.outputs.filename }} /SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="$BOOST_ROOT" /LOG="$INSTALL_LOG"
-#          echo "::debug::Installer finished with code $LASTEXITCODE"
-#          type $INSTALL_LOG
-#          dir $BOOST_ROOT
-#          echo "BOOST_ROOT=$BOOST_ROOT" >> $env:GITHUB_OUTPUT
-
       - name: Install Boost
         id: install-boost
         run: |
@@ -59,46 +45,35 @@ jobs:
           echo "BOOST_ROOT=$pwd" >> $env:GITHUB_ENV
           echo "BOOST_LIBRARYDIR=$pwd\stage\lib" >> $env:GITHUB_ENV
 
-# Missing python files in boost directory. b2 tries to mklink them unsuccessfully
-#      - name: STEP 3. Install Boost
-#        id: install-boost
-#        uses: MarkusJx/install-boost@main
-#        with:
-#          boost_version: 1.74.0
-#          platform_version: 2019
-
       - name: STEP 4. Build Boost.Python
         run: |
-          ls $env
           cd ${{ steps.install-boost.outputs.BOOST_ROOT }}
-          ls
           .\bootstrap.bat
           $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
           echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
-          type project-config.jam
           (Get-Content libs\python\src\exec.cpp).replace('_Py_fopen', 'fopen') | Set-Content libs\python\src\exec.cpp
           .\b2.exe stage link=static runtime-link=static --with-python --debug-configuration
+          ls stage\lib
 
       - name: STEP 5. Build wheel
+        env:
+          DEPOT_TOOLS_WIN_TOOLCHAIN: 0
         run: |
           python setup.py v8
           python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
           cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
-        # env:
-        #   V8_DEPS_LINUX: 0
-        #   LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
-      # - name: STEP 6. Test wheel
-      #   run: |
-      #     pytest -v
+      - name: STEP 6. Test wheel
+        run: |
+          pytest -v
 
-      # - name: STEP 7. Create wheel zip
-      #   uses: vimtor/action-zip@v1.1
-      #   with:
-      #     files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
-      #     recursive: false
-      #     dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+      - name: STEP 7. Create wheel zip
+        uses: vimtor/action-zip@v1.1
+        with:
+          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
+          recursive: false
+          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
 
       # - name: STEP 7. Upload wheel zip
       #   uses: actions/upload-artifact@v3
