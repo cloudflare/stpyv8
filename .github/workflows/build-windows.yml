@@ -33,8 +33,9 @@ jobs:
         id: install-boost
         run: |
           $BOOST_ROOT="D:\boost"
-          mkdir D:\boost
+          mkdir $BOOST_ROOT
           .\${{ steps.download-boost.outputs.filename }} /SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="$BOOST_ROOT"
+          dir $BOOST_ROOT
           echo "BOOST_ROOT=$BOOST_ROOT" >> $env:GITHUB_OUTPUT
 
 # No MSVC version
