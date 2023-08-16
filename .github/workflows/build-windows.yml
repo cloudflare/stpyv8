@@ -1,0 +1,61 @@
+name: Build
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    name: Build wheel on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+        python-version: ['3.8', '3.9', '3.10']
+
+    steps:
+      - name: STEP 1. Checkout repository
+        uses: actions/checkout@v3
+
+      - name: STEP 2. Set up Python
+        id: python-install
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: STEP 3. Install Boost for MSVC 14.3
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: install boost-msvc-14.3
+
+      - name: STEP 4. Build Boost.Python
+        run: |
+          cd C:\local\boost_1_74_0
+          .\bootstrap.bat
+          echo "using python : : ${{ steps.python-install.outputs.python-path }} ;" >> project-config.jam
+          .\b2.exe stage link=static link=shared runtime-link=static --with-python
+
+      - name: STEP 5. Build wheel
+        run: |
+          python setup.py v8
+          python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
+          python setup.py install
+          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
+        # env:
+        #   V8_DEPS_LINUX: 0
+        #   LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
+
+      # - name: STEP 6. Test wheel
+      #   run: |
+      #     pytest -v
+
+      # - name: STEP 7. Create wheel zip
+      #   uses: vimtor/action-zip@v1.1
+      #   with:
+      #     files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
+      #     recursive: false
+      #     dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+
+      # - name: STEP 7. Upload wheel zip
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: wheels
+      #     path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
