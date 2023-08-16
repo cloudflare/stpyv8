@@ -50,10 +50,12 @@ jobs:
           platform_version: 2019
 
       - name: STEP 4. Build Boost.Python
-        env:
-          BOOST_HOME: "${{ steps.install-boost.outputs.BOOST_ROOT }}"
+        uses: ilammy/msvc-dev-cmd@master
         run: |
+          ls $env
           cd ${{ steps.install-boost.outputs.BOOST_ROOT }}
+          ls
+          ls boost
           .\bootstrap.bat
           $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
           echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
