@@ -42,7 +42,6 @@ jobs:
 #          dir $BOOST_ROOT
 #          echo "BOOST_ROOT=$BOOST_ROOT" >> $env:GITHUB_OUTPUT
 
-# No MSVC version
       - name: STEP 3. Install Boost
         id: install-boost
         uses: MarkusJx/install-boost@main
@@ -51,13 +50,14 @@ jobs:
           platform_version: 2019
 
       - name: STEP 4. Build Boost.Python
+        env:
+          BOOST_HOME="${{ steps.install-boost.outputs.BOOST_ROOT }}"
         run: |
-          echo ${{ steps.install-boost.outputs.BOOST_ROOT }}
           cd ${{ steps.install-boost.outputs.BOOST_ROOT }}
           .\bootstrap.bat
           $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
           echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
-          .\b2.exe stage include=${{ steps.install-python.outputs.python-path }}\include link=static runtime-link=static --with-python
+          .\b2.exe stage include=${{ steps.install-boost.outputs.BOOST_ROOT }}\include link=static runtime-link=static --with-python
 
       - name: STEP 5. Build wheel
         run: |
