@@ -23,32 +23,33 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Download Boost
-        id: download-boost
-        uses: suisei-cn/actions-download-file@v1.4.0
-        with:
-          url: https://downloads.sourceforge.net/project/boost/boost-binaries/1.74.0/boost_1_74_0-msvc-14.0-32.exe
-
-      - name: Install Boost
-        id: install-boost
-        run: |
-          $BOOST_ROOT="D:\boost"
-          $INSTALL_LOG="install.log"
-          mkdir $BOOST_ROOT
-          echo "::debug::Installing..."
-          .\${{ steps.download-boost.outputs.filename }} /SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="$BOOST_ROOT" /LOG="$INSTALL_LOG"
-          echo "::debug::Installer finished with code $LASTEXITCODE"
-          type $INSTALL_LOG
-          dir $BOOST_ROOT
-          echo "BOOST_ROOT=$BOOST_ROOT" >> $env:GITHUB_OUTPUT
+#      - name: Download Boost
+#        id: download-boost
+#        uses: suisei-cn/actions-download-file@v1.4.0
+#        with:
+#          url: https://downloads.sourceforge.net/project/boost/boost-binaries/1.74.0/boost_1_74_0-msvc-14.0-32.exe
+#
+#      - name: Install Boost
+#        id: install-boost
+#        run: |
+#          $BOOST_ROOT="D:\boost"
+#          $INSTALL_LOG="install.log"
+#          mkdir $BOOST_ROOT
+#          echo "::debug::Installing..."
+#          .\${{ steps.download-boost.outputs.filename }} /SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="$BOOST_ROOT" /LOG="$INSTALL_LOG"
+#          echo "::debug::Installer finished with code $LASTEXITCODE"
+#          type $INSTALL_LOG
+#          dir $BOOST_ROOT
+#          echo "BOOST_ROOT=$BOOST_ROOT" >> $env:GITHUB_OUTPUT
 
 # No MSVC version
-#      - name: STEP 3. Install Boost
-#        id: install-boost
-#        uses: MarkusJx/install-boost@v2.4.1
-#        with:
-#          boost_version: 1.74.0
-#          platform_version: 2019
+      - name: STEP 3. Install Boost
+        id: install-boost
+        uses: MarkusJx/install-boost@main
+        with:
+          boost_version: 1.74.0
+          toolset: msvc
+          platform_version: 2019
 
       - name: STEP 4. Build Boost.Python
         run: |
