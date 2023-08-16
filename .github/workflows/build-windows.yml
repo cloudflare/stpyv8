@@ -54,15 +54,11 @@ jobs:
         run: |
           echo ${{ steps.install-boost.outputs.BOOST_ROOT }}
           cd ${{ steps.install-boost.outputs.BOOST_ROOT }}
-          dir
-          dir boost
-          type bootstrap.bat
+#          dir
+#          dir boost
+#          type bootstrap.bat
           .\bootstrap.bat
-          type project-config.jam
-          dir ${{ steps.install-boost.outputs.BOOST_ROOT }}
-          dir ${{ steps.install-boost.outputs.BOOST_ROOT }}\stage
-          dir ${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib
-          echo "using python : : ${{ steps.install-python.outputs.python-path }} ;" >> project-config.jam
+          echo ("using python : : ${{ steps.install-python.outputs.python-path }} ;" -replace "\\","\\") >> project-config.jam
           .\b2.exe stage link=static link=shared runtime-link=static --with-python
 
       - name: STEP 5. Build wheel
