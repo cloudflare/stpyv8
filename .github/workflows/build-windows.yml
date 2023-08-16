@@ -76,6 +76,7 @@ jobs:
           $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
           echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
           type project-config.jam
+          (Get-Content libs\python\src\exec.cpp).replace('_Py_fopen', 'fopen') | Set-Content libs\python\src\exec.cpp
           .\b2.exe stage link=static runtime-link=static --with-python --debug-configuration
 
       - name: STEP 5. Build wheel
