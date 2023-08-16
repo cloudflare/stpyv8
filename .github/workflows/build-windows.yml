@@ -32,7 +32,6 @@ jobs:
       - name: Install Boost
         id: install-boost
         run: |
-          dir
           $BOOST_ROOT="D:\boost"
           mkdir D:\boost
           .\${{ steps.download-boost.outputs.filename }} /SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="$BOOST_ROOT"
@@ -50,6 +49,7 @@ jobs:
         run: |
           echo ${{ steps.install-boost.outputs.BOOST_ROOT }}
           cd ${{ steps.install-boost.outputs.BOOST_ROOT }}
+          dir
           .\bootstrap.bat
           type project-config.jam
           dir ${{ steps.install-boost.outputs.BOOST_ROOT }}
