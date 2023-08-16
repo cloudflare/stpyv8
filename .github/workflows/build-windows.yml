@@ -58,7 +58,8 @@ jobs:
 #          dir boost
 #          type bootstrap.bat
           .\bootstrap.bat
-          echo ("using python : : ${{ steps.install-python.outputs.python-path }} ;" -replace "\\","\\") >> project-config.jam
+          $pythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
+          echo "using python : : $pythonPath ;" >> project-config.jam
           .\b2.exe stage link=static link=shared runtime-link=static --with-python
 
       - name: STEP 5. Build wheel
