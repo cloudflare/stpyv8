@@ -57,56 +57,80 @@ def install_depot():
 
     # depot_tools updates itself automatically when running gclient tool
     if os.path.isfile(os.path.join(DEPOT_HOME, 'gclient')):
-        _, stdout, _ = exec_cmd(os.path.join(DEPOT_HOME, 'gclient'), # pylint:disable=unused-variable
+        success, stdout, __ = exec_cmd(os.path.join(DEPOT_HOME, 'gclient'), # pylint:disable=unused-variable
                                 "--version",
                                 cwd    = DEPOT_HOME,
                                 output = True,
                                 msg    = "Found depot tools")
+
+        if not success:
+            exit(1)
 
 
 def checkout_v8():
     install_depot()
 
     if not os.path.exists(V8_HOME):
-        exec_cmd(os.path.join(DEPOT_HOME, 'fetch'),
+        success, _, __ = exec_cmd(os.path.join(DEPOT_HOME, 'fetch'),
                  "--no-history",
                  'v8',
                  cwd = os.path.dirname(V8_HOME),
                  msg = "Fetching Google V8 code")
 
-    exec_cmd('git fetch --tags',
+        if not success:
+            exit(1)
+
+    success, _, __ = exec_cmd('git fetch --tags',
              cwd = V8_HOME,
              msg = "Fetching the release tag information")
 
-    exec_cmd('git checkout',
+    if not success:
+        exit(1)
+
+    success, _, __ = exec_cmd('git checkout',
              V8_GIT_TAG,
              cwd = V8_HOME,
              msg = f"Checkout Google V8 v{V8_GIT_TAG}")
 
-    exec_cmd(os.path.join(DEPOT_HOME, 'gclient'),
+    if not success:
+        exit(1)
+
+    success, _, __ = exec_cmd(os.path.join(DEPOT_HOME, 'gclient'),
              'sync',
              '-D',
              cwd = os.path.dirname(V8_HOME),
              msg = "Syncing Google V8 code")
 
+    if not success:
+        exit(1)
+
     # On Linux, install additional dependencies, per
     # https://v8.dev/docs/build step 4
     if sys.platform in ("linux", "linux2", ) and v8_deps_linux:
-        exec_cmd('./v8/build/install-build-deps.sh',
+        success, _, __ = exec_cmd('./v8/build/install-build-deps.sh',
                  cwd = os.path.dirname(V8_HOME),
                  msg = "Installing additional linux dependencies")
 
+        if not success:
+            exit(1)
+
 def build_v8():
     args = f"gen {os.path.join('out.gn', 'x64.release.sample')} --args=\"{GN_ARGS}\""
-    exec_cmd(os.path.join(DEPOT_HOME, 'gn'),
+    success, _, __ = exec_cmd(os.path.join(DEPOT_HOME, 'gn'),
              args,
              cwd = V8_HOME,
              msg = f"Generate build scripts for V8 (v{V8_GIT_TAG})")
 
-    exec_cmd(os.path.join(DEPOT_HOME, 'ninja'),
+    if not success:
+        exit(1)
+
+    success, _, __ = exec_cmd(os.path.join(DEPOT_HOME, 'ninja'),
              f"-C {os.path.join('out.gn', 'x64.release.sample')} v8_monolith",
              cwd = V8_HOME,
              msg = "Build V8 with ninja")
+
+    if not success:
+        exit(1)
 
 
 def clean_stpyv8():
@@ -189,6 +213,7 @@ stpyv8_win = Extension(
     library_dirs=library_dirs + [
         os.path.join(os.environ["Python_ROOT_DIR"], "libs") if os.environ.get("Python_ROOT_DIR") else "",
         os.path.join(os.environ["BOOST_ROOT"], "stage", "lib") if os.environ.get("BOOST_ROOT") else "",
+        os.path.join(os.environ["BOOST_ROOT"], "lib32-msvc-14.2") if os.environ.get("BOOST_ROOT") else "",
     ],
     libraries=libraries,
     extra_compile_args=extra_compile_args + ["/std:c++20"],
