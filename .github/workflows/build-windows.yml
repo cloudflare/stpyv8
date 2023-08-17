@@ -78,7 +78,15 @@ jobs:
         with:
           url: https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip
 
+      - name: Restore Boost.Python from cache
+        id: restore-boost-python
+        uses: actions/cache/restore@v3
+        with:
+          path: D:\boost\stage\lib
+          key: libboost_python-${{ matrix.python-version }}_vc142
+
       - name: Install Boost
+        if: ${{ steps.restore-boost-python.outputs.cache-hit != 'true' }}
         id: install-boost
         run: |
           $BOOST_ROOT="D:\boost"
@@ -89,13 +97,6 @@ jobs:
           echo "BOOST_ROOT=$pwd" >> $env:GITHUB_OUTPUT
           echo "BOOST_ROOT=$pwd" >> $env:GITHUB_ENV
           echo "BOOST_LIBRARYDIR=$pwd\stage\lib" >> $env:GITHUB_ENV
-
-      - name: Restore Boost.Python from cache
-        id: restore-boost-python
-        uses: actions/cache/restore@v3
-        with:
-          path: ${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib
-          key: libboost_python-${{ matrix.python-version }}_vc142
 
       - name: STEP 4. Build Boost.Python
         if: ${{ steps.restore-boost-python.outputs.cache-hit != 'true' }}
