@@ -5,8 +5,47 @@ on:
   push:
 
 jobs:
+  build-v8:
+    name: Build v8
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Clone v8
+        env:
+          DEPOT_TOOLS_WIN_TOOLCHAIN: 0
+        run: |
+          python setup.py checkout_v8
+
+      - name: Restore v8 from cache
+        id: restore-v8
+        uses: actions/cache/restore@v3
+        with:
+          path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('v8/src/**') }}
+
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
+        with:
+          toolset: 14.2
+
+      - name: Build v8
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
+        continue-on-error: false
+        env:
+          DEPOT_TOOLS_WIN_TOOLCHAIN: 0
+        run: python setup.py v8
+
+      - uses: actions/cache/save@v3
+        if: always()
+        with:
+          path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('v8/src/**') }}
+
   build:
     name: Build wheel on ${{ matrix.os }}
+    needs: build-v8
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -56,16 +95,21 @@ jobs:
           .\b2.exe stage link=static runtime-link=static --with-python --debug-configuration
           ls stage\lib
 
+      - name: Restore v8 from cache
+        id: cache
+        uses: actions/cache/restore@v3
+        with:
+          path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('v8/src/**') }}
+
       - name: STEP 5. Build wheel
-        env:
-          DEPOT_TOOLS_WIN_TOOLCHAIN: 0
         run: |
           python -m pip freeze
           python -m pip show wheel
           python -m pip install -U setuptools
           python -m pip install wheel
           $env:LIB="$env:LIB;${{steps.download.outputs.download-path}};${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib"
-          python setup.py v8
+          : #          python setup.py v8
           python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
           cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat

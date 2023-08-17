@@ -9,3 +9,4 @@ v8
 switch_repo*
 *.pyc
 *.cmake
+.idea

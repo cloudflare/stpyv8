@@ -65,6 +65,8 @@ def install_depot():
 
 
 def checkout_v8():
+    install_depot()
+
     if not os.path.exists(V8_HOME):
         exec_cmd(os.path.join(DEPOT_HOME, 'fetch'),
                  'v8',
@@ -115,7 +117,6 @@ def clean_stpyv8():
 
 def prepare_v8():
     try:
-        install_depot()
         checkout_v8()
         build_v8()
         # clean_stpyv8()
@@ -161,6 +162,11 @@ class stpyv8_install(install):
         install.run(self)
 
 
+class stpyv8_checkout_v8(build_ext):
+    def run(self):
+        checkout_v8()
+
+
 stpyv8 = Extension(name               = "_STPyV8",
                    sources            = [os.path.join("src", source) for source in source_files],
                    define_macros      = macros,
@@ -175,12 +181,13 @@ stpyv8_win = Extension(
     name="_STPyV8",
     sources=[os.path.join("src", source) for source in source_files],
     define_macros=macros,
-    include_dirs=include_dirs + [r"C:\local\boost_1_74_0", r"C:\python310\include"],
+    include_dirs=include_dirs + [
+        os.environ.get("BOOST_ROOT", ""),
+        os.path.join(os.environ["Python_ROOT_DIR"], "include") if os.environ.get("Python_ROOT_DIR") else ""
+    ],
     library_dirs=library_dirs + [
-        r"C:\Python310\libs",
-        r"C:\local\boost_1_74_0\lib32-msvc-14.2",
-        r"C:\local\boost_1_74_0\lib64-msvc-14.2",
-        r"C:\local\boost_1_74_0\stage\lib",
+        os.path.join(os.environ["Python_ROOT_DIR"], "libs") if os.environ.get("Python_ROOT_DIR") else "",
+        os.path.join(os.environ["BOOST_ROOT"], "stage", "lib") if os.environ.get("BOOST_ROOT") else "",
     ],
     libraries=libraries,
     extra_compile_args=extra_compile_args + ["/std:c++20"],
@@ -225,5 +232,6 @@ setup(name         = "stpyv8",
           develop   = stpyv8_develop,
           v8        = stpyv8_install_v8,
           stpyv8    = stpyv8_build_no_v8,
-          install   = stpyv8_install),
+          install   = stpyv8_install,
+          checkout_v8 = stpyv8_checkout_v8),
       )

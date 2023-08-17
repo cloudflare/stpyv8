@@ -24,7 +24,7 @@ if os.name in ("posix", ):
 else:
     icu_data_folder = None
 
-os.environ['PATH'] = f"{os.environ['PATH']}:{DEPOT_HOME}"
+os.environ['PATH'] = f"{os.environ.get('PATH', '')}:{DEPOT_HOME}"
 
 gn_args = {
   "dcheck_always_on"                   : "false",
@@ -39,7 +39,7 @@ gn_args = {
   "v8_enable_31bit_smis_on_64bit_arch" : "false",
   "v8_imminent_deprecation_warnings"   : "true",
   "v8_monolithic"                      : "true",
-  "v8_use_external_startup_data"       : "false"
+  "v8_use_external_startup_data"       : "false",
 }
 
 GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
@@ -63,7 +63,7 @@ extra_compile_args = []
 extra_link_args    = []
 
 include_dirs.append(os.path.join(V8_HOME, 'include'))
-library_dirs.append(os.path.join(V8_HOME, 'out.gn/x64.release.sample/obj/'))
+library_dirs.append(os.path.join(V8_HOME, os.path.join('out.gn', 'x64.release.sample', 'obj')))
 
 BOOST_PYTHON_LIB_SHORT = f"boost_python{sys.version_info.major}"
 BOOST_PYTHON_LIB_LONG  = f"boost_python{sys.version_info.major}{sys.version_info.minor}"
@@ -107,8 +107,8 @@ def get_libboost_python_name():
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 
 if os.name in ("nt", ):
-    include_dirs       += os.environ["INCLUDE"].split(';')
-    library_dirs       += os.environ["LIB"].split(';')
+    include_dirs       += os.environ.get("INCLUDE", "").split(';')
+    library_dirs       += os.environ.get("LIB", "").split(';')
     libraries          += ["winmm", "ws2_32"]
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
