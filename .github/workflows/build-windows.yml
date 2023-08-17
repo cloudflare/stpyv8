@@ -5,6 +5,27 @@ on:
   push:
 
 jobs:
+  build-v8:
+    name: Build v8
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+
+      - name: Build
+        run: |
+          python setup.py v8
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: v8_monolith.lib
+          path: |
+            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+
   build:
     name: Build wheel on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -46,8 +67,8 @@ jobs:
           echo "BOOST_LIBRARYDIR=$pwd\stage\lib" >> $env:GITHUB_ENV
 
       - name: STEP 4. Build Boost.Python
+        working-directory: ${{ steps.install-boost.outputs.BOOST_ROOT }}
         run: |
-          cd ${{ steps.install-boost.outputs.BOOST_ROOT }}
           .\bootstrap.bat
           if (-not $?) { type bootstrap.log }
           $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
@@ -55,6 +76,12 @@ jobs:
           (Get-Content libs\python\src\exec.cpp).replace('_Py_fopen', 'fopen') | Set-Content libs\python\src\exec.cpp
           .\b2.exe stage link=static runtime-link=static --with-python --debug-configuration
           ls stage\lib
+
+      - name: Download v8 artifact
+        id: download
+        uses: actions/download-artifact@v3
+        with:
+          name: v8_monolith.lib
 
       - name: STEP 5. Build wheel
         env:
@@ -64,8 +91,8 @@ jobs:
           python -m pip show wheel
           python -m pip install -U setuptools
           python -m pip install wheel
-          $env:INCLUDE="$env:INCLUDE;${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib"
-          python setup.py v8
+          $env:LIB="$env:LIB;${{steps.download.outputs.download-path}};${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib"
+#          python setup.py v8
           python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
           cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
