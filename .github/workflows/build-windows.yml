@@ -60,7 +60,7 @@ jobs:
         env:
           DEPOT_TOOLS_WIN_TOOLCHAIN: 0
         run: |
-          $env:INCLUDE=$env:INCLUDE;${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib
+          $env:INCLUDE="$env:INCLUDE;${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib"
           python setup.py v8
           python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
