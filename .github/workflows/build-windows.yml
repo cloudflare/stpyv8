@@ -5,32 +5,6 @@ on:
   push:
 
 jobs:
-  build-v8:
-    name: Build v8
-    runs-on: windows-latest
-    steps:
-      - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          toolset: 14.2
-
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3
-
-      - name: Build
-        run: |
-          python setup.py v8
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: v8
-          path: |
-            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
   build:
     name: Build wheel on ${{ matrix.os }}
     needs: build-v8
@@ -98,7 +72,7 @@ jobs:
           python -m pip install -U setuptools
           python -m pip install wheel
           $env:LIB="$env:LIB;${{steps.download.outputs.download-path}};${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib"
-          : #          python setup.py v8
+          python setup.py v8
           python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
           cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
