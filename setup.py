@@ -47,7 +47,7 @@ def exec_cmd(cmdline, *args, **kwargs):
 
 def install_depot():
     if not os.path.exists(DEPOT_HOME):
-        exec_cmd("git clone",
+        exec_cmd("git clone --depth 1",
                  DEPOT_GIT_URL,
                  DEPOT_HOME,
                  cwd = os.path.dirname(DEPOT_HOME),
