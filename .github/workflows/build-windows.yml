@@ -126,9 +126,7 @@ jobs:
           python -m pip install wheel
           python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
-
-      - run: |
-          if (Get-ChildItem build\lib.win32* | Measure-Object -eq 0) {
+          if ((Get-ChildItem build\lib.win32* | Measure-Object) -eq 0) {
             echo "::error::Wheel build failed (no artifacts generated)"
             exit 1
           }
