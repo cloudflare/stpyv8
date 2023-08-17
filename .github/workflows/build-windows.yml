@@ -123,9 +123,6 @@ jobs:
         env:
           DEPOT_TOOLS_WIN_TOOLCHAIN: 0
         run: |
-          python -m pip freeze
-          python -m pip show wheel
-          python -m pip install -U setuptools
           python -m pip install wheel
           python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
