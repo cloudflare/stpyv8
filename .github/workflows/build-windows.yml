@@ -35,7 +35,10 @@ jobs:
         continue-on-error: false
         env:
           DEPOT_TOOLS_WIN_TOOLCHAIN: 0
-        run: python setup.py v8
+        run: |
+          echo "::group::v8"
+          python setup.py v8
+          echo "::endgroup::"
 
       - uses: actions/cache/save@v3
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
@@ -126,7 +129,12 @@ jobs:
           python -m pip install wheel
           python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
-#          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
+
+      - run: |
+          if (Get-ChildItem build\lib.win32* | Measure-Object -eq 0) {
+            echo "::error::Wheel build failed (no artifacts generated)"
+            exit 1
+          }
 
       - name: STEP 6. Test wheel
         run: |
