@@ -21,18 +21,39 @@ jobs:
         with:
           python-version: 3
 
-      - name: Build
+      - name: Cache v8
+        id: cache-v8
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-v8
+        with:
+          path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('v8/src/**') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - if: ${{ steps.cache-v8.outputs.cache-hit != 'true' }}
+        name: Build v8
+        continue-on-error: false
         env:
           DEPOT_TOOLS_WIN_TOOLCHAIN: 0
-        run: |
-          python setup.py v8
+        run: python setup.py v8
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+      - uses: actions/cache/save@v3
+        if: always()
         with:
-          name: v8
-          path: |
-            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+          path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('v8/src/**') }}
+
+#      - name: Upload artifacts
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: v8
+#          path: |
+#            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+
   build:
     name: Build wheel on ${{ matrix.os }}
     needs: build-v8
@@ -85,11 +106,12 @@ jobs:
           .\b2.exe stage link=static runtime-link=static --with-python --debug-configuration
           ls stage\lib
 
-      - name: Download v8 artifact
-        id: download
-        uses: actions/download-artifact@v3
+      - name: Restore v8 from cache
+        id: cache
+        uses: actions/cache/restore@v3
         with:
-          name: v8
+          path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('v8/src/**') }}
 
       - name: STEP 5. Build wheel
         run: |
