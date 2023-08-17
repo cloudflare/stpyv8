@@ -94,13 +94,14 @@ def checkout_v8():
                  msg = "Installing additional linux dependencies")
 
 def build_v8():
+    args = f"gen {os.path.join('out.gn', 'x64.release.sample')} --args=\"{GN_ARGS}\""
     exec_cmd(os.path.join(DEPOT_HOME, 'gn'),
-             f"gen out.gn/x64.release.sample --args='{GN_ARGS}'",
+             args,
              cwd = V8_HOME,
              msg = f"Generate build scripts for V8 (v{V8_GIT_TAG})")
 
     exec_cmd(os.path.join(DEPOT_HOME, 'ninja'),
-             "-C out.gn/x64.release.sample v8_monolith",
+             f"-C {os.path.join('out.gn', 'x64.release.sample')} v8_monolith",
              cwd = V8_HOME,
              msg = "Build V8 with ninja")
 
@@ -154,7 +155,7 @@ class stpyv8_install(install):
 
         if icu_data_folder:
             os.makedirs(icu_data_folder, exist_ok = True)
-            shutil.copy(os.path.join(V8_HOME, "out.gn/x64.release.sample/icudtl.dat"),
+            shutil.copy(os.path.join(V8_HOME, os.path.join("out.gn", "x64.release.sample", "icudtl.dat")),
                         icu_data_folder)
 
         install.run(self)
@@ -170,6 +171,22 @@ stpyv8 = Extension(name               = "_STPyV8",
                    extra_link_args    = extra_link_args,
                    )
 
+stpyv8_win = Extension(
+    name="_STPyV8",
+    sources=[os.path.join("src", source) for source in source_files],
+    define_macros=macros,
+    include_dirs=include_dirs + [r"C:\local\boost_1_74_0", r"C:\python310\include"],
+    library_dirs=library_dirs + [
+        r"C:\Python310\libs",
+        r"C:\local\boost_1_74_0\lib32-msvc-14.2",
+        r"C:\local\boost_1_74_0\lib64-msvc-14.2",
+        r"C:\local\boost_1_74_0\stage\lib",
+    ],
+    libraries=libraries,
+    extra_compile_args=extra_compile_args + ["/std:c++20"],
+    extra_link_args=extra_link_args,
+)
+
 setup(name         = "stpyv8",
       version      = STPYV8_VERSION,
       description  = "Python Wrapper for Google V8 Engine",
@@ -178,7 +195,7 @@ setup(name         = "stpyv8",
       url          = "https://github.com/cloudflare/stpyv8",
       license      = "Apache License 2.0",
       py_modules   = ["STPyV8"],
-      ext_modules  = [stpyv8],
+      ext_modules  = [stpyv8_win],
       classifiers  = [
         "Development Status :: 4 - Beta",
         "Environment :: Plugins",
@@ -208,4 +225,4 @@ setup(name         = "stpyv8",
           v8        = stpyv8_install_v8,
           stpyv8    = stpyv8_build_no_v8,
           install   = stpyv8_install),
-)
+      )
