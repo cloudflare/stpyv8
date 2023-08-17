@@ -222,24 +222,6 @@ stpyv8 = Extension(name               = "_STPyV8",
                    extra_link_args    = extra_link_args,
                    )
 
-stpyv8_win = Extension(
-    name="_STPyV8",
-    sources=[os.path.join("src", source) for source in source_files],
-    define_macros=macros,
-    include_dirs=include_dirs + [
-        os.environ.get("BOOST_ROOT", ""),
-        os.path.join(os.environ["Python_ROOT_DIR"], "include") if os.environ.get("Python_ROOT_DIR") else ""
-    ],
-    library_dirs=library_dirs + [
-        os.path.join(os.environ["Python_ROOT_DIR"], "libs") if os.environ.get("Python_ROOT_DIR") else "",
-        os.path.join(os.environ["BOOST_ROOT"], "stage", "lib") if os.environ.get("BOOST_ROOT") else "",
-        os.path.join(os.environ["BOOST_ROOT"], "lib32-msvc-14.2") if os.environ.get("BOOST_ROOT") else "",
-    ],
-    libraries=libraries,
-    extra_compile_args=extra_compile_args + ["/std:c++20"],
-    extra_link_args=extra_link_args,
-)
-
 setup(name         = "stpyv8",
       version      = STPYV8_VERSION,
       description  = "Python Wrapper for Google V8 Engine",
@@ -248,7 +230,7 @@ setup(name         = "stpyv8",
       url          = "https://github.com/cloudflare/stpyv8",
       license      = "Apache License 2.0",
       py_modules   = ["STPyV8"],
-      ext_modules  = [stpyv8_win],
+      ext_modules  = [stpyv8],
       install_requires=["wheel"],
       classifiers  = [
         "Development Status :: 4 - Beta",

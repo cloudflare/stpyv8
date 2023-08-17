@@ -42,8 +42,6 @@ gn_args = {
   "v8_use_external_startup_data"       : "false",
 }
 
-GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
-
 source_files = ["Exception.cpp",
                 "Platform.cpp",
                 "Isolate.cpp",
@@ -109,14 +107,37 @@ STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_py
 if os.name in ("nt", ):
     include_dirs       += os.environ.get("INCLUDE", "").split(';')
     library_dirs       += os.environ.get("LIB", "").split(';')
+
+    if os.environ.get("BOOST_ROOT"):
+        include_dirs.append(os.environ.get("BOOST_ROOT"))
+        library_dirs.append(os.path.join(os.environ["BOOST_ROOT"], "stage", "lib"))
+
+    if os.environ.get("Python_ROOT_DIR"):
+        include_dirs.append(os.path.join(os.environ["Python_ROOT_DIR"], "include"))
+        library_dirs.append(os.path.join(os.environ["Python_ROOT_DIR"], "libs"))
+
     libraries          += ["winmm", "ws2_32"]
-    extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
-    extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
+    extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi", "/std:c++20"]
+    extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X32"]
 
     os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
+
+    # https://groups.google.com/g/v8-users/c/cvFGONOg_BY
+    gn_args["is_clang"] = "false"
+    gn_args["v8_static_library"] = "true"
+    # is_debug = false
+    # use_glib = false
+    # is_component_build = true
+    # v8_use_external_startup_data = true
+    gn_args["v8_enable_i18n_support"] = "false"
+    gn_args["target_cpu"] = "\\\"x32\\\""
+
 elif os.name in ("posix", ):
     libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]
     extra_compile_args.append('-std=c++17')
 
     if platform.system() in ('Linux', ):
         libraries.append("rt")
+
+
+GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
