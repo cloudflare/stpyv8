@@ -22,6 +22,8 @@ jobs:
           python-version: 3
 
       - name: Build
+        env:
+          DEPOT_TOOLS_WIN_TOOLCHAIN: 0
         run: |
           python setup.py v8
 
@@ -90,8 +92,6 @@ jobs:
           name: v8
 
       - name: STEP 5. Build wheel
-        env:
-          DEPOT_TOOLS_WIN_TOOLCHAIN: 0
         run: |
           python -m pip freeze
           python -m pip show wheel
