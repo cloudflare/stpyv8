@@ -12,6 +12,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3
+
       - name: Clone v8
         run: |
           python setup.py checkout_v8
@@ -27,12 +32,6 @@ jobs:
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         with:
           toolset: 14.2
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
-        with:
-          python-version: 3
 
       - name: Build v8
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
