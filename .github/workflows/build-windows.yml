@@ -88,7 +88,7 @@ jobs:
         id: restore-boost-python
         uses: actions/cache/restore@v3
         with:
-          path: ${{ BOOST_ROOT }}\stage\lib
+          path: ${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib
           key: libboost_python-${{ matrix.python-version }}_vc142
 
       - name: STEP 4. Build Boost.Python
@@ -106,7 +106,7 @@ jobs:
       - uses: actions/cache/save@v3
         if: ${{ steps.restore-boost-python.outputs.cache-hit != 'true' }}
         with:
-          path: ${{ BOOST_ROOT }}\stage\lib
+          path: ${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib
           key: libboost_python-${{ matrix.python-version }}_vc142
 
       - name: Restore v8 from cache
