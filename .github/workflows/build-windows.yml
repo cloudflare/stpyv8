@@ -16,7 +16,6 @@ jobs:
         env:
           DEPOT_TOOLS_WIN_TOOLCHAIN: 0
         run: |
-          python -m pip install wheel
           python setup.py checkout_v8
 
       - name: Restore v8 from cache
