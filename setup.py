@@ -162,6 +162,11 @@ class stpyv8_install(install):
         install.run(self)
 
 
+class stpyv8_checkout_v8(build_ext):
+    def run(self):
+        checkout_v8()
+
+
 stpyv8 = Extension(name               = "_STPyV8",
                    sources            = [os.path.join("src", source) for source in source_files],
                    define_macros      = macros,
@@ -227,6 +232,6 @@ setup(name         = "stpyv8",
           develop   = stpyv8_develop,
           v8        = stpyv8_install_v8,
           stpyv8    = stpyv8_build_no_v8,
-          install   = stpyv8_install),
-          checkout_v8 = checkout_v8(),
+          install   = stpyv8_install,
+          checkout_v8 = stpyv8_checkout_v8),
       )
