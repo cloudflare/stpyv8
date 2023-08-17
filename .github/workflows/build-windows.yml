@@ -117,6 +117,8 @@ jobs:
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
       - name: STEP 5. Build wheel
+        env:
+          DEPOT_TOOLS_WIN_TOOLCHAIN: 0
         run: |
           python -m pip freeze
           python -m pip show wheel
