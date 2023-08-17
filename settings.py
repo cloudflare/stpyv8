@@ -105,6 +105,8 @@ def get_libboost_python_name():
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 
 if os.name in ("nt", ):
+    library_dirs.append(os.path.join(V8_HOME, "out.gn", "x64.release.sample", "obj"))
+
     if "INCLUDE" in os.environ:
         include_dirs += os.environ["INCLUDE"].split(';')
 
@@ -127,13 +129,13 @@ if os.name in ("nt", ):
 
     # https://groups.google.com/g/v8-users/c/cvFGONOg_BY
     gn_args["is_clang"] = "false"
-    gn_args["v8_static_library"] = "true"
-    # is_debug = false
-    # use_glib = false
-    # is_component_build = true
-    # v8_use_external_startup_data = true
-    gn_args["v8_enable_i18n_support"] = "false"
-    gn_args["target_cpu"] = "\\\"x64\\\""
+    # gn_args["v8_static_library"] = "true"
+    # gn_args["is_debug"] = "false"
+    # gn_args["use_glib"] = "false"
+    # gn_args["is_component_build"] = "true"
+    # gn_args["v8_use_external_startup_data"] = "true"
+    # gn_args["v8_enable_i18n_support"] = "false"
+    # gn_args["target_cpu"] = "\\\"x64\\\""
 
 elif os.name in ("posix", ):
     libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]
