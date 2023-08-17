@@ -56,12 +56,6 @@ jobs:
           .\b2.exe stage link=static runtime-link=static --with-python --debug-configuration
           ls stage\lib
 
-      - name: Download v8 artifact
-        id: download
-        uses: actions/download-artifact@v3
-        with:
-          name: v8
-
       - name: STEP 5. Build wheel
         env:
           DEPOT_TOOLS_WIN_TOOLCHAIN: 0
