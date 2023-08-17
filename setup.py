@@ -229,7 +229,7 @@ setup(name         = "stpyv8",
       license      = "Apache License 2.0",
       py_modules   = ["STPyV8"],
       ext_modules  = [stpyv8_win],
-      setup_requires=["wheel"],
+      install_requires=["wheel"],
       classifiers  = [
         "Development Status :: 4 - Beta",
         "Environment :: Plugins",
