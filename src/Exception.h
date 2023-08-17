@@ -8,6 +8,20 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
+#include <v8-isolate.h>
+#include <v8-value.h>
+#include <v8-context.h>
+#include <v8-message.h>
+#include <v8-local-handle.h>
+#include <v8-exception.h>
+#include <v8-persistent-handle.h>
+#include <v8-script.h>
+#include <v8-primitive.h>
+#include <v8-function-callback.h>
+#include <v8-object.h>
+#include <v8-weak-callback-info.h>
+#include <v8-template.h>
+
 #include "Config.h"
 #include "Utils.h"
 

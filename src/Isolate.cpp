@@ -1,3 +1,7 @@
+#include <v8-isolate.h>
+#include <v8-debug.h>
+#include <v8-local-handle.h>
+
 #include "Context.h"
 #include "Wrapper.h"
 #include "Engine.h"

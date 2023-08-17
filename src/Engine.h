@@ -5,6 +5,15 @@
 #include <vector>
 #include <map>
 
+#include <v8-isolate.h>
+#include <v8-value.h>
+#include <v8-context.h>
+#include <v8-message.h>
+#include <v8-local-handle.h>
+#include <v8-exception.h>
+#include <v8-persistent-handle.h>
+#include <v8-script.h>
+
 #include "Utils.h"
 
 class CScript;

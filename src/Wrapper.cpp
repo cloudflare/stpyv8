@@ -2,6 +2,25 @@
 #include <iostream>
 #include <vector>
 
+#include <v8-isolate.h>
+#include <v8-value.h>
+#include <v8-context.h>
+#include <v8-message.h>
+#include <v8-local-handle.h>
+#include <v8-exception.h>
+#include <v8-persistent-handle.h>
+#include <v8-script.h>
+#include <v8-primitive.h>
+#include <v8-primitive-object.h>
+#include <v8-function-callback.h>
+#include <v8-object.h>
+#include <v8-weak-callback-info.h>
+#include <v8-template.h>
+#include <v8-external.h>
+#include <v8-container.h>
+#include <v8-maybe.h>
+#include <v8-function.h>
+
 #include <boost/python/raw_function.hpp>
 #include <descrobject.h>
 #include <datetime.h>
