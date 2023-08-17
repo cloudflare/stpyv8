@@ -13,6 +13,8 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Clone v8
+        env:
+          DEPOT_TOOLS_WIN_TOOLCHAIN: 0
         run: |
           python setup.py checkout_v8
 
