@@ -54,14 +54,14 @@ source_files = ["Exception.cpp",
 
 
 macros             = [("BOOST_PYTHON_STATIC_LIB", None)]
-include_dirs       = []
-library_dirs       = []
+include_dirs       = set()
+library_dirs       = set()
 libraries          = []
 extra_compile_args = []
 extra_link_args    = []
 
-include_dirs.append(os.path.join(V8_HOME, 'include'))
-library_dirs.append(os.path.join(V8_HOME, os.path.join('out.gn', 'x64.release.sample', 'obj')))
+include_dirs.add(os.path.join(V8_HOME, 'include'))
+library_dirs.add(os.path.join(V8_HOME, os.path.join('out.gn', 'x64.release.sample', 'obj')))
 
 BOOST_PYTHON_LIB_SHORT = f"boost_python{sys.version_info.major}"
 BOOST_PYTHON_LIB_LONG  = f"boost_python{sys.version_info.major}{sys.version_info.minor}"
@@ -105,21 +105,21 @@ def get_libboost_python_name():
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 
 if os.name in ("nt", ):
-    library_dirs.append(os.path.join(V8_HOME, "out.gn", "x64.release.sample", "obj"))
+    library_dirs.add(os.path.join(V8_HOME, "out.gn", "x64.release.sample", "obj"))
 
     if "INCLUDE" in os.environ:
-        include_dirs += os.environ["INCLUDE"].split(';')
+        include_dirs.update(os.environ["INCLUDE"].split(';'))
 
     if "LIB" in os.environ:
-        library_dirs += os.environ["LIB"].split(';')
+        library_dirs.update(os.environ["LIB"].split(';'))
 
     if "BOOST_ROOT" in os.environ:
-        include_dirs.append(os.environ.get("BOOST_ROOT"))
-        library_dirs.append(os.path.join(os.environ["BOOST_ROOT"], "stage", "lib"))
+        include_dirs.add(os.environ.get("BOOST_ROOT"))
+        library_dirs.add(os.path.join(os.environ["BOOST_ROOT"], "stage", "lib"))
 
     if "Python_ROOT_DIR" in os.environ:
-        include_dirs.append(os.path.join(os.environ["Python_ROOT_DIR"], "include"))
-        library_dirs.append(os.path.join(os.environ["Python_ROOT_DIR"], "libs"))
+        include_dirs.add(os.path.join(os.environ["Python_ROOT_DIR"], "include"))
+        library_dirs.add(os.path.join(os.environ["Python_ROOT_DIR"], "libs"))
 
     libraries          += ["winmm", "ws2_32"]
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi", "/std:c++20"]
@@ -146,3 +146,6 @@ elif os.name in ("posix", ):
 
 
 GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
+
+include_dirs = list(include_dirs)
+library_dirs = list(library_dirs)

@@ -72,18 +72,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Download Boost
-        id: download-boost
-        uses: suisei-cn/actions-download-file@v1.4.0
-        with:
-          url: https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip
-
       - name: Restore Boost.Python from cache
         id: restore-boost-python
         uses: actions/cache/restore@v3
         with:
           path: D:\boost\stage\lib
           key: libboost_python-${{ matrix.python-version }}_vc142
+
+      - name: Download Boost
+        if: ${{ steps.restore-boost-python.outputs.cache-hit != 'true' }}
+        id: download-boost
+        uses: suisei-cn/actions-download-file@v1.4.0
+        with:
+          url: https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip
 
       - name: Install Boost
         if: ${{ steps.restore-boost-python.outputs.cache-hit != 'true' }}

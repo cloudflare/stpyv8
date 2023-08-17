@@ -159,9 +159,7 @@ class stpyv8_bdist_wheel(bdist_wheel):
         self.skip_build_v8 = None
 
     def run(self):
-        if self.skip_build_v8:
-            checkout_v8()
-        else:
+        if not self.skip_build_v8:
             prepare_v8()
 
         bdist_wheel.run(self)
