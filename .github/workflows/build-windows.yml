@@ -7,7 +7,6 @@ on:
 jobs:
   build:
     name: Build wheel on ${{ matrix.os }}
-    needs: build-v8
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
