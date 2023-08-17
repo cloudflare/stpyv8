@@ -22,7 +22,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: v8_monolith.lib
+          name: v8
           path: |
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
 
@@ -82,7 +82,7 @@ jobs:
         id: download
         uses: actions/download-artifact@v3
         with:
-          name: v8_monolith.lib
+          name: v8
 
       - name: STEP 5. Build wheel
         env:
