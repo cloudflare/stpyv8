@@ -24,7 +24,7 @@ if os.name in ("posix", ):
 else:
     icu_data_folder = None
 
-os.environ['PATH'] = f"{os.environ.get('PATH')}:{DEPOT_HOME}"
+os.environ['PATH'] = f"{os.environ.get('PATH', '')}:{DEPOT_HOME}"
 
 gn_args = {
   "dcheck_always_on"                   : "false",
@@ -107,8 +107,8 @@ def get_libboost_python_name():
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 
 if os.name in ("nt", ):
-    include_dirs       += os.environ.get("INCLUDE").split(';')
-    library_dirs       += os.environ.get("LIB").split(';')
+    include_dirs       += os.environ.get("INCLUDE", "").split(';')
+    library_dirs       += os.environ.get("LIB", "").split(';')
     libraries          += ["winmm", "ws2_32"]
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
