@@ -11,7 +11,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
+
+      - run: ls
 
       - name: Restore v8 from cache
         id: restore-v8
