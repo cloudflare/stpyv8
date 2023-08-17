@@ -38,7 +38,7 @@ jobs:
         run: python setup.py v8
 
       - uses: actions/cache/save@v3
-        if: always()
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         with:
           path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
