@@ -14,8 +14,7 @@ jobs:
 
       - name: Clone v8
         run: |
-          pip install wheel
-          python -c "from setup import checkout_v8; checkout_v8()"
+          python setup.py checkout_v8
 
       - name: Restore v8 from cache
         id: restore-v8
