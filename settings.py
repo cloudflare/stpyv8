@@ -105,20 +105,23 @@ def get_libboost_python_name():
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 
 if os.name in ("nt", ):
-    include_dirs       += os.environ.get("INCLUDE", "").split(';')
-    library_dirs       += os.environ.get("LIB", "").split(';')
+    if "INCLUDE" in os.environ:
+        include_dirs += os.environ["INCLUDE"].split(';')
 
-    if os.environ.get("BOOST_ROOT"):
+    if "LIB" in os.environ:
+        library_dirs += os.environ["LIB"].split(';')
+
+    if "BOOST_ROOT" in os.environ:
         include_dirs.append(os.environ.get("BOOST_ROOT"))
         library_dirs.append(os.path.join(os.environ["BOOST_ROOT"], "stage", "lib"))
 
-    if os.environ.get("Python_ROOT_DIR"):
+    if "Python_ROOT_DIR" in os.environ:
         include_dirs.append(os.path.join(os.environ["Python_ROOT_DIR"], "include"))
         library_dirs.append(os.path.join(os.environ["Python_ROOT_DIR"], "libs"))
 
     libraries          += ["winmm", "ws2_32"]
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi", "/std:c++20"]
-    extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X32"]
+    extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X64"]
 
     os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
 
@@ -130,7 +133,7 @@ if os.name in ("nt", ):
     # is_component_build = true
     # v8_use_external_startup_data = true
     gn_args["v8_enable_i18n_support"] = "false"
-    gn_args["target_cpu"] = "\\\"x32\\\""
+    gn_args["target_cpu"] = "\\\"x64\\\""
 
 elif os.name in ("posix", ):
     libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]
