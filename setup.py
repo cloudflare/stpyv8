@@ -65,6 +65,8 @@ def install_depot():
 
 
 def checkout_v8():
+    install_depot()
+
     if not os.path.exists(V8_HOME):
         exec_cmd(os.path.join(DEPOT_HOME, 'fetch'),
                  'v8',
@@ -115,7 +117,6 @@ def clean_stpyv8():
 
 def prepare_v8():
     try:
-        install_depot()
         checkout_v8()
         build_v8()
         # clean_stpyv8()
