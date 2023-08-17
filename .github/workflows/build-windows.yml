@@ -12,7 +12,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - run: ls
+      - name: Clone v8
+        run: |
+          python -c "from setup import checkout_v8; checkout_v8()"
 
       - name: Restore v8 from cache
         id: restore-v8
