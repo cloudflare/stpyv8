@@ -69,6 +69,7 @@ def checkout_v8():
 
     if not os.path.exists(V8_HOME):
         exec_cmd(os.path.join(DEPOT_HOME, 'fetch'),
+                 "--no-history",
                  'v8',
                  cwd = os.path.dirname(V8_HOME),
                  msg = "Fetching Google V8 code")
