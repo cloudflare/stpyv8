@@ -9,11 +9,17 @@ jobs:
     name: Build v8
     runs-on: windows-latest
     steps:
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          toolset: 14.2
+
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Setup Python
         uses: actions/setup-python@v4
+        with:
+          python-version: 3
 
       - name: Build
         run: |
