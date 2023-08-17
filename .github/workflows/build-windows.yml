@@ -23,7 +23,7 @@ jobs:
         uses: actions/cache/restore@v3
         with:
           path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('v8/src/**') }}
+          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
       - uses: ilammy/msvc-dev-cmd@v1
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
@@ -41,7 +41,7 @@ jobs:
         if: always()
         with:
           path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('v8/src/**') }}
+          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
   build:
     name: Build wheel on ${{ matrix.os }}
@@ -100,7 +100,7 @@ jobs:
         uses: actions/cache/restore@v3
         with:
           path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('v8/src/**') }}
+          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
       - name: STEP 5. Build wheel
         run: |
