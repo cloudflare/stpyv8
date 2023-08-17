@@ -63,7 +63,7 @@ extra_compile_args = []
 extra_link_args    = []
 
 include_dirs.append(os.path.join(V8_HOME, 'include'))
-library_dirs.append(os.path.join(V8_HOME, 'out.gn/x64.release.sample/obj/'))
+library_dirs.append(os.path.join(V8_HOME, os.path.join('out.gn', 'x64.release.sample', 'obj')))
 
 BOOST_PYTHON_LIB_SHORT = f"boost_python{sys.version_info.major}"
 BOOST_PYTHON_LIB_LONG  = f"boost_python{sys.version_info.major}{sys.version_info.minor}"

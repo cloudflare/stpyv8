@@ -176,12 +176,13 @@ stpyv8_win = Extension(
     name="_STPyV8",
     sources=[os.path.join("src", source) for source in source_files],
     define_macros=macros,
-    include_dirs=include_dirs + [r"C:\local\boost_1_74_0", r"C:\python310\include"],
+    include_dirs=include_dirs + [
+        os.environ.get("BOOST_ROOT"),
+        os.path.join(os.environ.get("Python_ROOT_DIR"), "include")
+    ],
     library_dirs=library_dirs + [
-        r"C:\Python310\libs",
-        r"C:\local\boost_1_74_0\lib32-msvc-14.2",
-        r"C:\local\boost_1_74_0\lib64-msvc-14.2",
-        r"C:\local\boost_1_74_0\stage\lib",
+        os.path.join(os.environ.get("Python_ROOT_DIR"), "libs"),
+        os.path.join(os.environ.get("BOOST_ROOT"), "stage", "lib"),
     ],
     libraries=libraries,
     extra_compile_args=extra_compile_args + ["/std:c++20"],
