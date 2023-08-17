@@ -124,7 +124,7 @@ jobs:
       - name: STEP 5. Build wheel
         run: |
           python -m pip install wheel
-          python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
+          python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
           python setup.py install
           if ((Get-ChildItem build\lib.win32* | Measure-Object) -eq 0) {
             echo "::error::Wheel build failed (no artifacts generated)"

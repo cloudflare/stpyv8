@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
-import sys
-import os
-import subprocess
-import shutil
 import logging
+import shutil
+import subprocess
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from setuptools.command.install import install
+from wheel.bdist_wheel import bdist_wheel
 
-from settings import * # pylint:disable=wildcard-import,unused-wildcard-import
+from settings import *  # pylint:disable=wildcard-import,unused-wildcard-import
 
 log = logging.getLogger()
 
@@ -149,10 +148,31 @@ def prepare_v8():
         log.error("Fail to checkout and build v8, %s", str(e))
 
 
+class stpyv8_bdist_wheel(bdist_wheel):
+    user_options = bdist_wheel.user_options + [
+        ('skip-build-v8', None, 'don\'t build v8')
+    ]
+
+    def initialize_options(self) -> None:
+        bdist_wheel.initialize_options(self)
+
+        self.skip_build_v8 = None
+
+    def run(self):
+        self.skip_build = True
+
+        if self.skip_build_v8:
+            checkout_v8()
+        else:
+            prepare_v8()
+
+        bdist_wheel.run(self)
+
+
 class stpyv8_build(build_ext):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_STABLE # pylint:disable=redefined-outer-name,unused-variable
-        prepare_v8()
+
         build_ext.run(self)
 
 
@@ -254,6 +274,7 @@ setup(name         = "stpyv8",
         "Programming Language :: Python :: 3.10",
       ],
       cmdclass = dict(
+          bdist_wheel=stpyv8_bdist_wheel,
           build_ext = stpyv8_build,
           develop   = stpyv8_develop,
           v8        = stpyv8_install_v8,
