@@ -9,33 +9,30 @@ jobs:
     name: Build v8
     runs-on: windows-latest
     steps:
+      - name: Restore v8 from cache
+        id: restore-v8
+        uses: actions/cache/restore@v3
+        with:
+          path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('v8/src/**') }}
+
       - uses: ilammy/msvc-dev-cmd@v1
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         with:
           toolset: 14.2
 
       - name: Checkout
         uses: actions/checkout@v3
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
 
       - name: Setup Python
         uses: actions/setup-python@v4
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         with:
           python-version: 3
 
-      - name: Cache v8
-        id: cache-v8
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-v8
-        with:
-          path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('v8/src/**') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - if: ${{ steps.cache-v8.outputs.cache-hit != 'true' }}
-        name: Build v8
+      - name: Build v8
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         continue-on-error: false
         env:
           DEPOT_TOOLS_WIN_TOOLCHAIN: 0
@@ -46,13 +43,6 @@ jobs:
         with:
           path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('v8/src/**') }}
-
-#      - name: Upload artifacts
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: v8
-#          path: |
-#            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
 
   build:
     name: Build wheel on ${{ matrix.os }}
