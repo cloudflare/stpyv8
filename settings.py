@@ -107,12 +107,6 @@ STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_py
 if os.name in ("nt", ):
     library_dirs.add(os.path.join(V8_HOME, "out.gn", "x64.release.sample", "obj"))
 
-    if "INCLUDE" in os.environ:
-        include_dirs.update(os.environ["INCLUDE"].split(';'))
-
-    if "LIB" in os.environ:
-        library_dirs.update(os.environ["LIB"].split(';'))
-
     if "BOOST_ROOT" in os.environ:
         include_dirs.add(os.environ.get("BOOST_ROOT"))
         library_dirs.add(os.path.join(os.environ["BOOST_ROOT"], "stage", "lib"))
@@ -121,27 +115,14 @@ if os.name in ("nt", ):
         include_dirs.add(os.path.join(os.environ["Python_ROOT_DIR"], "include"))
         library_dirs.add(os.path.join(os.environ["Python_ROOT_DIR"], "libs"))
 
-    libraries          += ["winmm", "ws2_32"]
+    libraries          += ["winmm", "ws2_32", "v8_monolith"]
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi", "/std:c++20"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X64"]
-
-    for include in include_dirs:
-        extra_compile_args.append(f"/I\"{include}\"")
 
     include_dirs.clear()
 
     os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
     # os.environ["DISTUTILS_USE_SDK"] = "1"
-
-    # https://groups.google.com/g/v8-users/c/cvFGONOg_BY
-    # gn_args["is_clang"] = "false"
-    # gn_args["v8_static_library"] = "true"
-    # gn_args["is_debug"] = "false"
-    # gn_args["use_glib"] = "false"
-    # gn_args["is_component_build"] = "true"
-    # gn_args["v8_use_external_startup_data"] = "true"
-    # gn_args["v8_enable_i18n_support"] = "false"
-    # gn_args["target_cpu"] = "\\\"x64\\\""
 
 elif os.name in ("posix", ):
     libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]

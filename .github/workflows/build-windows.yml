@@ -45,7 +45,9 @@ jobs:
         uses: actions/cache/save@v3
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         with:
-          path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+          path: |
+            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+            v8\include
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
   build:
@@ -122,10 +124,15 @@ jobs:
         id: cache
         uses: actions/cache/restore@v3
         with:
-          path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+          path: |
+            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+            v8\include
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
       - name: STEP 5. Build wheel
+        env:
+          INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include;D:\boost;v8\include
+          LIB: ${{ env.LIB }};v8\out.gn\x64.release.sample\obj
         run: |
           python -m pip install wheel
           python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
