@@ -125,8 +125,13 @@ if os.name in ("nt", ):
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi", "/std:c++20"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X64"]
 
+    for include in include_dirs:
+        extra_compile_args.append(f"/I\"{include}\"")
+
+    include_dirs.clear()
+
     os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
-    os.environ["DISTUTILS_USE_SDK"] = "1"
+    # os.environ["DISTUTILS_USE_SDK"] = "1"
 
     # https://groups.google.com/g/v8-users/c/cvFGONOg_BY
     # gn_args["is_clang"] = "false"
