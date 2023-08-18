@@ -126,9 +126,10 @@ if os.name in ("nt", ):
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X64"]
 
     os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
+    os.environ["DISTUTILS_USE_SDK"] = "1"
 
     # https://groups.google.com/g/v8-users/c/cvFGONOg_BY
-    gn_args["is_clang"] = "false"
+    # gn_args["is_clang"] = "false"
     # gn_args["v8_static_library"] = "true"
     # gn_args["is_debug"] = "false"
     # gn_args["use_glib"] = "false"
