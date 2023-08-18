@@ -62,11 +62,6 @@ jobs:
         python-version: ['3.10']
 
     steps:
-      - name: Initialize MSVC environment
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          toolset: 14.2
-
       - name: STEP 1. Checkout repository
         uses: actions/checkout@v3
 
