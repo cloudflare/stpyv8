@@ -102,6 +102,7 @@ def get_libboost_python_name():
 
     return BOOST_PYTHON_UBUNTU_MATRIX[release]
 
+
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 
 if os.name in ("nt", ):
@@ -115,7 +116,7 @@ if os.name in ("nt", ):
         include_dirs.add(os.path.join(os.environ["Python_ROOT_DIR"], "include"))
         library_dirs.add(os.path.join(os.environ["Python_ROOT_DIR"], "libs"))
 
-    libraries          += ["winmm", "ws2_32", "v8_monolith"]
+    libraries          += ["winmm", "ws2_32", "Advapi32", "dbghelp", "v8_monolith"]
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi", "/std:c++20"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X64"]
 
