@@ -54,6 +54,8 @@ jobs:
     name: Build wheel on ${{ matrix.os }}
     needs: build-v8
     runs-on: ${{ matrix.os }}
+    env:
+      BOOST_ROOT: ${{ RUNNER_TEMP }}\boost
     strategy:
       matrix:
         os: [windows-2019]
@@ -78,7 +80,7 @@ jobs:
         id: restore-boost-python
         uses: actions/cache/restore@v3
         with:
-          path: D:\boost\stage\lib
+          path: ${{ env.BOOST_ROOT }}\stage\lib
           key: libboost_python-${{ matrix.python-version }}_vc142
 
       - name: Download Boost
@@ -92,11 +94,9 @@ jobs:
         if: ${{ steps.restore-boost-python.outputs.cache-hit != 'true' }}
         id: install-boost
         run: |
-          $BOOST_ROOT="D:\boost"
-          $INSTALL_LOG="install.log"
-          mkdir $BOOST_ROOT
-          Expand-Archive ${{ steps.download-boost.outputs.filename }} -DestinationPath $BOOST_ROOT
-          cd $BOOST_ROOT\*
+          mkdir $env:BOOST_ROOT
+          Expand-Archive ${{ steps.download-boost.outputs.filename }} -DestinationPath $env:BOOST_ROOT
+          cd $env:BOOST_ROOT\*
           echo "BOOST_ROOT=$pwd" >> $env:GITHUB_OUTPUT
           echo "BOOST_ROOT=$pwd" >> $env:GITHUB_ENV
           echo "BOOST_LIBRARYDIR=$pwd\stage\lib" >> $env:GITHUB_ENV
@@ -131,7 +131,7 @@ jobs:
 
       - name: STEP 5. Build wheel
         env:
-          INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include;D:\boost;v8\include
+          INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include;${{ env.BOOST_ROOT }};v8\include
           LIB: ${{ env.LIB }};v8\out.gn\x64.release.sample\obj
         run: |
           python -m pip install wheel
