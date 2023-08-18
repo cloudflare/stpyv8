@@ -113,6 +113,7 @@ def checkout_v8():
         if not success:
             exit(1)
 
+
 def build_v8():
     args = f"gen {os.path.join('out.gn', 'x64.release.sample')} --args=\"{GN_ARGS}\""
     success, _, __ = exec_cmd(os.path.join(DEPOT_HOME, 'gn'),

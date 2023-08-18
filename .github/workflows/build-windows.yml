@@ -8,6 +8,8 @@ jobs:
   build-v8:
     name: Build v8
     runs-on: windows-latest
+    outputs:
+      v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -33,9 +35,11 @@ jobs:
           toolset: 14.2
 
       - name: Build v8
+        id: build-v8
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         continue-on-error: false
         run: |
+          echo "v8-hash=${{ hashFiles('v8/src/**') }}" >> "$GITHUB_OUTPUT"
           python -m pip install wheel
           echo "::group::v8"
           python setup.py v8
@@ -116,16 +120,17 @@ jobs:
           key: libboost_python-${{ matrix.python-version }}_vc142
 
       - name: Restore v8 from cache
-        id: cache
+        id: restore-v8
         uses: actions/cache/restore@v3
         with:
           path: |
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
             v8\include
-          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+          key: ${{ runner.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
 
       - name: STEP 5. Build wheel
         env:
+          : # Set include and library files which will be picked up by setuptools
           INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include;${{ env.BOOST_ROOT }};v8\include
           LIB: ${{ env.LIB }};v8\out.gn\x64.release.sample\obj
         run: |
