@@ -55,7 +55,7 @@ jobs:
     needs: build-v8
     runs-on: ${{ matrix.os }}
     env:
-      BOOST_ROOT: ${{ RUNNER_TEMP }}\boost
+      BOOST_ROOT: ${{ runner.temp }}\boost
     strategy:
       matrix:
         os: [windows-2019]
