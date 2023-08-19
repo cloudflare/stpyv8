@@ -90,6 +90,7 @@ jobs:
         if: ${{ steps.restore-boost-python.outputs.cache-hit != 'true' }}
         id: download-boost
         uses: suisei-cn/actions-download-file@v1.4.0
+        # Pending further investigation, this Windows build requires Boost.Python v1.74.0
         with:
           url: https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip
 
@@ -113,7 +114,8 @@ jobs:
           $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
           echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
           (Get-Content libs\python\src\exec.cpp).replace('_Py_fopen', 'fopen') | Set-Content libs\python\src\exec.cpp
-          .\b2.exe stage link=static runtime-link=static --with-python
+          .\b2.exe stage link=static runtime-link=static --with-python --with-iostreams
+          dir -Path C:\FolderName -Filter libboost_iostreams-vc142-mt-s-x64-1_74.lib -Recurse | %{$_.FullName}
           ls stage\lib
 
       - name: Save Boost to cache
