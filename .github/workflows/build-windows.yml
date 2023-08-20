@@ -65,7 +65,7 @@ jobs:
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
   build:
-    name: Build ${{ matrix.python-version }} wheel on ${{ matrix.os }}
+    name: Build ${{ matrix.python-version }} wheel
     needs: build-v8
     runs-on: ${{ matrix.os }}
     env:
