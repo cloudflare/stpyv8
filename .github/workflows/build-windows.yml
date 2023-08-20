@@ -31,7 +31,9 @@ jobs:
         id: restore-v8
         uses: actions/cache/restore@main
         with:
-          path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+          path: |
+            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+            v8\include
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
       - name: Initialize MSVC environment
