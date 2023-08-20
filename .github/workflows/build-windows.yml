@@ -25,7 +25,7 @@ jobs:
 
       - name: Restore v8 from cache
         id: restore-v8
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@main
         with:
           path: v8\out.gn\x64.release.sample\obj\v8_monolith.lib
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
@@ -48,7 +48,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Save v8 to cache
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@main
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         with:
           # Save compiled binary and header files
@@ -81,7 +81,7 @@ jobs:
 
       - name: Restore Boost from cache
         id: restore-boost-python
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@main
         with:
           path: ${{ env.BOOST_ROOT }}\stage\lib
           key: libboost_python-${{ matrix.python-version }}_vc142
@@ -124,7 +124,7 @@ jobs:
           ls stage\lib
 
       - name: Save Boost to cache
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@main
         if: ${{ steps.restore-boost-python.outputs.cache-hit != 'true' }}
         with:
           path: ${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib
@@ -132,7 +132,7 @@ jobs:
 
       - name: Restore v8 from cache
         id: restore-v8
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@main
         with:
           path: |
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
