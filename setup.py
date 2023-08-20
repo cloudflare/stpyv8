@@ -79,7 +79,7 @@ def checkout_v8():
         if not success:
             exit(1)
 
-    success, _, __ = exec_cmd('git fetch --tags',
+    success, _, __ = exec_cmd('git fetch --tags --quiet',
              cwd = V8_HOME,
              msg = "Fetching the release tag information")
 
