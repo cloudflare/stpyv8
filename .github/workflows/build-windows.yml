@@ -142,7 +142,7 @@ jobs:
       - name: STEP 5. Build wheel
         env:
           # Set include and library files which will be picked up by setuptools
-          INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include;${{ env.BOOST_ROOT }};v8\include
+          INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include;v8\include
           LIB: ${{ env.LIB }};v8\out.gn\x64.release.sample\obj
         run: |
           python -m pip install wheel

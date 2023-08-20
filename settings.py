@@ -106,6 +106,7 @@ def get_libboost_python_name():
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 
 if os.name in ("nt", ):
+    include_dirs.add(os.path.join(V8_HOME, "include"))
     library_dirs.add(os.path.join(V8_HOME, "out.gn", "x64.release.sample", "obj"))
 
     if "BOOST_ROOT" in os.environ:
@@ -120,10 +121,7 @@ if os.name in ("nt", ):
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi", "/std:c++20"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X64"]
 
-    include_dirs.clear()
-
     os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
-    # os.environ["DISTUTILS_USE_SDK"] = "1"
 
 elif os.name in ("posix", ):
     libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]
