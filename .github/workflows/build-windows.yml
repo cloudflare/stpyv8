@@ -65,14 +65,14 @@ jobs:
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
   build:
-    name: Build wheel on ${{ matrix.os }}
+    name: Build ${{ matrix.python-version }} wheel on ${{ matrix.os }}
     needs: build-v8
     runs-on: ${{ matrix.os }}
     env:
       BOOST_ROOT: $RUNNER_TEMP\boost
     strategy:
       matrix:
-        os: [windows-2019]
+        os: [windows-latest]
         python-version: ['3.8', '3.9', '3.10']
 
     steps:
