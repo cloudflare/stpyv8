@@ -74,6 +74,12 @@ jobs:
           path: ${{ env.BOOST_ROOT }}\stage\lib
           key: libboost_python-${{ matrix.python-version }}_vc${{ env.MSVC_TOOLSET_VERSION }}
 
+      - name: Initialize MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        if: ${{ steps.restore-boost-python.outputs.cache-hit != 'true' }}
+        with:
+          toolset: ${{ env.MSVC_TOOLSET_VERSION }}
+
       - name: Download Boost
         if: ${{ steps.restore-boost-python.outputs.cache-hit != 'true' }}
         id: download-boost
