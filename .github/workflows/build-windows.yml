@@ -79,7 +79,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Restore Boost.Python from cache
+      - name: Restore Boost from cache
         id: restore-boost-python
         uses: actions/cache/restore@v3
         with:
@@ -105,17 +105,22 @@ jobs:
           echo "BOOST_ROOT=$pwd" >> $env:GITHUB_ENV
           echo "BOOST_LIBRARYDIR=$pwd\stage\lib" >> $env:GITHUB_ENV
 
-      - name: STEP 4. Build Boost.Python
+      - name: STEP 4. Build Boost
         if: ${{ steps.restore-boost-python.outputs.cache-hit != 'true' }}
         working-directory: ${{ steps.install-boost.outputs.BOOST_ROOT }}
         run: |
           .\bootstrap.bat
           if (-not $?) { type bootstrap.log }
+          
+          # Set specific Python version
           $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
           echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
+          
+          # Patch bug affecting compilation on Python 3.10
+          # https://github.com/boostorg/python/commit/cbd2d9f033c61d29d0a1df14951f4ec91e7d05cd
           (Get-Content libs\python\src\exec.cpp).replace('_Py_fopen', 'fopen') | Set-Content libs\python\src\exec.cpp
+          
           .\b2.exe stage -j 8 link=static runtime-link=static --with-python --with-iostreams
-          dir -Path $env:BOOST_ROOT -Filter libboost_iostreams-vc142-mt-s-x64-1_74.lib -Recurse -ErrorAction SilentlyContinue -Force | %{$_.FullName}
           ls stage\lib
 
       - name: Save Boost to cache
