@@ -5,7 +5,7 @@ on:
   push:
 
 env:
-  BOOST: $RUNNER_TEMP\boost
+  BOOST_ROOT: $RUNNER_TEMP\boost
   MSVC_TOOLSET_VERSION: 14.2
 
 jobs:
