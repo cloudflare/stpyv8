@@ -114,7 +114,7 @@ jobs:
           $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
           echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
           (Get-Content libs\python\src\exec.cpp).replace('_Py_fopen', 'fopen') | Set-Content libs\python\src\exec.cpp
-          .\b2.exe stage link=static runtime-link=static --with-python --with-iostreams
+          .\b2.exe stage -j 8 link=static runtime-link=static --with-python --with-iostreams
           dir -Path C:\FolderName -Filter libboost_iostreams-vc142-mt-s-x64-1_74.lib -Recurse -ErrorAction SilentlyContinue -Force | %{$_.FullName}
           ls stage\lib
 
