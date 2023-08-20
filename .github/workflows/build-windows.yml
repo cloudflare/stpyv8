@@ -67,7 +67,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-2019]
-        python-version: ['3.10']
+        python-version: ['3.8', '3.9', '3.10']
 
     steps:
       - name: STEP 1. Checkout repository
@@ -142,20 +142,22 @@ jobs:
       - name: STEP 5. Build wheel
         env:
           # Set include and library files which will be picked up by setuptools
-          INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include;v8\include
-          LIB: ${{ env.LIB }};v8\out.gn\x64.release.sample\obj
+          INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include
         run: |
-          python -m pip install wheel
+          python -m pip install wheel pytest
           python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
+          if (-not $?) {
+            echo "::error::Wheel build failed"
+            exit 1
+          }
           python setup.py install
-          if ((Get-ChildItem build\lib.win32* | Measure-Object) -eq 0) {
-            echo "::error::Wheel build failed (no artifacts generated)"
+          if (-not $?) {
+            echo "::error::Wheel installation failed"
             exit 1
           }
 
       - name: STEP 6. Test wheel
         run: |
-          python -m pip install pytest
           pytest -v
 
       - name: STEP 7. Create wheel zip
