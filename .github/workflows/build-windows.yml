@@ -5,7 +5,7 @@ on:
   push:
 
 env:
-  BOOST_ROOT: $RUNNER_TEMP\boost
+  BOOST_ROOT: boost
   MSVC_TOOLSET_VERSION: 14.2
 
 jobs:
@@ -68,8 +68,6 @@ jobs:
     name: Build ${{ matrix.python-version }} wheel
     needs: build-v8
     runs-on: ${{ matrix.os }}
-    env:
-      BOOST_ROOT: $RUNNER_TEMP\boost
     strategy:
       matrix:
         # Needed for MSVC toolset 14.2
