@@ -73,14 +73,6 @@ v8::Handle<v8::String> ToString(py::object str)
 
     if (PyUnicode_CheckExact(str.ptr()))
     {
-#ifndef Py_UNICODE_WIDE
-        return scope.Escape(
-                   v8::String::NewFromTwoByte(
-                       v8::Isolate::GetCurrent(),
-                       reinterpret_cast<const uint16_t *>(PyUnicode_2BYTE_DATA(str.ptr())))
-                   .ToLocalChecked());
-
-#else
         int kind = PyUnicode_KIND(str.ptr());
         void *dp = PyUnicode_DATA(str.ptr());
 
@@ -100,7 +92,6 @@ v8::Handle<v8::String> ToString(py::object str)
                        v8::NewStringType::kNormal,
                        len)
                    .ToLocalChecked());
-#endif
     }
 
     return ToString(py::object(py::handle<>(::PyObject_Str(str.ptr()))));
