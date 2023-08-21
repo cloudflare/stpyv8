@@ -77,10 +77,11 @@ jobs:
         python-version: ['3.9', '3.10']
         boost-version: ['1.74.0']
         boost-version-snake: ['1_74_0']
-      include:
-        - python-version: '3.11'
-          boost-version: '1.83.0'
-          boost-version-snake: '1_83_0'
+
+        include:
+          - python-version: '3.11'
+            boost-version: '1.83.0'
+            boost-version-snake: '1_83_0'
 
     steps:
       - name: STEP 1. Checkout repository
