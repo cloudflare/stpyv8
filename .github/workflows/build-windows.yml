@@ -1,8 +1,6 @@
 name: Build Windows
 
-on:
-  workflow_dispatch:
-  push:
+on: [push, pull_request]
 
 env:
   BOOST_ROOT: boost
