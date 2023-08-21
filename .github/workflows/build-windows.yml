@@ -74,7 +74,13 @@ jobs:
       matrix:
         # Needed for MSVC toolset 14.2
         os: [windows-2019]
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10']
+        boost-version: ['1.74.0']
+        boost-version-snake: ['1_74_0']
+      include:
+        - python-version: '3.11'
+          boost-version: '1.83.0'
+          boost-version-snake: '1_83_0'
 
     steps:
       - name: STEP 1. Checkout repository
@@ -91,7 +97,7 @@ jobs:
         uses: actions/cache/restore@main
         with:
           path: ${{ env.BOOST_ROOT }}\stage\lib
-          key: libboost_python-${{ matrix.python-version }}_vc142
+          key: boost_${{ matrix.boost-version }}_py${{ matrix.python-version }}_vc142
 
       - name: Initialize MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
@@ -105,7 +111,7 @@ jobs:
         uses: suisei-cn/actions-download-file@v1.4.0
         # Pending further investigation, this Windows build requires Boost.Python v1.74.0
         with:
-          url: https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip
+          url: https://boostorg.jfrog.io/artifactory/main/release/${{ matrix.boost-version }}/source/boost_${{ matrix.boost-version-snake }}.zip
 
       - name: Install Boost
         if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
@@ -141,7 +147,7 @@ jobs:
         if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
         with:
           path: ${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib
-          key: libboost_python-${{ matrix.python-version }}_vc142
+          key: boost_${{ matrix.boost-version }}_py${{ matrix.python-version }}_vc142
 
       - name: Restore v8 from cache
         id: restore-v8
