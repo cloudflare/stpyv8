@@ -170,7 +170,7 @@ jobs:
           python -m pip install wheel pytest
           
           # v8 build should already be supplied from cache hence no need to rebuild
-          python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
+          python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-windows-${{ matrix.python-version }}
           if (-not $?) {
             echo "::error::Wheel build failed"
             exit 1
@@ -192,8 +192,8 @@ jobs:
           recursive: false
           dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
 
-      # - name: STEP 7. Upload wheel zip
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: wheels
-      #     path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+      - name: STEP 7. Upload wheel zip
+        uses: actions/upload-artifact@v3
+        with:
+         name: wheels
+         path: stpyv8-windows-python-${{ matrix.python-version }}.zip
