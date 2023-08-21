@@ -121,7 +121,6 @@ if os.name in ("nt", ):
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi", "/std:c++20"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X64"]
     macros += [
-        ("Py_UNICODE_WIDE", None),
         ("HAVE_SNPRINTF", None),
     ]
 
