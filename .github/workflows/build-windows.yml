@@ -190,7 +190,7 @@ jobs:
         with:
           files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
           recursive: false
-          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+          dest: stpyv8-windows-python-${{ matrix.python-version }}.zip
 
       - name: STEP 7. Upload wheel zip
         uses: actions/upload-artifact@v3
