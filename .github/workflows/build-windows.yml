@@ -77,10 +77,14 @@ jobs:
         boost-version-snake: ['1_74_0']
 
         include:
-          - os: 'windows-2019'
-            python-version: '3.11'
+          - python-version: '3.11'
+            os: 'windows-2019'
             boost-version: '1.83.0'
             boost-version-snake: '1_83_0'
+          - python-version: '3.8'
+            os: 'windows-2019'
+            boost-version: '1.73.0'
+            boost-version-snake: '1_73_0'
 
     steps:
       - name: STEP 1. Checkout repository
