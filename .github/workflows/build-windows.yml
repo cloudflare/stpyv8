@@ -68,6 +68,8 @@ jobs:
     name: Build ${{ matrix.python-version }} wheel
     needs: build-v8
     runs-on: ${{ matrix.os }}
+    env:
+      DIST_NAME: stpyv8-windows-py${{ matrix.python-version }}
     strategy:
       matrix:
         # Needed for MSVC toolset 14.2
@@ -170,7 +172,7 @@ jobs:
           python -m pip install wheel pytest
           
           # v8 build should already be supplied from cache hence no need to rebuild
-          python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-windows-${{ matrix.python-version }}
+          python setup.py sdist bdist_wheel --skip-build-v8 -d ${{ env.DIST_NAME }}
           if (-not $?) {
             echo "::error::Wheel build failed"
             exit 1
@@ -188,12 +190,12 @@ jobs:
       - name: STEP 7. Create wheel zip
         uses: vimtor/action-zip@v1.1
         with:
-          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
+          files: ${{ env.DIST_NAME }}/
           recursive: false
-          dest: stpyv8-windows-python-${{ matrix.python-version }}.zip
+          dest: ${{ env.DIST_NAME }}.zip
 
       - name: STEP 7. Upload wheel zip
         uses: actions/upload-artifact@v3
         with:
          name: wheels
-         path: stpyv8-windows-python-${{ matrix.python-version }}.zip
+         path: ${{ env.DIST_NAME }}.zip
