@@ -1,3 +1,5 @@
+#include "Wrapper.h"
+
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
@@ -8,7 +10,6 @@
 
 #include "libplatform/libplatform.h"
 
-#include "Wrapper.h"
 #include "Context.h"
 #include "Utils.h"
 
