@@ -2,7 +2,6 @@
 
 #include <fstream>
 #include <v8.h>
-#include <v8-platform.h>
 
 #include "Config.h"
 

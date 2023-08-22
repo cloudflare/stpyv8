@@ -2,18 +2,6 @@
 
 #include <string>
 
-#include <v8-isolate.h>
-#include <v8-value.h>
-#include <v8-context.h>
-#include <v8-message.h>
-#include <v8-local-handle.h>
-#include <v8-exception.h>
-#include <v8-persistent-handle.h>
-#include <v8-script.h>
-#include <v8-primitive.h>
-#include <v8-function-callback.h>
-#include <v8-object.h>
-
 #ifdef _WIN32
 #ifdef DEBUG
 # pragma warning( push )

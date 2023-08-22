@@ -1,7 +1,6 @@
 #pragma once
 
-#include <v8.h>
-#include <v8-locker.h>
+#include <v8.h> 
 
 #include "Exception.h"
 
