@@ -6,9 +6,9 @@
 #include <map>
 #include <sstream>
 
-#include <boost/iterator/iterator_facade.hpp>
-
 #include "Exception.h"
+
+#include <boost/iterator/iterator_facade.hpp>
 
 class CJavascriptObject;
 class CJavascriptFunction;

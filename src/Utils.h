@@ -58,6 +58,8 @@ inline bool isfinite(double val) {
 #  undef TIME_UTC
 # endif
 
+#include <v8.h>
+
 #include <boost/python.hpp>
 namespace py = boost::python;
 
@@ -68,8 +70,6 @@ namespace py = boost::python;
 #undef FP_SUBNORMAL
 #undef FP_NORMAL
 #endif
-
-#include <v8.h>
 
 #ifdef _WIN32
 #ifdef DEBUG

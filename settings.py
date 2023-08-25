@@ -24,7 +24,7 @@ if os.name in ("posix", ):
 else:
     icu_data_folder = None
 
-os.environ['PATH'] = f"{os.environ['PATH']}:{DEPOT_HOME}"
+os.environ['PATH'] = f"{os.environ.get('PATH', '')}:{DEPOT_HOME}"
 
 gn_args = {
   "dcheck_always_on"                   : "false",
@@ -39,10 +39,8 @@ gn_args = {
   "v8_enable_31bit_smis_on_64bit_arch" : "false",
   "v8_imminent_deprecation_warnings"   : "true",
   "v8_monolithic"                      : "true",
-  "v8_use_external_startup_data"       : "false"
+  "v8_use_external_startup_data"       : "false",
 }
-
-GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
 
 source_files = ["Exception.cpp",
                 "Platform.cpp",
@@ -56,14 +54,14 @@ source_files = ["Exception.cpp",
 
 
 macros             = [("BOOST_PYTHON_STATIC_LIB", None)]
-include_dirs       = []
-library_dirs       = []
+include_dirs       = set()
+library_dirs       = set()
 libraries          = []
 extra_compile_args = []
 extra_link_args    = []
 
-include_dirs.append(os.path.join(V8_HOME, 'include'))
-library_dirs.append(os.path.join(V8_HOME, 'out.gn/x64.release.sample/obj/'))
+include_dirs.add(os.path.join(V8_HOME, 'include'))
+library_dirs.add(os.path.join(V8_HOME, os.path.join('out.gn', 'x64.release.sample', 'obj')))
 
 BOOST_PYTHON_LIB_SHORT = f"boost_python{sys.version_info.major}"
 BOOST_PYTHON_LIB_LONG  = f"boost_python{sys.version_info.major}{sys.version_info.minor}"
@@ -104,17 +102,39 @@ def get_libboost_python_name():
 
     return BOOST_PYTHON_UBUNTU_MATRIX[release]
 
+
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 
 if os.name in ("nt", ):
-    include_dirs       += os.environ["INCLUDE"].split(';')
-    library_dirs       += os.environ["LIB"].split(';')
-    libraries          += ["winmm", "ws2_32"]
-    extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi"]
-    extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X86"]
+    include_dirs.add(os.path.join(V8_HOME, "include"))
+    library_dirs.add(os.path.join(V8_HOME, "out.gn", "x64.release.sample", "obj"))
+
+    if "BOOST_ROOT" in os.environ:
+        include_dirs.add(os.environ.get("BOOST_ROOT"))
+        library_dirs.add(os.path.join(os.environ["BOOST_ROOT"], "stage", "lib"))
+
+    if "Python_ROOT_DIR" in os.environ:
+        include_dirs.add(os.path.join(os.environ["Python_ROOT_DIR"], "include"))
+        library_dirs.add(os.path.join(os.environ["Python_ROOT_DIR"], "libs"))
+
+    libraries          += ["winmm", "ws2_32", "Advapi32", "dbghelp", "v8_monolith"]
+    extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi", "/std:c++20"]
+    extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X64"]
+    macros += [
+        ("HAVE_SNPRINTF", None),
+    ]
+
+    os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
+
 elif os.name in ("posix", ):
     libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]
     extra_compile_args.append('-std=c++17')
 
     if platform.system() in ('Linux', ):
         libraries.append("rt")
+
+
+GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
+
+include_dirs = list(include_dirs)
+library_dirs = list(library_dirs)

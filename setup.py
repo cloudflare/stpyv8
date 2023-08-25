@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
-import sys
-import os
-import subprocess
-import shutil
 import logging
+import shutil
+import subprocess
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from setuptools.command.install import install
+from wheel.bdist_wheel import bdist_wheel
 
-from settings import * # pylint:disable=wildcard-import,unused-wildcard-import
+from settings import *  # pylint:disable=wildcard-import,unused-wildcard-import
 
 log = logging.getLogger()
 
@@ -47,7 +46,7 @@ def exec_cmd(cmdline, *args, **kwargs):
 
 def install_depot():
     if not os.path.exists(DEPOT_HOME):
-        exec_cmd("git clone",
+        exec_cmd("git clone --depth 1",
                  DEPOT_GIT_URL,
                  DEPOT_HOME,
                  cwd = os.path.dirname(DEPOT_HOME),
@@ -57,52 +56,82 @@ def install_depot():
 
     # depot_tools updates itself automatically when running gclient tool
     if os.path.isfile(os.path.join(DEPOT_HOME, 'gclient')):
-        _, stdout, _ = exec_cmd(os.path.join(DEPOT_HOME, 'gclient'), # pylint:disable=unused-variable
+        success, stdout, __ = exec_cmd(os.path.join(DEPOT_HOME, 'gclient'), # pylint:disable=unused-variable
                                 "--version",
                                 cwd    = DEPOT_HOME,
                                 output = True,
                                 msg    = "Found depot tools")
 
+        if not success:
+            exit(1)
+
 
 def checkout_v8():
+    install_depot()
+
     if not os.path.exists(V8_HOME):
-        exec_cmd(os.path.join(DEPOT_HOME, 'fetch'),
+        success, _, __ = exec_cmd(os.path.join(DEPOT_HOME, 'fetch'),
+                 "--no-history",
                  'v8',
                  cwd = os.path.dirname(V8_HOME),
                  msg = "Fetching Google V8 code")
 
-    exec_cmd('git fetch --tags',
+        if not success:
+            exit(1)
+
+    success, _, __ = exec_cmd('git fetch --tags --quiet',
              cwd = V8_HOME,
              msg = "Fetching the release tag information")
 
-    exec_cmd('git checkout',
+    if not success:
+        exit(1)
+
+    success, _, __ = exec_cmd('git checkout',
              V8_GIT_TAG,
              cwd = V8_HOME,
              msg = f"Checkout Google V8 v{V8_GIT_TAG}")
 
-    exec_cmd(os.path.join(DEPOT_HOME, 'gclient'),
+    if not success:
+        exit(1)
+
+    success, _, __ = exec_cmd(os.path.join(DEPOT_HOME, 'gclient'),
              'sync',
              '-D',
+             "-j8",
              cwd = os.path.dirname(V8_HOME),
              msg = "Syncing Google V8 code")
+
+    if not success:
+        exit(1)
 
     # On Linux, install additional dependencies, per
     # https://v8.dev/docs/build step 4
     if sys.platform in ("linux", "linux2", ) and v8_deps_linux:
-        exec_cmd('./v8/build/install-build-deps.sh',
+        success, _, __ = exec_cmd('./v8/build/install-build-deps.sh',
                  cwd = os.path.dirname(V8_HOME),
                  msg = "Installing additional linux dependencies")
 
+        if not success:
+            exit(1)
+
+
 def build_v8():
-    exec_cmd(os.path.join(DEPOT_HOME, 'gn'),
-             f"gen out.gn/x64.release.sample --args='{GN_ARGS}'",
+    args = f"gen {os.path.join('out.gn', 'x64.release.sample')} --args=\"{GN_ARGS}\""
+    success, _, __ = exec_cmd(os.path.join(DEPOT_HOME, 'gn'),
+             args,
              cwd = V8_HOME,
              msg = f"Generate build scripts for V8 (v{V8_GIT_TAG})")
 
-    exec_cmd(os.path.join(DEPOT_HOME, 'ninja'),
-             "-C out.gn/x64.release.sample v8_monolith",
+    if not success:
+        exit(1)
+
+    success, _, __ = exec_cmd(os.path.join(DEPOT_HOME, 'ninja'),
+             f"-C {os.path.join('out.gn', 'x64.release.sample')} v8_monolith",
              cwd = V8_HOME,
              msg = "Build V8 with ninja")
+
+    if not success:
+        exit(1)
 
 
 def clean_stpyv8():
@@ -114,7 +143,6 @@ def clean_stpyv8():
 
 def prepare_v8():
     try:
-        install_depot()
         checkout_v8()
         build_v8()
         # clean_stpyv8()
@@ -122,10 +150,27 @@ def prepare_v8():
         log.error("Fail to checkout and build v8, %s", str(e))
 
 
+class stpyv8_bdist_wheel(bdist_wheel):
+    user_options = bdist_wheel.user_options + [
+        ('skip-build-v8', None, 'don\'t build v8')
+    ]
+
+    def initialize_options(self) -> None:
+        bdist_wheel.initialize_options(self)
+
+        self.skip_build_v8 = None
+
+    def run(self):
+        if not self.skip_build_v8:
+            prepare_v8()
+
+        bdist_wheel.run(self)
+
+
 class stpyv8_build(build_ext):
     def run(self):
         V8_GIT_TAG = V8_GIT_TAG_STABLE # pylint:disable=redefined-outer-name,unused-variable
-        prepare_v8()
+
         build_ext.run(self)
 
 
@@ -154,10 +199,15 @@ class stpyv8_install(install):
 
         if icu_data_folder:
             os.makedirs(icu_data_folder, exist_ok = True)
-            shutil.copy(os.path.join(V8_HOME, "out.gn/x64.release.sample/icudtl.dat"),
+            shutil.copy(os.path.join(V8_HOME, os.path.join("out.gn", "x64.release.sample", "icudtl.dat")),
                         icu_data_folder)
 
         install.run(self)
+
+
+class stpyv8_checkout_v8(build_ext):
+    def run(self):
+        checkout_v8()
 
 
 stpyv8 = Extension(name               = "_STPyV8",
@@ -179,6 +229,7 @@ setup(name         = "stpyv8",
       license      = "Apache License 2.0",
       py_modules   = ["STPyV8"],
       ext_modules  = [stpyv8],
+      install_requires=["wheel"],
       classifiers  = [
         "Development Status :: 4 - Beta",
         "Environment :: Plugins",
@@ -203,9 +254,11 @@ setup(name         = "stpyv8",
         "Programming Language :: Python :: 3.10",
       ],
       cmdclass = dict(
+          bdist_wheel=stpyv8_bdist_wheel,
           build_ext = stpyv8_build,
           develop   = stpyv8_develop,
           v8        = stpyv8_install_v8,
           stpyv8    = stpyv8_build_no_v8,
-          install   = stpyv8_install),
-)
+          install   = stpyv8_install,
+          checkout_v8 = stpyv8_checkout_v8),
+      )

@@ -4,12 +4,12 @@
 #include <stdexcept>
 #include <memory>
 
+#include "Config.h"
+#include "Utils.h"
+
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/iterator/iterator_facade.hpp>
-
-#include "Config.h"
-#include "Utils.h"
 
 #define BEGIN_HANDLE_PYTHON_EXCEPTION try
 #define END_HANDLE_PYTHON_EXCEPTION \

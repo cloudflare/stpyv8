@@ -1,4 +1,5 @@
 #include <sstream>
+
 #include "Exception.h"
 
 std::ostream& operator<<(std::ostream& os, const CJavascriptException& ex)
