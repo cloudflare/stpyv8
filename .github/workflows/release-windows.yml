@@ -117,7 +117,6 @@ jobs:
         if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
         id: download-boost
         uses: suisei-cn/actions-download-file@v1.4.0
-        # Pending further investigation, this Windows build requires Boost.Python v1.74.0
         with:
           url: https://boostorg.jfrog.io/artifactory/main/release/${{ matrix.boost-version }}/source/boost_${{ matrix.boost-version-snake }}.zip
 
