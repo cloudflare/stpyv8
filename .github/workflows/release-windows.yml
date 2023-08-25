@@ -194,9 +194,9 @@ jobs:
         with:
           files: ${{ env.DIST_NAME }}/
           recursive: false
-          dest: ${{ env.DIST_NAME }}.zip
+          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
 
-      - name: STEP 7. Release
+      - name: STEP 8. Release
         uses: softprops/action-gh-release@v1
         with:
           files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip'
