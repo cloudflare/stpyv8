@@ -71,7 +71,7 @@ jobs:
     strategy:
       matrix:
         # Needed for MSVC toolset 14.2
-        os: [windows-2019]
+        os: [windows-latest]
         python-version: ['3.8', '3.9', '3.10', '3.11']
         boost-version: ['1.83.0']
         boost-version-snake: ['1_83_0']
@@ -92,7 +92,7 @@ jobs:
         with:
             boost_version: 1.81.0
             boost_install_dir: ${{ env.BOOST_ROOT }}
-            platform_version: 2019
+            platform_version: 2022
             toolset: msvc
             
       - name: Restore v8 from cache
