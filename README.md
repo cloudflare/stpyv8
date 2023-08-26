@@ -207,6 +207,8 @@ cd $env:BOOST_ROOT
 .\bootstrap.bat
 ```
 
+NOTE: In order to build Boost 1.74 for Python 3.10 a patch must be made to the code: In the file `$env:BOOST_ROOT\libs\python\src\exec.cpp`, change all instances of `_Py_fopen` to `fopen` (a simple find/replace works).
+
 Before building you must tell Boost which Python version you're building for. To do this, add the following line to the end of `project-config.jam`:
 
     using python : : "C:\\python311" ;
