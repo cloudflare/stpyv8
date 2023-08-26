@@ -37,8 +37,6 @@ jobs:
       - name: Initialize MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
-        with:
-          toolset: 14.2
 
       - name: Build v8
         id: build-v8
@@ -103,6 +101,10 @@ jobs:
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
             v8\include
           key: ${{ runner.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
+
+      - name: Initialize MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
 
       - name: STEP 5. Build wheel
         env:
