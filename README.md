@@ -171,10 +171,7 @@ Please note that building STPyV8 on Windows may take a while and can be a pretty
 Here are the prerequisites for building on Windows:
 
 * MSVC 14.20 (packaged with Visual Studio 2019)
-* Boost
-  * For Python version 3.8, Boost 1.73 is required
-  * For versions 3.9-3.10, Boost 1.74 is required
-  * For version 3.11, the latest Boost version may be used (1.83)
+* [Boost](https://boostorg.jfrog.io/ui/repos/tree/General/main/release)
 
 The following environment variables must be set:
 * `BOOST_ROOT` - Boost installation directory (e.g. `C:\local\boost_1_83_0`)
@@ -206,8 +203,6 @@ To build the Boost.Python component of Boost with Powershell Developer Console:
 cd $env:BOOST_ROOT
 .\bootstrap.bat
 ```
-
-NOTE: In order to build Boost 1.74 for Python 3.10 a patch must be made to the code: In the file `$env:BOOST_ROOT\libs\python\src\exec.cpp`, change all instances of `_Py_fopen` to `fopen` (a simple find/replace works).
 
 Before building you must tell Boost which Python version you're building for. To do this, add the following line to the end of `project-config.jam`:
 
