@@ -86,58 +86,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Restore Boost from cache
-        id: restore-boost
-        uses: actions/cache/restore@main
-        with:
-          path: ${{ env.BOOST_ROOT }}\stage\lib
-          key: boost${{ matrix.boost-version }}_py${{ matrix.python-version }}_vc142
-
-      - name: Initialize MSVC environment
-        uses: ilammy/msvc-dev-cmd@v1
-        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
-        with:
-          toolset: ${{ env.MSVC_TOOLSET_VERSION }}
-
-      - name: Download Boost
-        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
-        id: download-boost
-        uses: suisei-cn/actions-download-file@v1.4.0
-        # Pending further investigation, this Windows build requires Boost.Python v1.74.0
-        with:
-          url: https://boostorg.jfrog.io/artifactory/main/release/${{ matrix.boost-version }}/source/boost_${{ matrix.boost-version-snake }}.zip
-
-      - name: Install Boost
-        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
+      - name: Install boost
+        uses: MarkusJx/install-boost@main
         id: install-boost
-        run: |
-          mkdir $env:BOOST_ROOT
-          Expand-Archive ${{ steps.download-boost.outputs.filename }} -DestinationPath $env:BOOST_ROOT
-          cd $env:BOOST_ROOT\*
-          echo "BOOST_ROOT=$pwd" >> $env:GITHUB_OUTPUT
-          echo "BOOST_ROOT=$pwd" >> $env:GITHUB_ENV
-          echo "BOOST_LIBRARYDIR=$pwd\stage\lib" >> $env:GITHUB_ENV
-
-      - name: STEP 4. Build Boost
-        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
-        working-directory: ${{ steps.install-boost.outputs.BOOST_ROOT }}
-        run: |
-          .\bootstrap.bat
-          if (-not $?) { type bootstrap.log }
-          
-          # Set specific Python version
-          $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
-          echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
-          
-          .\b2.exe stage -j 8 link=static runtime-link=static --with-python --with-iostreams --with-date_time --with-thread
-
-      - name: Save Boost to cache
-        uses: actions/cache/save@main
-        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
         with:
-          path: ${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib
-          key: boost${{ matrix.boost-version }}_py${{ matrix.python-version }}_vc142
-
+            boost_version: 1.81.0
+            boost_install_dir: ${{ env.BOOST_ROOT }}
+            platform_version: 2019
+            toolset: msvc
+            
       - name: Restore v8 from cache
         id: restore-v8
         uses: actions/cache/restore@main
