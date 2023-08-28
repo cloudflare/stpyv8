@@ -8,7 +8,7 @@ STPyV8 is a fork of the original [PyV8](https://code.google.com/archive/p/pyv8/)
 with code changed to work with the latest Google V8 engine and Python 3. STPyV8 links with
 Google V8 built as a static library.
 
-Currently the library builds on Linux and MacOS, with Windows planned for the future.
+Currently the library builds on Linux, MacOS and Windows.
 
 # Usage Examples
 
