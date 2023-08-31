@@ -31,7 +31,7 @@ jobs:
         with:
           path: |
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
-            v8\out.gn\x64.release.sample\obj\icudtl.dat
+            v8\out.gn\x64.release.sample\icudtl.dat
             v8\include
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
@@ -60,7 +60,7 @@ jobs:
           # This will save an additional clone of v8 for the linker
           path: |
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
-            v8\out.gn\x64.release.sample\obj\icudtl.dat
+            v8\out.gn\x64.release.sample\icudtl.dat
             v8\include
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
@@ -160,7 +160,7 @@ jobs:
         with:
           path: |
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
-            v8\out.gn\x64.release.sample\obj\icudtl.dat
+            v8\out.gn\x64.release.sample\icudtl.dat
             v8\include
           key: ${{ runner.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
 
@@ -183,7 +183,9 @@ jobs:
             exit 1
           }
           
-          cp v8\out.gn\x64.release.sample\obj\icudtl.dat ${{ env.DIST_NAME }}
+          ls v8\out.gn\x64.release.sample\
+          
+          cp v8\out.gn\x64.release.sample\icudtl.dat ${{ env.DIST_NAME }}
 
       - name: STEP 6. Test wheel
         run: |
