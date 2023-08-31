@@ -1,0 +1,202 @@
+name: Release Windows
+
+on:
+  release:
+    types: [published]
+    branches:
+      - master
+
+env:
+  BOOST_ROOT: boost
+  MSVC_TOOLSET_VERSION: 14.2
+
+jobs:
+  build-v8:
+    # If v8 is in Workflow cache, don't build
+    # Clone is necessary in any event to calculate a hash for the cache key
+    name: Build v8
+    runs-on: windows-latest
+    outputs:
+      v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Clone v8
+        run: |
+          python -m pip install wheel
+          echo "::group::Clone v8"
+          python setup.py checkout_v8
+          echo "::endgroup::"
+
+      - name: Restore v8 from cache
+        id: restore-v8
+        uses: actions/cache/restore@main
+        with:
+          path: |
+            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+            v8\include
+          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+
+      - name: Initialize MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
+        with:
+          toolset: 14.2
+
+      - name: Build v8
+        id: build-v8
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
+        continue-on-error: false
+        run: |
+          echo "v8-hash=${{ hashFiles('v8/src/**') }}" >> "$GITHUB_OUTPUT"
+          python -m pip install wheel
+          echo "::group::v8"
+          python setup.py v8
+          echo "::endgroup::"
+
+      - name: Save v8 to cache
+        uses: actions/cache/save@main
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
+        with:
+          # Save compiled binary and header files
+          # This will save an additional clone of v8 for the linker
+          path: |
+            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+            v8\include
+          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+
+  build:
+    name: Build ${{ matrix.python-version }} wheel
+    needs: build-v8
+    runs-on: ${{ matrix.os }}
+    env:
+      DIST_NAME: stpyv8-windows-py${{ matrix.python-version }}
+    strategy:
+      matrix:
+        # Needed for MSVC toolset 14.2
+        os: [windows-2019]
+        python-version: ['3.9', '3.10']
+        boost-version: ['1.74.0']
+        boost-version-snake: ['1_74_0']
+
+        include:
+          - python-version: '3.11'
+            os: 'windows-2019'
+            boost-version: '1.83.0'
+            boost-version-snake: '1_83_0'
+          - python-version: '3.8'
+            os: 'windows-2019'
+            boost-version: '1.73.0'
+            boost-version-snake: '1_73_0'
+
+    steps:
+      - name: STEP 1. Checkout repository
+        uses: actions/checkout@v3
+
+      - name: STEP 2. Set up Python
+        id: install-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Restore Boost from cache
+        id: restore-boost
+        uses: actions/cache/restore@main
+        with:
+          path: ${{ env.BOOST_ROOT }}\stage\lib
+          key: boost${{ matrix.boost-version }}_py${{ matrix.python-version }}_vc142
+
+      - name: Initialize MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
+        with:
+          toolset: ${{ env.MSVC_TOOLSET_VERSION }}
+
+      - name: Download Boost
+        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
+        id: download-boost
+        uses: suisei-cn/actions-download-file@v1.4.0
+        with:
+          url: https://boostorg.jfrog.io/artifactory/main/release/${{ matrix.boost-version }}/source/boost_${{ matrix.boost-version-snake }}.zip
+
+      - name: Install Boost
+        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
+        id: install-boost
+        run: |
+          mkdir $env:BOOST_ROOT
+          Expand-Archive ${{ steps.download-boost.outputs.filename }} -DestinationPath $env:BOOST_ROOT
+          cd $env:BOOST_ROOT\*
+          echo "BOOST_ROOT=$pwd" >> $env:GITHUB_OUTPUT
+          echo "BOOST_ROOT=$pwd" >> $env:GITHUB_ENV
+          echo "BOOST_LIBRARYDIR=$pwd\stage\lib" >> $env:GITHUB_ENV
+
+      - name: STEP 4. Build Boost
+        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
+        working-directory: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+        run: |
+          .\bootstrap.bat
+          if (-not $?) { type bootstrap.log }
+          
+          # Set specific Python version
+          $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
+          echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
+          
+          # Patch bug affecting compilation on Python 3.10
+          # https://github.com/boostorg/python/commit/cbd2d9f033c61d29d0a1df14951f4ec91e7d05cd
+          (Get-Content libs\python\src\exec.cpp).replace('_Py_fopen', 'fopen') | Set-Content libs\python\src\exec.cpp
+          
+          .\b2.exe stage -j 8 link=static runtime-link=static --with-python --with-iostreams --with-date_time --with-thread
+          ls stage\lib
+
+      - name: Save Boost to cache
+        uses: actions/cache/save@main
+        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
+        with:
+          path: ${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib
+          key: boost${{ matrix.boost-version }}_py${{ matrix.python-version }}_vc142
+
+      - name: Restore v8 from cache
+        id: restore-v8
+        uses: actions/cache/restore@main
+        with:
+          path: |
+            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+            v8\include
+          key: ${{ runner.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
+
+      - name: STEP 5. Build wheel
+        env:
+          # Set include and library files which will be picked up by setuptools
+          INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include
+        run: |
+          python -m pip install wheel pytest
+          
+          # v8 build should already be supplied from cache hence no need to rebuild
+          python setup.py sdist bdist_wheel --skip-build-v8 -d ${{ env.DIST_NAME }}
+          if (-not $?) {
+            echo "::error::Wheel build failed"
+            exit 1
+          }
+          python setup.py install
+          if (-not $?) {
+            echo "::error::Wheel installation failed"
+            exit 1
+          }
+
+      - name: STEP 6. Test wheel
+        run: |
+          pytest -v
+
+      - name: STEP 7. Create wheel zip
+        uses: vimtor/action-zip@v1.1
+        with:
+          files: ${{ env.DIST_NAME }}/
+          recursive: false
+          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+
+      - name: STEP 8. Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip'
+          token: ${{ secrets.GITHUB_TOKEN }}

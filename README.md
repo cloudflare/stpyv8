@@ -8,7 +8,7 @@ STPyV8 is a fork of the original [PyV8](https://code.google.com/archive/p/pyv8/)
 with code changed to work with the latest Google V8 engine and Python 3. STPyV8 links with
 Google V8 built as a static library.
 
-Currently the library builds on Linux and MacOS, with Windows planned for the future.
+Currently the library builds on Linux, MacOS and Windows.
 
 # Usage Examples
 
@@ -163,6 +163,73 @@ $ sudo python setup.py install
 ```
 
 More detailed build instructions are in the [docs](docs/source/build.rst) folder.
+
+### Windows
+
+Please note that building STPyV8 on Windows may take a while and can be a pretty involved process. You're encouraged to download a precompiled binary from this repository.
+
+Here are the prerequisites for building on Windows:
+
+* MSVC 14.20 (packaged with Visual Studio 2019)
+* [Boost](https://boostorg.jfrog.io/ui/repos/tree/General/main/release)
+
+The following environment variables must be set:
+* `BOOST_ROOT` - Boost installation directory (e.g. `C:\local\boost_1_83_0`)
+* `Python_ROOT_DIR` - Python installation directory (e.g. `C:\python311`) 
+
+#### Boost installation with precompiled binaries
+
+If your Boost installation comes with precompiled binaries you'll have to make sure they can be used to build this project.
+
+The binaries required are statically-linkable LIB files compiled with MSVC 14.20 and may look something like this (in a Boost 1.82 installation):
+
+    boost_python310-vc142-mt-s-x64-1_82.lib
+
+If you were able to locate a similar file for your Python version you might not need to build Boost.
+
+If the LIB file you found is not located in the directory `$env:BOOST_DIR\stage\lib` then you must add its containing directory path to the `LIB` environment variable.
+
+For example, if you installed Boost through an official installer, the LIB file might be in the `lib64-msvc-14.2` directory. In this case: `$env:LIB = "$env:LIB;$env:BOOST_ROOT\lib64-msvc-14.2"`.
+
+If you weren't able to located the correct file, or you encountered linking errors further down the build process, you'll have to build Boost. Here is an example of one such linking error:
+
+    LINK : fatal error LNK1104: cannot open file 'libboost_python310-vc142-mt-s-x32-1_74.lib'
+
+#### Building Boost
+
+To build the Boost.Python component of Boost with Powershell Developer Console:
+
+```powershell
+cd $env:BOOST_ROOT
+.\bootstrap.bat
+```
+
+Before building you must tell Boost which Python version you're building for. To do this, add the following line to the end of `project-config.jam`:
+
+    using python : : "C:\\python311" ;
+
+NOTE: Use the actual path to your Python installation and ensure backslases are escaped. This directory should include `python.exe`, an `include` directory and a `libs` directory.
+
+Back to Powershell:
+
+```powershell
+.\b2.exe stage -j 8 link=static runtime-link=static --with-python --with-iostreams --with-date_time --with-thread
+```
+
+The boost binaries will be generated to `$env:BOOST_ROOT\stage\lib`.
+
+#### Building STPyV8
+
+Once you've got your Boost binaries you're ready to build STPyV8.
+
+From Powershell, `cd` into the project root:
+
+```powershell
+python -m pip install wheel
+python setup.py bdist_wheel
+```
+
+Once the second command is done (may take quite a while) you'll have a wheel file ready to be installed.
 
 # How does this work?
 STPyV8 is a Python [C++ Extension Module](https://docs.python.org/3/c-api/index.html) that

@@ -68,7 +68,6 @@ jobs:
       DIST_NAME: stpyv8-windows-py${{ matrix.python-version }}
     strategy:
       matrix:
-        # Needed for MSVC toolset 14.2
         os: [windows-latest]
         python-version: ['3.8', '3.9', '3.10', '3.11']
         boost-version: ['1.83.0']
@@ -102,10 +101,6 @@ jobs:
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
             v8\include
           key: ${{ runner.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
-
-      - name: Initialize MSVC environment
-        uses: ilammy/msvc-dev-cmd@v1
-        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
 
       - name: STEP 5. Build wheel
         env:
