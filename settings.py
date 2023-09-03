@@ -121,7 +121,7 @@ if os.name in ("nt", ):
     libraries          += ["winmm", "ws2_32", "Advapi32", "dbghelp", "v8_monolith"]
     extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi", "/std:c++20"]
     extra_link_args    += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X64"]
-    macros += [
+    macros = [
         ("HAVE_SNPRINTF", None),
     ]
 
