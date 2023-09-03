@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 env:
   BOOST_ROOT: boost
-  MSVC_TOOLSET_VERSION: 14.2
+  BOOST_VERSION: 1.83.0
 
 jobs:
   build-v8:
@@ -72,8 +72,6 @@ jobs:
       matrix:
         os: [windows-latest]
         python-version: ['3.8', '3.9', '3.10', '3.11']
-        boost-version: ['1.83.0']
-        boost-version-snake: ['1_83_0']
 
     steps:
       - name: STEP 1. Checkout repository
@@ -90,7 +88,7 @@ jobs:
         id: install-boost
         with:
           link: static
-          boost_version: 1.81.0
+          boost_version: ${{ env.BOOST_VERSION }}
           boost_install_dir: ${{ env.BOOST_ROOT }}
           platform_version: 2022
           toolset: msvc
