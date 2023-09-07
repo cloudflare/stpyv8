@@ -1,12 +1,6 @@
-name: MacOSX build/release workflow (debug)
+name: MacOSX build workflow (debug)
 
-on:
-  push:
-  pull_request:
-  release:
-    types: [published]
-    branches:
-      - master
+on: [push, pull_request]
 
 jobs:
   build:
@@ -62,14 +56,6 @@ jobs:
 
       - name: Upload wheel zip
         uses: actions/upload-artifact@v3
-        if: ${{ github.event_name != 'release' }}
         with:
           name: wheels
           path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: ${{ github.event_name == 'release' }}
-        with:
-          files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip'
-          token: ${{ secrets.GITHUB_TOKEN }}
