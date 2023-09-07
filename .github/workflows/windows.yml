@@ -1,6 +1,12 @@
-name: Build Windows
+name: Windows build/release workflow
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+    branches:
+      - master
 
 env:
   BOOST_ROOT: boost
@@ -182,9 +188,9 @@ jobs:
             echo "::error::Wheel installation failed"
             exit 1
           }
-          
+
           ls v8\out.gn\x64.release.sample\
-          
+
           cp v8\out.gn\x64.release.sample\icudtl.dat ${{ env.DIST_NAME }}
 
       - name: STEP 6. Test wheel
@@ -196,10 +202,18 @@ jobs:
         with:
           files: ${{ env.DIST_NAME }}/
           recursive: false
-          dest: ${{ env.DIST_NAME }}.zip
+          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
 
-      - name: STEP 7. Upload wheel zip
+      - name: STEP 8. Upload wheel zip
         uses: actions/upload-artifact@v3
+        if: ${{ github.event_name != 'release' }}
         with:
          name: wheels
          path: ${{ env.DIST_NAME }}.zip
+
+      - name: STEP 8. Release
+        uses: softprops/action-gh-release@v1
+        if: ${{ github.event_name == 'release' }}
+        with:
+          files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip'
+          token: ${{ secrets.GITHUB_TOKEN }}
