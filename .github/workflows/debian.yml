@@ -1,6 +1,12 @@
-name: Build
+name: Debian build/release workflow
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+    branches:
+      - master
 
 jobs:
   build:
@@ -11,20 +17,20 @@ jobs:
         python-version: ['3.9']
 
     steps:
-      - name: STEP 1. Initialization
+      - name: Initialization
         run: |
           rm -rf stpyv8
           pip uninstall -y stpyv8
 
-      - name: STEP 2. Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: STEP 3. Install dependencies
+      - name: Install dependencies
         run: |
           sudo apt install libboost-dev libboost-system-dev libboost-iostreams-dev libboost-python-dev
           pip install --upgrade pip setuptools wheel pytest
 
-      - name: STEP 4. Build wheel
+      - name: Build wheel
         run: |
           python setup.py v8
           python setup.py sdist bdist_wheel -d stpyv8-debian-11-${{ matrix.python-version }}
@@ -33,24 +39,32 @@ jobs:
           V8_DEPS_LINUX: 0
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
-      - name: STEP 5. Install wheel
+      - name: Install wheel
         run : |
           cp stpyv8-debian-11-${{ matrix.python-version }}/icudtl.dat /usr/share/stpyv8
           pip install --upgrade stpyv8-debian-11-${{ matrix.python-version }}/stpyv8*.whl
 
-      - name: STEP 6. Test wheel
+      - name: Test wheel
         run: |
           pytest -v
 
-      - name: STEP 7. Create wheel zip
+      - name: Create wheel zip
         uses: vimtor/action-zip@v1.1
         with:
           files: stpyv8-debian-11-${{ matrix.python-version }}/
           recursive: false
           dest: stpyv8-debian-11-python-${{ matrix.python-version }}.zip
 
-      - name: STEP 8. Upload wheel zip
+      - name: Upload wheel zip
         uses: actions/upload-artifact@v3
+        if: ${{ github.event_name != 'release' }}
         with:
           name: wheels
           path: stpyv8-debian-11-python-${{ matrix.python-version }}.zip
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: ${{ github.event_name == 'release' }}
+        with:
+          files: 'stpyv8-debian-11-python-${{ matrix.python-version }}.zip'
+          token: ${{ secrets.GITHUB_TOKEN }}

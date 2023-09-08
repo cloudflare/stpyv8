@@ -1,4 +1,4 @@
-name: Build
+name: Ubuntu build workflow (debug)
 
 on: [push, pull_request]
 
