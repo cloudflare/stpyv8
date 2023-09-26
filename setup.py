@@ -89,7 +89,7 @@ def checkout_v8():
     success, _, __ = exec_cmd('git checkout',
              V8_GIT_TAG,
              cwd = V8_HOME,
-             msg = f"Checkout Google V8 v{V8_GIT_TAG}")
+             msg = f"Checkout Google V8 v{V8_GIT_TAG}"
 
     if not success:
         exit(1)
