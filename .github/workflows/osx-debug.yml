@@ -113,7 +113,7 @@ jobs:
           python -m pip install wheel pytest
 
           # Google V8 build should be already be supplied from the cache so no need to rebuild
-          python setup.py sdist bdist_wheel --skip-build-v8 -d ${{ env.DIST_NAME }}
+          python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/
           if (-not $?) {
             echo "::error::Wheel build failed"
             exit 1
@@ -125,7 +125,7 @@ jobs:
           }
 
           ls v8\out.gn\x64.release.sample\
-          cp v8\out.gn\x64.release.sample\icudtl.dat ${{ env.DIST_NAME }}
+          cp v8\out.gn\x64.release.sample\icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/
 
       - name: Test wheel
         run: |
