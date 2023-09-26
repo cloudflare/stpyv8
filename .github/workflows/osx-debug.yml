@@ -2,7 +2,69 @@ name: MacOSX build workflow (debug)
 
 on: [push, pull_request]
 
+env:
+  BOOST_ROOT: boost
+  BOOST_VERSION: 1.83.0
+  STPYV8_DEBUG: 1
+
 jobs:
+  build-v8:
+    # Don't build Google V8 if it is already in the workflow cache
+    # Cloning is necessary in any case to calculate a hash for the
+    # cache key
+    name: Build Google V8
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-11, macos-12, macos-13]
+        python-version: ['3.11']
+
+    outputs:
+      v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Clone Google V8
+        run: |
+          python -m pip install wheel
+          echo "::group::Clone Google V8"
+          python setup.py checkout_v8
+          echo "::endgroup::"
+
+      - name: Restore Google V8 from cache
+        id: restore-v8
+        uses: actions/cache/restore@main
+        with:
+          path: |
+            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+            v8\out.gn\x64.release.sample\icudtl.dat
+            v8\include
+          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+
+      - name: Build Google V8
+        id: build-v8
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
+        continue-on-error: false
+        run: |
+          echo "v8-hash=${{ hashFiles('v8/src/**') }}" >> "$GITHUB_OUTPUT"
+          python -m pip install wheel
+          echo "::group::v8"
+          python setup.py v8
+          echo "::endgroup::"
+
+      - name: Save Google V8 to cache
+        uses: actions/cache/save@main
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
+        with:
+          # Save compiled binary and header files
+          # This will save an additional clone of v8 for the linker
+          path: |
+            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+            v8\out.gn\x64.release.sample\icudtl.dat
+            v8\include
+          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+
   build:
     name: Build wheel on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -20,32 +82,50 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip setuptools wheel pytest
-          brew update
-          brew install boost
-          # The option --ignore-dependencies is a workaround required to
-          # avoid boost-python3 installing python@3.11. This option will
-          # be removed when Python default Mac OSX version will be v3.11
-          brew install boost-python3 --ignore-dependencies
-        env:
-          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+      - name: Install Boost
+        uses: MarkusJx/install-boost@main
+        id: install-boost
+        with:
+          link: static
+          boost_version: ${{ env.BOOST_VERSION }}
+          boost_install_dir: ${{ env.BOOST_ROOT }}
+          platform_version: 11
+
+      - name: Restore Google V8 from cache
+        id: restore-v8
+        uses: actions/cache/restore@main
+        with:
+          path: |
+            v8\out.gn\x64.release.sample\obj\v8_monolith.lib
+            v8\out.gn\x64.release.sample\icudtl.dat
+            v8\include
+          key: ${{ runner.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
 
       - name: Build wheel
-        run: |
-          python setup.py v8
-          sudo --preserve-env=STPYV8_DEBUG python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
-          sudo --preserve-env=STPYV8_DEBUG python setup.py install
-          sudo --preserve-env=STPYV8_DEBUG cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
         env:
-          STPYV8_DEBUG: 1
+          INCLUDE: ${{steps.install-boost.outputs.BOOST_ROOT}}/include
+        run: |
+          python -m pip install wheel pytest
+
+          # Google V8 build should be already be supplied from the cache
+		  # so no need to rebuild
+          python setup.py sdist bdist_wheel --skip-build-v8 -d ${{ env.DIST_NAME }}
+          if (-not $?) {
+            echo "::error::Wheel build failed"
+            exit 1
+          }
+          python setup.py install
+          if (-not $?) {
+            echo "::error::Wheel installation failed"
+            exit 1
+          }
+
+          ls v8\out.gn\x64.release.sample\
+          cp v8\out.gn\x64.release.sample\icudtl.dat ${{ env.DIST_NAME }}
 
       - name: Test wheel
         run: |
           pytest -v
-        env:
-          STPYV8_DEBUG: 1
 
       - name: Create wheel zip
         uses: vimtor/action-zip@v1.1
