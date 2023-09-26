@@ -107,8 +107,7 @@ jobs:
         run: |
           python -m pip install wheel pytest
 
-          # Google V8 build should be already be supplied from the cache
-		  # so no need to rebuild
+          # Google V8 build should be already be supplied from the cache so no need to rebuild
           python setup.py sdist bdist_wheel --skip-build-v8 -d ${{ env.DIST_NAME }}
           if (-not $?) {
             echo "::error::Wheel build failed"
