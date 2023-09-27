@@ -42,7 +42,9 @@ jobs:
         uses: actions/cache/restore@main
         with:
           path: |
-            v8/out.gn/x64.release.sample/obj/v8_monolith.lib
+            v8/out.gn/x64.release.sample/obj/libv8_libbase.a
+            v8/out.gn/x64.release.sample/obj/libv8_libplatform.a
+            v8/out.gn/x64.release.sample/obj/libv8_monolith.lib
             v8/out.gn/x64.release.sample/icudtl.dat
             v8/include
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
@@ -66,7 +68,9 @@ jobs:
           # Save compiled binary and header files
           # This will save an additional clone of v8 for the linker
           path: |
-            v8/out.gn/x64.release.sample/obj/v8_monolith.lib
+            v8/out.gn/x64.release.sample/obj/libv8_libbase.a
+            v8/out.gn/x64.release.sample/obj/libv8_libplatform.a
+            v8/out.gn/x64.release.sample/obj/libv8_monolith.a
             v8/out.gn/x64.release.sample/icudtl.dat
             v8/include
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
@@ -89,6 +93,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Evaluate platform version
+        uses: winterjung/split@v2
+        id: split
+        with:
+          msg: ${{ matrix.os }}
+          separator: '-'
+
       - name: Install Boost
         uses: MarkusJx/install-boost@main
         id: install-boost
@@ -96,14 +107,16 @@ jobs:
           link: static
           boost_version: ${{ env.BOOST_VERSION }}
           boost_install_dir: ${{ env.BOOST_ROOT }}
-          platform_version: 11
+          platform_version: ${{ steps.split.outputs._1 }}
 
       - name: Restore Google V8 from cache
         id: restore-v8
         uses: actions/cache/restore@main
         with:
           path: |
-            v8/out.gn/x64.release.sample/obj/v8_monolith.lib
+            v8/out.gn/x64.release.sample/obj/libv8_libbase.a
+            v8/out.gn/x64.release.sample/obj/libv8_libplatform.a
+            v8/out.gn/x64.release.sample/obj/libv8_monolith.lib
             v8/out.gn/x64.release.sample/icudtl.dat
             v8/include
           key: ${{ runner.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
