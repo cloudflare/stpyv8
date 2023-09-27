@@ -94,17 +94,17 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Platform configuration for macos-11
-        if: ${ matrix.os == 'macos-11' }
+        if: ${{ matrix.os == 'macos-11' }}
         run:
           echo "PLATFORM_VERSION=11" >> $GITHUB_ENV
 
       - name: Platform configuration for macos-12
-        if: ${ matrix.os == 'macos-12' }
+        if: ${{ matrix.os == 'macos-12' }}
         run:
           echo "PLATFORM_VERSION=12" >> $GITHUB_ENV
 
       - name: Platform configuration for macos-13
-        if: ${ matrix.os == 'macos-13' }
+        if: ${{ matrix.os == 'macos-13' }}
         run:
           echo "PLATFORM_VERSION=13" >> $GITHUB_ENV
 
