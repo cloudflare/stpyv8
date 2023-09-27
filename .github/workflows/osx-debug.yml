@@ -93,12 +93,20 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Evaluate platform version
-        uses: winterjung/split@v2
-        id: split
-        with:
-          msg: ${{ matrix.os }}
-          separator: '-'
+      - name: Platform configuration for macos-11
+        if: $${ matrix.os == 'macos-11' }
+        run:
+          echo "PLATFORM_VERSION=11" >> $GITHUB_ENV
+
+      - name: Platform configuration for macos-12
+        if: $${ matrix.os == 'macos-12' }
+        run:
+          echo "PLATFORM_VERSION=12" >> $GITHUB_ENV
+
+      - name: Platform configuration for macos-13
+        if: $${ matrix.os == 'macos-13' }
+        run:
+          echo "PLATFORM_VERSION=13" >> $GITHUB_ENV
 
       - name: Install Boost
         uses: MarkusJx/install-boost@main
@@ -107,7 +115,7 @@ jobs:
           link: static
           boost_version: ${{ env.BOOST_VERSION }}
           boost_install_dir: ${{ env.BOOST_ROOT }}
-          platform_version: ${{ steps.split.outputs._1 }}
+          platform_version: ${{ env.PLATFORM_VERSION }}
 
       - name: Restore Google V8 from cache
         id: restore-v8
