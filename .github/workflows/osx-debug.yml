@@ -8,19 +8,14 @@ env:
   STPYV8_DEBUG: 1
 
 jobs:
-  build-v8:
-    # Don't build Google V8 if it is already in the workflow cache
-    # Cloning is necessary in any case to calculate a hash for the
-    # cache key
-    name: Build Google V8
+  build:
+    name: Build STPyV8
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-11, macos-12, macos-13]
         python-version: ['3.11']
 
-    outputs:
-      v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -30,6 +25,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      # Don't build Google V8 if it is already in the workflow cache
+      # Cloning is necessary in any case to calculate a hash for the
+      # cache key
       - name: Clone Google V8
         run: |
           python -m pip install wheel
@@ -73,25 +71,7 @@ jobs:
             v8/out.gn/x64.release.sample/obj/libv8_monolith.a
             v8/out.gn/x64.release.sample/icudtl.dat
             v8/include
-          key: ${{ matrix.os }}-build-v8-${{ hashFiles('v8/src/**') }}
-
-  build:
-    name: Build wheel on ${{ matrix.os }}
-    needs: build-v8
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-11, macos-12, macos-13]
-        python-version: ['3.11']
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
+          key: ${{ matrix.os }}-build-v8-${{ steps.build.outputs.v8-hash }}
 
       - name: Platform configuration for macos-11
         if: ${{ matrix.os == 'macos-11' }}
@@ -114,10 +94,10 @@ jobs:
         with:
           link: static
           boost_version: ${{ env.BOOST_VERSION }}
-          boost_install_dir: ${{ env.BOOST_ROOT }}
           platform_version: ${{ env.PLATFORM_VERSION }}
 
       - name: Restore Google V8 from cache
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         id: restore-v8
         uses: actions/cache/restore@main
         with:
@@ -127,7 +107,7 @@ jobs:
             v8/out.gn/x64.release.sample/obj/libv8_monolith.lib
             v8/out.gn/x64.release.sample/icudtl.dat
             v8/include
-          key: ${{ matrix.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
+          key: ${{ matrix.os }}-build-v8-${{ steps.build.outputs.v8-hash }}
 
       - name: Build wheel
         env:
