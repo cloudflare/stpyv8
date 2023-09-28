@@ -98,7 +98,7 @@ jobs:
 
       - name: Restore Google V8 from cache
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
-        id: restore-v8
+        id: restore-cached-v8
         uses: actions/cache/restore@main
         with:
           path: |
