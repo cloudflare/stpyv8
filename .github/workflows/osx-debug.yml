@@ -52,7 +52,7 @@ jobs:
 
       - name: Build wheel
         run: |
-          ls ${{ env.BOOST_ROOT }}/boost
+          ls /Users/runner/work/stpyv8/stpyv8/boost/boost
           python setup.py v8
           sudo --preserve-env=STPYV8_DEBUG python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
           sudo --preserve-env=STPYV8_DEBUG python setup.py install
