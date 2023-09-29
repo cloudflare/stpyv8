@@ -139,7 +139,7 @@ elif os.name in ("posix", ):
     if platform.system() in ('Linux', ):
         libraries.append("rt")
 
-if "GITHUB_ACTIONS_STPYV8" in os.environ:
+if "STPYV8_GITHUB_ACTIONS" in os.environ:
     include_dirs.add(os.path.join(os.getcwd(), "boost", "boost", "include"))
     library_dirs.add(os.path.join(os.getcwd(), "boost", "boost", "lib"))
 

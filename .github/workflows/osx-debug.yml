@@ -56,12 +56,12 @@ jobs:
           ls /Users/runner/work/stpyv8/stpyv8/boost/boost/include/boost
           ls /Users/runner/work/stpyv8/stpyv8/boost/boost/lib
           python setup.py v8
-          sudo --preserve-env=STPYV8_DEBUG python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
-          sudo --preserve-env=STPYV8_DEBUG python setup.py install
-          sudo --preserve-env=STPYV8_DEBUG cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
+          sudo --preserve-env=STPYV8_DEBUG,STPYV8_GITHUB_ACTIONS python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
+          sudo --preserve-env=STPYV8_DEBUG,STPYV8_GITHUB_ACTIONS python setup.py install
+          sudo --preserve-env=STPYV8_DEBUG,STPYV8_GITHUB_ACTIONS cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
         env:
           STPYV8_DEBUG: 1
-          GITHUB_ACTIONS_STPYV8: 1
+          STPYV8_GITHUB_ACTIONS: 1
 
       - name: Test wheel
         run: |
