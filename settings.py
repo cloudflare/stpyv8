@@ -140,8 +140,8 @@ elif os.name in ("posix", ):
         libraries.append("rt")
 
 if "GITHUB_ACTIONS_STPYV8" in os.environ:
-    include_dirs.add(os.path.join(os.getcwd(), "boost", "include"))
-    library_dirs.add(os.path.join(os.getcwd(), "boost", "lib"))
+    include_dirs.add(os.path.join(os.getcwd(), "boost", "boost", "include"))
+    library_dirs.add(os.path.join(os.getcwd(), "boost", "boost", "lib"))
 
 
 GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
