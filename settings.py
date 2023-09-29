@@ -133,15 +133,15 @@ if os.name in ("nt", ):
     os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
 
 elif os.name in ("posix", ):
-    if "BOOST_ROOT" in os.environ:
-        include_dirs.add(os.path.join(os.environ["BOOST_ROOT"], "include"))
-        library_dirs.add(os.path.join(os.environ["BOOST_ROOT"], "lib"))
-
     libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]
     extra_compile_args.append('-std=c++17')
 
     if platform.system() in ('Linux', ):
         libraries.append("rt")
+
+if "GITHUB_ACTIONS_STPYV8" in os.environ:
+    include_dirs.add(os.path.join(os.getcwd(), "boost", "include"))
+    library_dirs.add(os.path.join(os.getcwd(), "boost", "lib"))
 
 
 GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())

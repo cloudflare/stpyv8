@@ -52,13 +52,13 @@ jobs:
 
       - name: Build wheel
         run: |
-          echo $env:BOOST_ROOT
           python setup.py v8
           sudo --preserve-env=STPYV8_DEBUG python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
           sudo --preserve-env=STPYV8_DEBUG python setup.py install
           sudo --preserve-env=STPYV8_DEBUG cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
         env:
           STPYV8_DEBUG: 1
+          GITHUB_ACTIONS_STPYV8: 1
 
       - name: Test wheel
         run: |
