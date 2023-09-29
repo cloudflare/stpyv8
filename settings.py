@@ -148,3 +148,6 @@ GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
 
 include_dirs = list(include_dirs)
 library_dirs = list(library_dirs)
+
+print(include_dirs)
+print(library_dirs)
