@@ -109,14 +109,6 @@ STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_py
 include_dirs.add(os.path.join(V8_HOME, "include"))
 library_dirs.add(os.path.join(V8_HOME, "out.gn", "x64.release.sample", "obj"))
 
-if "BOOST_ROOT" in os.environ:
-  include_dirs.add(os.environ.get("BOOST_ROOT"))
-  library_dirs.add(os.path.join(os.environ["BOOST_ROOT"], "stage", "lib"))
-
-if "Python_ROOT_DIR" in os.environ:
-  include_dirs.add(os.path.join(os.environ["Python_ROOT_DIR"], "include"))
-  library_dirs.add(os.path.join(os.environ["Python_ROOT_DIR"], "libs"))
-
 if os.name in ("nt", ):
     icu_data_folder = ICU_DATA_FOLDER_WINDOWS
 
@@ -141,6 +133,10 @@ if os.name in ("nt", ):
     os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
 
 elif os.name in ("posix", ):
+    if "BOOST_ROOT" in os.environ:
+        include_dirs.add(os.path.join(os.environ["BOOST_ROOT"], "include"))
+        library_dirs.add(os.path.join(os.environ["BOOST_ROOT"], "lib"))
+
     libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]
     extra_compile_args.append('-std=c++17')
 
