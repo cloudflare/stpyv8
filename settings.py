@@ -143,6 +143,9 @@ if "STPYV8_GITHUB_ACTIONS" in os.environ:
     include_dirs.add(os.path.join(os.getcwd(), "boost", "boost", "include"))
     library_dirs.add(os.path.join(os.getcwd(), "boost", "boost", "lib"))
 
+    if os.name in ("posix", ):
+      libraries = [f"{item}-mt-x64" if item.startswith("boost") else item for item in libraries]
+
 
 GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
 
