@@ -145,6 +145,7 @@ if "STPYV8_GITHUB_ACTIONS" in os.environ:
 
     if os.name in ("posix", ):
       libraries = [f"{item}-mt-x64" if item.startswith("boost") else item for item in libraries]
+      extra_link_args.append('-static')
 
 
 GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
