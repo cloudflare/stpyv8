@@ -106,14 +106,8 @@ def get_libboost_python_name():
 
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 
-include_dirs.add(os.path.join(V8_HOME, "include"))
-library_dirs.add(os.path.join(V8_HOME, "out.gn", "x64.release.sample", "obj"))
-
 if os.name in ("nt", ):
     icu_data_folder = ICU_DATA_FOLDER_WINDOWS
-
-    include_dirs.add(os.path.join(V8_HOME, "include"))
-    library_dirs.add(os.path.join(V8_HOME, "out.gn", "x64.release.sample", "obj"))
 
     if "BOOST_ROOT" in os.environ:
         include_dirs.add(os.environ.get("BOOST_ROOT"))
@@ -139,7 +133,8 @@ elif os.name in ("posix", ):
     if platform.system() in ('Linux', ):
         libraries.append("rt")
 
-if "STPYV8_GITHUB_ACTIONS" in os.environ:
+
+if "STPYV8_BOOST_ACTION" in os.environ:
     include_dirs.add(os.path.join(os.getcwd(), "boost", "boost", "include"))
     library_dirs.add(os.path.join(os.getcwd(), "boost", "boost", "lib"))
 
@@ -152,6 +147,3 @@ GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
 
 include_dirs = list(include_dirs)
 library_dirs = list(library_dirs)
-
-print(include_dirs)
-print(library_dirs)
