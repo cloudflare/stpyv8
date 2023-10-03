@@ -6,6 +6,7 @@ from __future__ import print_function
 
 import re
 import collections.abc
+from typing import Callable
 
 import _STPyV8
 
@@ -34,8 +35,8 @@ __all__ = ["ReadOnly",
 
 
 class JSAttribute:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, name: str):
+        self.name: str = name
 
     def __call__(self, func):
         setattr(func, f"__{self.name}__", True)
@@ -50,9 +51,9 @@ Internal   = JSAttribute(name = 'internal')
 
 
 class JSError(Exception):
-    def __init__(self, impl):
+    def __init__(self, impl: BaseException):
         Exception.__init__(self)
-        self._impl = impl
+        self._impl: BaseException = impl
 
     def __str__(self):
         return str(self._impl)
@@ -70,7 +71,7 @@ class JSError(Exception):
     RE_FILE  = re.compile(r"\s+at\s(?P<file>[^:]+):?(?P<row>\d+)?:?(?P<col>\d+)?")
 
     @staticmethod
-    def parse_stack(value):
+    def parse_stack(value: str):
         stack = []
 
         def int_or_nul(value):
@@ -147,10 +148,11 @@ class JSUnlocker(_STPyV8.JSUnlocker):
 
 
 class JSClass:
-    __properties__ = {}
+    _CALLBACK_TYPE = Callable[[], None]  # () -> None
+    __properties__: dict[str, tuple[_CALLBACK_TYPE | None, _CALLBACK_TYPE | None]] = {}
     __watchpoints__ = {}
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str):
         if name == 'constructor':
             return JSClassConstructor(self.__class__)
 
@@ -164,7 +166,7 @@ class JSClass:
 
         raise AttributeError(name)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value):
         prop = self.__dict__.setdefault('__properties__', {}).get(name, None)
 
         if prop and isinstance(prop[1], collections.abc.Callable):
@@ -191,7 +193,7 @@ class JSClass:
         """
         return self
 
-    def hasOwnProperty(self, name):
+    def hasOwnProperty(self, name: str):
         """
         Return a boolean value indicating whether the object has a property
         with the specified name
@@ -205,27 +207,27 @@ class JSClass:
         """
         raise NotImplementedError()
 
-    def __defineGetter__(self, name, getter):
+    def __defineGetter__(self, name: str, getter: _CALLBACK_TYPE):
         """
         Bind the object property to a function to be called when that property
         is looked up
         """
         self.__properties__[name] = (getter, self.__lookupSetter__(name))
 
-    def __lookupGetter__(self, name):
+    def __lookupGetter__(self, name: str):
         """
         Return the function bound as a getter to the specified property
         """
         return self.__properties__.get(name, (None, None))[0]
 
-    def __defineSetter__(self, name, setter):
+    def __defineSetter__(self, name: str, setter: _CALLBACK_TYPE):
         """
         Bind the object property to a function to be called when an attempt
         is made to set that property
         """
         self.__properties__[name] = (self.__lookupGetter__(name), setter)
 
-    def __lookupSetter__(self, name):
+    def __lookupSetter__(self, name: str):
         """
         Return the function bound as setter to the specified property
         """
@@ -303,7 +305,7 @@ class JSIsolate(_STPyV8.JSIsolate):
 
 
 class JSContext(_STPyV8.JSContext):
-    def __init__(self, obj = None, ctxt = None):
+    def __init__(self, obj = None, ctxt: "JSContext" = None):
         self.lock = JSLocker()
         self.lock.enter()
 
