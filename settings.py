@@ -144,7 +144,7 @@ if "STPYV8_GITHUB_ACTIONS" in os.environ:
     library_dirs.add(os.path.join(os.getcwd(), "boost", "boost", "lib"))
 
     if os.name in ("posix", ):
-      libraries = [f"{item}-mt-x64" if item.startswith("boost") else item for item in libraries]
+      libraries = [f"{item}-mt-s-x64" if item.startswith("boost") else item for item in libraries]
       extra_link_args.append('-static')
 
 
