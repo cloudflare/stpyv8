@@ -1,5 +1,8 @@
 name: MacOSX build/release workflow
 
+env:
+  BOOST_VERSION: 1.83.0
+
 on:
   push:
   pull_request:
@@ -29,21 +32,38 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip setuptools wheel pytest
-          brew update
-          brew install boost
-          # The option --ignore-dependencies is a workaround required to
-          # avoid boost-python3 installing python@3.11. This option will
-          # be removed when Python default Mac OSX version will be v3.11
-          brew install boost-python3 --ignore-dependencies
-        env:
-          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+
+      - name: Platform configuration for macos-11
+        if: ${{ matrix.os == 'macos-11' }}
+        run:
+          echo "PLATFORM_VERSION=11" >> $GITHUB_ENV
+
+      - name: Platform configuration for macos-12
+        if: ${{ matrix.os == 'macos-12' }}
+        run:
+          echo "PLATFORM_VERSION=12" >> $GITHUB_ENV
+
+      - name: Platform configuration for macos-13
+        if: ${{ matrix.os == 'macos-13' }}
+        run:
+          echo "PLATFORM_VERSION=13" >> $GITHUB_ENV
+
+      - name: Install Boost
+        uses: MarkusJx/install-boost@main
+        id: install-boost
+        with:
+          link: static
+          boost_version: ${{ env.BOOST_VERSION }}
+          platform_version: ${{ env.PLATFORM_VERSION }}
 
       - name: Build wheel
         run: |
           python setup.py v8
-          sudo python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
-          sudo python setup.py install
-          sudo cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
+          sudo --preserve-env=STPYV8_BOOST_ACTION python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
+          sudo --preserve-env=STPYV8_BOOST_ACTION python setup.py install
+          sudo --preserve-env=STPYV8_BOOST_ACTION cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
+        env:
+          STPYV8_BOOST_ACTION: 1
 
       - name: Test wheel
         run: |

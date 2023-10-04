@@ -139,8 +139,11 @@ if "STPYV8_BOOST_ACTION" in os.environ:
     library_dirs.add(os.path.join(os.getcwd(), "boost", "boost", "lib"))
 
     if os.name in ("posix", ):
-      libraries = [f"{item}-mt-s-x64" if item.startswith("boost") else item for item in libraries]
-      extra_link_args.append('-static')
+        libraries = [f"{item}-mt-s-x64" if item.startswith("boost") else item for item in libraries]
+        extra_link_args.append('-static')
+
+    if sys.platform in ("darwin", ):
+        extra_compile_args.append('-mmacosx-version-min=10.9')
 
 
 GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
