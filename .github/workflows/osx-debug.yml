@@ -42,6 +42,11 @@ jobs:
         run:
           echo "PLATFORM_VERSION=13" >> $GITHUB_ENV
 
+      - name: Update Xcode CommandLineTools
+        run: |
+          sudo rm -rf /Library/Developer/CommandLineTools
+          sudo xcode-select --install
+
       - name: Install Boost
         uses: MarkusJx/install-boost@main
         id: install-boost
