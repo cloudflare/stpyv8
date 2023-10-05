@@ -49,11 +49,6 @@ jobs:
         run:
           echo "PLATFORM_VERSION=13" >> $GITHUB_ENV
 
-      - name: Update Xcode CommandLineTools
-        run: |
-          sudo rm -rf /Library/Developer/CommandLineTools
-          sudo xcode-select --install
-
       - name: Install Boost
         uses: MarkusJx/install-boost@main
         id: install-boost
@@ -65,9 +60,9 @@ jobs:
       - name: Build wheel
         run: |
           python setup.py v8
-          sudo --preserve-env=STPYV8_BOOST_ACTION python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
-          sudo --preserve-env=STPYV8_BOOST_ACTION python setup.py install
-          sudo --preserve-env=STPYV8_BOOST_ACTION cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
+          python setup.py bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
+          python setup.py install
+          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
         env:
           STPYV8_BOOST_ACTION: 1
 
