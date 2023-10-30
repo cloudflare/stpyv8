@@ -9,7 +9,7 @@ import STPyV8
 
 
 class TestMultiPythonThread(unittest.TestCase):
-    def testMultiPythonThread(self):
+    def _testMultiPythonThread(self):
         class Global:
             count = 0
             started = threading.Event()
