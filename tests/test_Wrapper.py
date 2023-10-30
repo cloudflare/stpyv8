@@ -726,12 +726,18 @@ class TestWrapper(unittest.TestCase):
                 var none = null;
             """)
 
+            print("First assert")
+            print(count)
+            print(sys.getrefcount(None))
             self.assertTrue(count <= sys.getrefcount(None) <= count + 1)
 
             ctxt.eval("""
                 var none = null;
             """)
 
+            print("Second assert")
+            print(count)
+            print(sys.getrefcount(None))
             self.assertTrue(count <= sys.getrefcount(None) <= count + 1)
 
             del ctxt
