@@ -28,7 +28,7 @@ jobs:
       - name: STEP 3. Install dependencies
         run: |
           sudo apt install libboost-dev libboost-system-dev libboost-iostreams-dev libboost-python-dev
-          pip install --upgrade pip setuptools wheel pytest
+          pip install --upgrade pip setuptools wheel pytest pytest-order
 
       - name: STEP 4. Build wheel
         run: |

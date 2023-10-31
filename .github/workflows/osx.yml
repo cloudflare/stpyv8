@@ -28,7 +28,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip setuptools wheel pytest
+          pip install --upgrade pip setuptools wheel pytest pytest-order
           brew update
           brew install boost
           # The option --ignore-dependencies is a workaround required to
