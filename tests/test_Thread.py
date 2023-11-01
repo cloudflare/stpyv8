@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import threading
 import time
+import threading
 import unittest
+import pytest
 
 import STPyV8
 
 
-class TestMultiPythonThread(unittest.TestCase):
+class TestThread(unittest.TestCase):
+    @pytest.mark.order(1)
     def testMultiPythonThread(self):
         class Global:
             count = 0
@@ -36,7 +38,8 @@ class TestMultiPythonThread(unittest.TestCase):
                         finished.release();
                     """)
 
-        threading.Thread(target = run).start()
+        t = threading.Thread(target = run)
+        t.start()
 
         now = time.time()
 
@@ -48,3 +51,35 @@ class TestMultiPythonThread(unittest.TestCase):
         self.assertEqual(10, g.count)
 
         self.assertTrue((time.time() - now) >= 1)
+        t.join()
+
+    @pytest.mark.order(2)
+    def testMultiJavascriptThread(self):
+        class Global(STPyV8.JSContext):
+            result = []
+
+            def add(self, value):
+                with STPyV8.JSUnlocker():
+                    self.result.append(value)
+
+        g = Global()
+
+        def run():
+            with STPyV8.JSIsolate():
+                with STPyV8.JSContext(g) as ctxt:
+                    ctxt.eval("""
+                        for (i=0; i<10; i++)
+                            add(i);
+                    """)
+
+        threads = [threading.Thread(target = run),
+                   threading.Thread(target = run)]
+
+        with STPyV8.JSLocker():
+            for t in threads:
+                t.start()
+
+        for t in threads:
+            t.join()
+
+        self.assertEqual(20, len(g.result))

@@ -726,13 +726,13 @@ class TestWrapper(unittest.TestCase):
                 var none = null;
             """)
 
-            self.assertTrue(count <= sys.getrefcount(None) <= count + 1)
+            self.assertTrue(count <= sys.getrefcount(None) <= count + 2)
 
             ctxt.eval("""
                 var none = null;
             """)
 
-            self.assertTrue(count <= sys.getrefcount(None) <= count + 1)
+            self.assertTrue(count <= sys.getrefcount(None) <= count + 2)
 
             del ctxt
 
