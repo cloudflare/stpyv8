@@ -133,7 +133,7 @@ void CPythonObject::ThrowIf(v8::Isolate* isolate)
 {
     CPythonGIL python_gil;
 
-    assert(PyErr_OCCURRED());
+    assert(PyErr_Occurred());
 
     v8::HandleScope handle_scope(isolate);
 
@@ -279,7 +279,7 @@ void CPythonObject::NamedGetter(v8::Local<v8::Name> prop, const v8::PropertyCall
 
     if (!value)
     {
-        if (PyErr_OCCURRED())
+        if (PyErr_Occurred())
         {
             if (::PyErr_ExceptionMatches(::PyExc_AttributeError))
             {
