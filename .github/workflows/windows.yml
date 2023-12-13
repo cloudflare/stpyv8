@@ -183,15 +183,16 @@ jobs:
             echo "::error::Wheel build failed"
             exit 1
           }
-          python setup.py install
+          # python setup.py install
+          pip install .
           if (-not $?) {
             echo "::error::Wheel installation failed"
             exit 1
           }
 
-          ls v8\out.gn\x64.release.sample\
+          # ls v8\out.gn\x64.release.sample\
 
-          cp v8\out.gn\x64.release.sample\icudtl.dat ${{ env.DIST_NAME }}
+          # cp v8\out.gn\x64.release.sample\icudtl.dat ${{ env.DIST_NAME }}
 
       - name: STEP 6. Test wheel
         run: |

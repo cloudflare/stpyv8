@@ -27,22 +27,23 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt install libboost-dev libboost-system-dev libboost-iostreams-dev libboost-python-dev
+          sudo apt install libboost-dev libboost-system-dev libboost-iostreams-dev libboost-filesystem-dev libboost-python-dev
           pip install --upgrade pip setuptools wheel pytest pytest-order
 
       - name: Build wheel
         run: |
           python setup.py v8
           python setup.py sdist bdist_wheel -d stpyv8-debian-11-${{ matrix.python-version }}
-          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-debian-11-${{ matrix.python-version }}/icudtl.dat
+          # cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-debian-11-${{ matrix.python-version }}/icudtl.dat
         env:
           V8_DEPS_LINUX: 0
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
       - name: Install wheel
         run : |
-          cp stpyv8-debian-11-${{ matrix.python-version }}/icudtl.dat /usr/share/stpyv8
-          pip install --upgrade stpyv8-debian-11-${{ matrix.python-version }}/stpyv8*.whl
+          # cp stpyv8-debian-11-${{ matrix.python-version }}/icudtl.dat /usr/share/stpyv8
+          # pip install --upgrade stpyv8-debian-11-${{ matrix.python-version }}/stpyv8*.whl
+          pip install .
 
       - name: Test wheel
         run: |

@@ -27,15 +27,16 @@ jobs:
 
       - name: STEP 3. Install dependencies
         run: |
-          sudo apt install libboost-dev libboost-system-dev libboost-iostreams-dev libboost-python-dev
+          sudo apt install libboost-dev libboost-system-dev libboost-iostreams-dev libboost-filesystem-dev libboost-python-dev
           pip install --upgrade pip setuptools wheel pytest pytest-order
 
       - name: STEP 4. Build wheel
         run: |
           python setup.py v8
           python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
-          python setup.py install
-          cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
+          # python setup.py install
+          # cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
+          pip install .
         env:
           STPYV8_DEBUG: 1
           V8_DEPS_LINUX: 0

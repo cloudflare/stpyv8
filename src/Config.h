@@ -7,13 +7,20 @@
 #define SUPPORT_TRACE_LIFECYCLE 1
 
 // ICU data file
-#define ICU_DATA_UNIX "/usr/share/stpyv8/icudtl.dat"
-#define ICU_DATA_OSX  "/Library/Application Support/STPyV8/icudtl.dat"
 
 #if defined(__linux)
-#  define ICU_DATA ICU_DATA_UNIX
+#  define ICU_DATA_SYSTEM "/usr/share/stpyv8/icudtl.dat"
+#  define ICU_DATA_USER   ".local/share/stpyv8/icudtl.dat"
 #elif defined(__APPLE)
-#  define ICU_DATA ICU_DATA_OSX
+#  define ICU_DATA_SYSTEM "/Library/Application Support/STPyV8/icudtl.dat"
+#  define ICU_DATA_USER   "Library/Application Support/STPyV8/icudtl.dat"
+#elif defined(_WIN32)
+#  define ICU_DATA_SYSTEM nullptr
+#  define ICU_DATA_USER   "\\STPyV8\\icudtl.dat"
+#elif defined (_WIN64)
+#  define ICU_DATA_SYSTEM nullptr
+#  define ICU_DATA_USER   "\\STPyV8\\icudtl.dat"
 #else
-#  define ICU_DATA nullptr
+#  define ICU_DATA_SYSTEM nullptr
+#  define ICU_DATA_USER   nullptr
 #endif
