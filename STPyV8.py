@@ -340,12 +340,25 @@ class JSContext(_STPyV8.JSContext):
         del self
 
 
-
 def icu_sync():
     if sys.version_info < (3 ,10):
         from importlib_resources import files
     else:
         from importlib.resources import files
+
+    for folder in icu_data_folders:
+        if not folder or not os.path.exists(folder):
+            continue
+
+        version_file = os.path.join(folder, 'stpyv8-version.txt')
+        if not os.path.exists(version_file):
+            continue
+
+        with open(version_file, encoding = 'utf-8', mode = 'r') as fd:
+            version = fd.read()
+
+        if version.strip() in (__version__, ):
+            return
 
     try:
         stpyv8_icu_files = files('stpyv8-icu')
@@ -356,8 +369,6 @@ def icu_sync():
         if f.name not in ('icudtl.dat', ):
             continue
 
-        synced = False
-
         data = f.read_bytes()
 
         for folder in icu_data_folders:
@@ -366,15 +377,12 @@ def icu_sync():
                 with open(os.path.join(folder, 'icudtl.dat'), mode = 'wb') as fd:
                     fd.write(data)
 
-                synced = True
+                version_file = os.path.join(folder, 'stpyv8-version.txt')
+                with open(version_file, encoding = 'utf-8', mode = 'w') as fd:
+                    fd.write(__version__)
             except PermissionError:
                 pass
 
-        if synced:
-            try:
-                f.unlink()
-            except PermissionError:
-                pass
 
 icu_sync()
 
