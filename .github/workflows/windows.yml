@@ -183,8 +183,7 @@ jobs:
             echo "::error::Wheel build failed"
             exit 1
           }
-          # python setup.py install
-          pip install .
+          python setup.py install
           if (-not $?) {
             echo "::error::Wheel installation failed"
             exit 1
