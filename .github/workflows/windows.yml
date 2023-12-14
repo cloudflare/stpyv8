@@ -183,7 +183,8 @@ jobs:
             echo "::error::Wheel build failed"
             exit 1
           }
-          python setup.py install
+          # python setup.py install
+          pip install --upgrade ${{ env.DIST_NAME }}/stpyv8*.whl
           if (-not $?) {
             echo "::error::Wheel installation failed"
             exit 1
