@@ -150,7 +150,7 @@ jobs:
           # https://github.com/boostorg/python/commit/cbd2d9f033c61d29d0a1df14951f4ec91e7d05cd
           (Get-Content libs\python\src\exec.cpp).replace('_Py_fopen', 'fopen') | Set-Content libs\python\src\exec.cpp
           
-          .\b2.exe stage -j 8 link=static runtime-link=static --with-python --with-iostreams --with-date_time --with-thread
+          .\b2.exe stage -j 8 link=static runtime-link=static --with-python --with-filesystem --with-iostreams --with-date_time --with-thread
           ls stage\lib
 
       - name: Save Boost to cache
