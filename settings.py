@@ -98,8 +98,6 @@ def get_libboost_python_name():
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 
 if os.name in ("nt", ):
-    icu_data_folder = ICU_DATA_FOLDER_WINDOWS
-
     include_dirs.add(os.path.join(V8_HOME, "include"))
     library_dirs.add(os.path.join(V8_HOME, "out.gn", "x64.release.sample", "obj"))
 
