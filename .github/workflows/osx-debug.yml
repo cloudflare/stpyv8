@@ -36,9 +36,8 @@ jobs:
         run: |
           python setup.py v8
           sudo --preserve-env=STPYV8_DEBUG python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
-          # sudo --preserve-env=STPYV8_DEBUG python setup.py install
+          sudo --preserve-env=STPYV8_DEBUG python setup.py install
           # sudo --preserve-env=STPYV8_DEBUG cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
-          sudo --preserve-env=STPYV8_DEBUG pip install .
         env:
           STPYV8_DEBUG: 1
 
