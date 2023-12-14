@@ -175,7 +175,7 @@ jobs:
           # Set include and library files which will be picked up by setuptools
           INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include
         run: |
-          python -m pip install wheel pytest pytest-order
+          python -m pip install wheel importlib_resources pytest pytest-order
           
           # v8 build should already be supplied from cache hence no need to rebuild
           python setup.py sdist bdist_wheel --skip-build-v8 -d ${{ env.DIST_NAME }}
@@ -183,8 +183,8 @@ jobs:
             echo "::error::Wheel build failed"
             exit 1
           }
-          # python setup.py install
-          pip install --upgrade ${{ env.DIST_NAME }}/stpyv8*.whl
+
+          python setup.py install
           if (-not $?) {
             echo "::error::Wheel installation failed"
             exit 1
