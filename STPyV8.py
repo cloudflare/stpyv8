@@ -6,7 +6,6 @@ from __future__ import print_function
 
 import os
 import sys
-import importlib.resources
 import re
 import collections.abc
 
@@ -343,12 +342,17 @@ class JSContext(_STPyV8.JSContext):
 
 
 def icu_sync():
+    if sys.version_info < (3 ,10):
+        from importlib_resources import files
+    else:
+        from importlib.resources import files
+
     try:
-        files = importlib.resources.files('stpyv8-icu')
+        stpyv8_icu_files = files('stpyv8-icu')
     except ModuleNotFoundError:
         return
 
-    for f in files.iterdir():
+    for f in stpyv8_icu_files.iterdir():
         if f.name not in ('icudtl.dat', ):
             continue
 
@@ -367,7 +371,10 @@ def icu_sync():
                 pass
 
         if synced:
-            f.unlink()
+            try:
+                f.unlink()
+            except PermissionError:
+                pass
 
 icu_sync()
 

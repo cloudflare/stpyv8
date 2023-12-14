@@ -225,7 +225,10 @@ setup(name             = "stpyv8",
       license          = "Apache License 2.0",
       py_modules       = ["STPyV8"],
       ext_modules      = [stpyv8],
-      install_requires = ["wheel"],
+      install_requires = [
+          "wheel",
+          "importlib_resources; python_version < '3.10'"
+      ],
       data_files       = [
               (ICU_DATA_PACKAGE_FOLDER, [ICU_DATA_V8_FILE_PATH]),
       ],
