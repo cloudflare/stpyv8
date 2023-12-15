@@ -28,6 +28,8 @@ const char * CPlatform::GetICUDataFile()
 #else
     boost::filesystem::path icu_data_path = getenv("HOME");
 #endif
+    if (icu_data_user == nullptr)
+        return nullptr
 
     if (boost::filesystem::is_directory(icu_data_path)) {
         icu_data_path /= icu_data_user;
