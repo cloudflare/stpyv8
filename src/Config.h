@@ -11,7 +11,7 @@
 #if defined(__linux)
 #  define ICU_DATA_SYSTEM "/usr/share/stpyv8/icudtl.dat"
 #  define ICU_DATA_USER   ".local/share/stpyv8/icudtl.dat"
-#elif defined(__APPLE)
+#elif defined(__APPLE__)
 #  define ICU_DATA_SYSTEM "/Library/Application Support/STPyV8/icudtl.dat"
 #  define ICU_DATA_USER   "Library/Application Support/STPyV8/icudtl.dat"
 #elif defined(_WIN32)
