@@ -22,12 +22,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip setuptools wheel pytest pytest-order
+          pip install --upgrade pip setuptools delocate wheel pytest pytest-order
           brew update
           brew install boost
-          # The option --ignore-dependencies is a workaround required to
-          # avoid boost-python3 installing python@3.11. This option will
-          # be removed when Python default Mac OSX version will be v3.11
           brew install boost-python3 --ignore-dependencies
         env:
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
@@ -35,11 +32,21 @@ jobs:
       - name: Build wheel
         run: |
           python setup.py v8
-          sudo --preserve-env=STPYV8_DEBUG python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
-          sudo --preserve-env=STPYV8_DEBUG python setup.py install
-          # sudo --preserve-env=STPYV8_DEBUG cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
+          python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
         env:
           STPYV8_DEBUG: 1
+
+      - name: Repair wheel
+        run: |
+          delocate-wheel stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/stpyv8*.whl
+
+      - name: Uninstall boost
+        run: |
+          brew uninstall boost boost-python3
+
+      - name: Install wheel
+        run: |
+          pip install --upgrade stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/stpyv8*.whl
 
       - name: Test wheel
         run: |
