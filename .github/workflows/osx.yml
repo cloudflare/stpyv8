@@ -30,7 +30,10 @@ jobs:
         run: |
           pip install --upgrade pip setuptools delocate wheel pytest pytest-order
           brew update
-          brew install boost boost-python3
+          brew install boost
+          brew install boost-python3 --ignore-dependencies
+        env:
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
 
       - name: Build wheel
         run: |
