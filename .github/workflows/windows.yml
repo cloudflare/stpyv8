@@ -184,6 +184,7 @@ jobs:
             exit 1
           }
 
+          ls ${{ env.DIST_NAME }}\
           pip install --upgrade ${{ env.DIST_NAME }}/stpyv8*.whl
 
           if (-not $?) {
