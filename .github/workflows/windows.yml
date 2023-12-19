@@ -185,7 +185,7 @@ jobs:
           }
 
           ls ${{ env.DIST_NAME }}\
-          python -m pip install --upgrade ${{ env.DIST_NAME }}\stpyv8*.whl
+          python -m pip install .
 
           if (-not $?) {
             echo "::error::Wheel installation failed"
