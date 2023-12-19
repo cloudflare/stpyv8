@@ -38,7 +38,7 @@ jobs:
 
       - name: Repair wheel
         run: |
-          delocate-wheel stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/stpyv8*.whl
+          delocate-wheel stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/stpyv8*.whl
 
       - name: Uninstall boost
         run: |
