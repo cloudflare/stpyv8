@@ -15,10 +15,10 @@
 #  define ICU_DATA_SYSTEM "/Library/Application Support/STPyV8/icudtl.dat"
 #  define ICU_DATA_USER   "Library/Application Support/STPyV8/icudtl.dat"
 #elif defined(_WIN32)
-#  define ICU_DATA_SYSTEM nullptr
+#  define ICU_DATA_SYSTEM "\\STPyV8\\icudtl.dat"
 #  define ICU_DATA_USER   "\\STPyV8\\icudtl.dat"
 #elif defined (_WIN64)
-#  define ICU_DATA_SYSTEM nullptr
+#  define ICU_DATA_SYSTEM "\\STPyV8\\icudtl.dat"
 #  define ICU_DATA_USER   "\\STPyV8\\icudtl.dat"
 #else
 #  define ICU_DATA_SYSTEM nullptr
