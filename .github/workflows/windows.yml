@@ -210,7 +210,7 @@ jobs:
         if: ${{ github.event_name != 'release' }}
         with:
          name: wheels
-         path: ${{ env.DIST_NAME }}.zip
+         path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
 
       - name: STEP 8. Release
         uses: softprops/action-gh-release@v1
