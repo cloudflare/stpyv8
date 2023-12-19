@@ -232,7 +232,6 @@ setup(name             = "stpyv8",
       data_files       = [
               (ICU_DATA_PACKAGE_FOLDER, [ICU_DATA_V8_FILE_PATH]),
       ],
-      include_package_data = True,
       classifiers  = [
         "Development Status :: 4 - Beta",
         "Environment :: Plugins",
