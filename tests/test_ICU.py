@@ -20,5 +20,9 @@ else:
 class TestICU(unittest.TestCase):
     def testIcu(self):
         print(icu_data_folders)
+        for f in icu_data_folders:
+            print(os.listdir(f))
+
         icu_paths = (os.path.join(folder, "icudtl.dat") for folder in icu_data_folders)
+        print(icu_paths)
         self.assertTrue(any(os.path.exists(icu) for icu in icu_paths))
