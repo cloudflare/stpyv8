@@ -186,7 +186,7 @@ jobs:
 
       - name: Repair wheel
         run: |
-          delvewheel repair -vv -w ${{ env.DIST_NAME }} ${{ env.DIST_NAME }}/stpyv8*.whl
+          delvewheel repair -vv -w ${{ env.DIST_NAME }} ${{ env.DIST_NAME }}\stpyv8*.whl
 
       - name: Install wheel
         run: |
