@@ -186,7 +186,9 @@ jobs:
 
       - name: Repair wheel
         run: |
-          delvewheel repair -vv -w ${{ env.DIST_NAME }} ${{ env.DIST_NAME }}\stpyv8*.whl
+          Get-ChildItem -Path ${{ env.DIST_NAME }} -Filter *.whl | Foreach-Object {
+            delvewheel repair -vv -w ${{ env.DIST_NAME }} $_.FullName
+          }
 
       - name: Install wheel
         run: |
