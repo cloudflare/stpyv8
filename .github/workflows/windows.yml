@@ -178,7 +178,7 @@ jobs:
           python -m pip install wheel delvewheel importlib_resources pytest pytest-order
           
           # Google V8 build should already be supplied from cache hence no need to rebuild
-          python setup.py sdist bdist_wheel --skip-build-v8 -d ${{ env.DIST_NAME }}
+          python setup.py sdist bdist_wheel --skip-build-v8 -d wheelhouse-${{ env.DIST_NAME }}
           if (-not $?) {
             echo "::error::Wheel build failed"
             exit 1
@@ -186,7 +186,7 @@ jobs:
 
       - name: Repair wheel
         run: |
-          Get-ChildItem -Path ${{ env.DIST_NAME }} -Filter *.whl | Foreach-Object {
+          Get-ChildItem -Path wheelhouse-${{ env.DIST_NAME }} -Filter *.whl | Foreach-Object {
             delvewheel repair -vv -w ${{ env.DIST_NAME }} $_.FullName
           }
 
