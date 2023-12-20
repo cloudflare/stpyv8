@@ -39,8 +39,6 @@ jobs:
         run: |
           python setup.py v8
           python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
-          # sudo python setup.py install
-          # sudo cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/icudtl.dat
 
       - name: Repair wheel
         run: |
@@ -52,7 +50,7 @@ jobs:
 
       - name: Install wheel
         run: |
-          pip install --upgrade stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/stpyv8*.whl
+          python -m pip install --find-links=stpyv8-${{ matrix.os }}-${{ matrix.python-version }} stpyv8
 
       - name: Test wheel
         run: |

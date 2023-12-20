@@ -17,45 +17,46 @@ jobs:
             python-version: '3.9'
 
     steps:
-      - name: STEP 1. Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: STEP 2. Set up Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: STEP 3. Install dependencies
+      - name: Install dependencies
         run: |
           sudo apt install libboost-dev libboost-system-dev libboost-iostreams-dev libboost-filesystem-dev libboost-python-dev
           pip install --upgrade pip setuptools wheel pytest pytest-order
 
-      - name: STEP 4. Build wheel
+      - name: Build wheel
         run: |
           python setup.py v8
           python setup.py sdist bdist_wheel -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug
-          # python setup.py install
-          # cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/icudtl.dat
-          pip install .
         env:
           STPYV8_DEBUG: 1
           V8_DEPS_LINUX: 0
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
-      - name: STEP 5. Test wheel
+      - name: Install wheel
+        run : |
+          python -m pip install --find-links=stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug stpyv8
+
+      - name: Test wheel
         run: |
           pytest -v
         env:
           STPYV8_DEBUG: 1
 
-      - name: STEP 6. Create wheel zip
+      - name: Create wheel zip
         uses: vimtor/action-zip@v1.1
         with:
           files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/
           recursive: false
           dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip
 
-      - name: STEP 7. Upload wheel zip
+      - name: Upload wheel zip
         uses: actions/upload-artifact@v3
         with:
           name: wheels

@@ -46,7 +46,7 @@ jobs:
 
       - name: Install wheel
         run: |
-          pip install --upgrade stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/stpyv8*.whl
+          python -m pip install --find-links=stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug stpyv8
 
       - name: Test wheel
         run: |

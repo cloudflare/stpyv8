@@ -34,16 +34,13 @@ jobs:
         run: |
           python setup.py v8
           python setup.py sdist bdist_wheel -d stpyv8-debian-11-${{ matrix.python-version }}
-          # cp v8/out.gn/x64.release.sample/icudtl.dat stpyv8-debian-11-${{ matrix.python-version }}/icudtl.dat
         env:
           V8_DEPS_LINUX: 0
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
       - name: Install wheel
         run : |
-          # cp stpyv8-debian-11-${{ matrix.python-version }}/icudtl.dat /usr/share/stpyv8
-          # pip install --upgrade stpyv8-debian-11-${{ matrix.python-version }}/stpyv8*.whl
-          pip install .
+          python -m pip install --find-links=stpyv8-debian-11-${{ matrix.python-version }} stpyv8
 
       - name: Test wheel
         run: |
