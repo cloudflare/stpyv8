@@ -1,4 +1,4 @@
-name: Ubuntu build/release workflow
+name: Linux build/release workflow
 
 on:
   push:
@@ -74,8 +74,6 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         python-version: ['3.9', '3.10', '3.11']
-        boost-version: ['1.83.0']
-        boost-version-snake: ['1_83_0']
 
     steps:
       - name: Checkout repository
@@ -110,6 +108,8 @@ jobs:
 
       - name: Build wheel
         run: |
+          ls $env:BOOST_ROOT
+          ls $env:BOOST_ROOT/stage/lib
           python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-linux-wheelhouse-${{ matrix.python-version }}
         env:
           V8_DEPS_LINUX: 0
