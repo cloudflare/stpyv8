@@ -106,7 +106,7 @@ jobs:
         run: |
           mkdir $env:BOOST_ROOT
           unzip ${{ steps.download-boost.outputs.filename }} -d $env:BOOST_ROOT
-          cd $env:BOOST_ROOT
+          cd $env:BOOST_ROOT/boost_${{ matrix.boost-version-snake }}
           echo "BOOST_ROOT=$pwd" >> $env:GITHUB_OUTPUT
           echo "BOOST_ROOT=$pwd" >> $env:GITHUB_ENV
           echo "BOOST_LIBRARYDIR=$pwd/stage/lib" >> $env:GITHUB_ENV
