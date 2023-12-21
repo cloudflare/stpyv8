@@ -125,6 +125,12 @@ elif os.name in ("posix", ):
     if platform.system() in ('Linux', ):
         libraries.append("rt")
 
+        if os.environ.get('GITHUB_ACTIONS', 'false') in ('true', ):
+            boost_root = os.environ.get('BOOST_ROOT', None)
+            if boost_root:
+                include_dirs.add(os.path.join(boost_root, "include"))
+                library_dirs.add(os.path.join(boost_root, "lib"))
+
 
 GN_ARGS = ' '.join(f"{key}={value}" for key, value in gn_args.items())
 
