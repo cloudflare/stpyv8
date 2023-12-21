@@ -108,6 +108,7 @@ jobs:
 
       - name: Restore Google V8 from cache
         id: restore-v8
+        working-directory: stpyv8/stpyv8
         uses: actions/cache/restore@main
         with:
           path: |
@@ -122,12 +123,12 @@ jobs:
 
       - name: Build wheel
         run: |
+          echo "STPYV8_BOOST_PYTHON=boost_python$(echo ${{ matrix.python_version }} | sed 's/.//g')" >> $env:GITHUB_ENV
           python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-linux-wheelhouse-${{ matrix.python-version }}
         env:
           INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include
           V8_DEPS_LINUX: 0
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
-          STPYV8_BOOST_PYTHON: boost_python$(echo ${{ matrix.python_version }} | sed 's/.//g')
 
       - name: Repair wheel
         run: |
