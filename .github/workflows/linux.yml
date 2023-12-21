@@ -64,6 +64,12 @@ jobs:
             v8/include
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
+      - name: Debug
+        run: |
+          pwd
+          ls -lh
+          ls -lh ..
+
   build:
     name: Build Linux wheel
     needs: build-v8
@@ -98,7 +104,7 @@ jobs:
           unzip -q ${{ steps.download-boost.outputs.filename }}
           cd boost_${{ matrix.boost-version-snake }}
           ./bootstrap.sh
-          sudo ./b2 install -j 8 link=static runtime-link=static --with-python --with-filesystem --with-iostreams --with-date_time --with-thread
+          sudo ./b2 install -j 8 link=static runtime-link=static --with-system --with-python --with-filesystem --with-iostreams --with-date_time --with-thread
 
       - name: Restore Google V8 from cache
         id: restore-v8
@@ -121,6 +127,7 @@ jobs:
           INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include
           V8_DEPS_LINUX: 0
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
+          STPYV8_BOOST_PYTHON: boost_python$(echo ${{ matrix.python_version }} | sed 's/.//g')
 
       - name: Repair wheel
         run: |
