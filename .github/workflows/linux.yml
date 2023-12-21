@@ -132,7 +132,7 @@ jobs:
 
       - name: Repair wheel
         run: |
-          auditwheel repair -v -w stpyv8-linux-${{ matrix.python-version }} stpyv8-linux-wheelhouse-${{ matrix.python-version }}/.whl
+          auditwheel repair -v -w stpyv8-linux-${{ matrix.python-version }} stpyv8-linux-wheelhouse-${{ matrix.python-version }}/*.whl
 
       - name: Install wheel
         run: |
