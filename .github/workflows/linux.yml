@@ -90,7 +90,7 @@ jobs:
         id: restore-boost
         uses: actions/cache/restore@main
         with:
-          path: ${{ env.BOOST_ROOT }}/stage/lib
+          path: boost_${{ matrix.boost-version-snake }}/stage/lib
           key: boost${{ matrix.boost-version }}_py${{ matrix.python-version }}_linux
 
       - name: Download Boost
@@ -152,9 +152,6 @@ jobs:
 
       - name: Build wheel
         run: |
-          ls ${{ steps.install-boost.outputs.BOOST_ROOT }}
-          ls ${{ steps.install-boost.outputs.BOOST_ROOT }}/include
-          ls ${{ steps.install-boost.outputs.BOOST_ROOT }}/lib
           python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-linux-wheelhouse-${{ matrix.python-version }}
         env:
           V8_DEPS_LINUX: 0
