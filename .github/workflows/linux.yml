@@ -86,55 +86,20 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Restore Boost from cache
-        id: restore-boost
-        uses: actions/cache/restore@main
-        with:
-          path: boost_${{ matrix.boost-version-snake }}/stage/lib
-          key: boost${{ matrix.boost-version }}_py${{ matrix.python-version }}_linux
-
       - name: Download Boost
-        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
         id: download-boost
         uses: suisei-cn/actions-download-file@v1.4.0
         with:
           url: https://boostorg.jfrog.io/artifactory/main/release/${{ matrix.boost-version }}/source/boost_${{ matrix.boost-version-snake }}.zip
 
       - name: Install Boost
-        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
         id: install-boost
         run: |
           unzip -q ${{ steps.download-boost.outputs.filename }}
           cd boost_${{ matrix.boost-version-snake }}
-          ls
-          echo "BOOST_ROOT=$pwd" >> $env:GITHUB_OUTPUT
-          echo "BOOST_ROOT=$pwd" >> $env:GITHUB_ENV
-          echo "BOOST_LIBRARYDIR=$pwd/stage/lib" >> $env:GITHUB_ENV
-
-      - name: Build Boost
-        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
-        working-directory: boost_${{ matrix.boost-version-snake }}
-        run: |
           ./bootstrap.sh
-
-          # Set specific Python version
-          # $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
-          # $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}"
-          # echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
-
-          # Patch bug affecting compilation on Python 3.10
-          # https://github.com/boostorg/python/commit/cbd2d9f033c61d29d0a1df14951f4ec91e7d05cd
-          # (Get-Content libs\python\src\exec.cpp).replace('_Py_fopen', 'fopen') | Set-Content libs\python\src\exec.cpp
-
           ./b2 stage -j 8 link=static runtime-link=static --with-python --with-filesystem --with-iostreams --with-date_time --with-thread
           ls stage/lib
-
-      - name: Save Boost to cache
-        uses: actions/cache/save@main
-        if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
-        with:
-          path: boost_${{ matrix.boost-version-snake }}/stage/lib
-          key: boost${{ matrix.boost-version }}_py${{ matrix.python-version }}_linux
 
       - name: Restore Google V8 from cache
         id: restore-v8
