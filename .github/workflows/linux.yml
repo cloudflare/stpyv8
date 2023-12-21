@@ -120,8 +120,8 @@ jobs:
 
           # Set specific Python version
           # $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
-          $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}"
-          echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
+          # $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}"
+          # echo "using python : : ""$escapedPythonPath"" ;" >> project-config.jam
 
           # Patch bug affecting compilation on Python 3.10
           # https://github.com/boostorg/python/commit/cbd2d9f033c61d29d0a1df14951f4ec91e7d05cd
