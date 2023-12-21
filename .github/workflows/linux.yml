@@ -116,7 +116,6 @@ jobs:
         working-directory: boost_${{ matrix.boost-version-snake }}
         run: |
           ./bootstrap.sh
-          if (-not $?) { type bootstrap.log }
 
           # Set specific Python version
           # $escapedPythonPath = "${{ steps.install-python.outputs.python-path }}" -Replace "\\","\\"
