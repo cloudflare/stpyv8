@@ -108,11 +108,13 @@ jobs:
 
       - name: Build wheel
         run: |
+          ls ${{ steps.install-boost.outputs.BOOST_ROOT }}
+          ls ${{ steps.install-boost.outputs.BOOST_ROOT }}/include
+          ls ${{ steps.install-boost.outputs.BOOST_ROOT }}/lib
           python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-linux-wheelhouse-${{ matrix.python-version }}
         env:
           V8_DEPS_LINUX: 0
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
-          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
       - name: Repair wheel
         run: |
