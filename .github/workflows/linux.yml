@@ -98,8 +98,7 @@ jobs:
           unzip -q ${{ steps.download-boost.outputs.filename }}
           cd boost_${{ matrix.boost-version-snake }}
           ./bootstrap.sh
-          ./b2 stage -j 8 link=static runtime-link=static --with-python --with-filesystem --with-iostreams --with-date_time --with-thread
-          ls stage/lib
+          ./b2 install -j 8 link=static runtime-link=static --with-python --with-filesystem --with-iostreams --with-date_time --with-thread
 
       - name: Restore Google V8 from cache
         id: restore-v8
