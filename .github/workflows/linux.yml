@@ -1,0 +1,150 @@
+name: Ubuntu build/release workflow
+
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+    branches:
+      - master
+
+env:
+  BOOST_ROOT: boost
+
+jobs:
+  build-v8:
+    # If Google V8 is in the workflow cache, don't build
+    # Clone is necessary in any case to calculate a hash
+    # for the cache key
+    name: Build Google V8
+    runs-on: ubuntu-20.04
+    outputs:
+      v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Clone Google V8
+        run: |
+          python -m pip install wheel
+          echo "::group::Clone Google V8"
+          python setup.py checkout_v8
+          echo "::endgroup::"
+
+      - name: Restore Google V8 from cache
+        id: restore-v8
+        uses: actions/cache/restore@main
+        with:
+          path: |
+            v8/out.gn/x64.release.sample/obj/v8_monolith.lib
+            v8/out.gn/x64.release.sample/icudtl.dat
+            v8/include
+          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+
+      - name: Build Google V8
+        id: build-v8
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
+        continue-on-error: false
+        run: |
+          echo "v8-hash=${{ hashFiles('v8/src/**') }}" >> "$GITHUB_OUTPUT"
+          python -m pip install wheel
+          echo "::group::v8"
+          python setup.py v8
+          echo "::endgroup::"
+
+      - name: Save Google V8 to cache
+        uses: actions/cache/save@main
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
+        with:
+          # Save compiled binary and header files
+          # This will save an additional clone of v8 for the linker
+          path: |
+            v8/out.gn/x64.release.sample/obj/v8_monolith.lib
+            v8/out.gn/x64.release.sample/icudtl.dat
+            v8/include
+          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+
+  build:
+    name: Build Linux wheel
+    needs: build-v8
+    runs-on: ${{ matrix.os }}
+    env:
+      DIST_NAME: stpyv8-linux-py${{ matrix.python-version }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+        python-version: ['3.9', '3.10', '3.11']
+        boost-version: ['1.83.0']
+        boost-version-snake: ['1_83_0']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install boost
+        uses: MarkusJx/install-boost@v2.4.4
+        id: install-boost
+        with:
+          boost_version: 1.83.0
+          platform_version: 20.04
+          arch: x86
+
+      - name: Restore Google V8 from cache
+        id: restore-v8
+        uses: actions/cache/restore@main
+        with:
+          path: |
+            v8/out.gn/x64.release.sample/obj/v8_monolith.lib
+            v8/out.gn/x64.release.sample/icudtl.dat
+            v8/include
+          key: ${{ runner.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel auditwheel pytest pytest-order
+
+      - name: Build wheel
+        run: |
+          python setup.py v8
+          python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-linux-wheelhouse-${{ matrix.python-version }}
+        env:
+          V8_DEPS_LINUX: 0
+          LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
+
+      - name: Repair wheel
+        run: |
+          auditwheel repair -v -w stpyv8-linux-${{ matrix.python-version }} stpyv8-linux-wheelhouse-${{ matrix.python-version }}/.whl
+
+      - name: Install wheel
+        run: |
+          python -m pip install --find-links=stpyv8-linux-${{ matrix.python-version }} stpyv8
+
+      - name: Test wheel
+        run: |
+          pytest -v
+
+      - name: Create wheel zip
+        uses: vimtor/action-zip@v1.1
+        with:
+          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
+          recursive: false
+          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+
+      - name: Upload wheel zip
+        uses: actions/upload-artifact@v3
+        if: ${{ github.event_name != 'release' }}
+        with:
+          name: wheels
+          path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: ${{ github.event_name == 'release' }}
+        with:
+          files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip'
+          token: ${{ secrets.GITHUB_TOKEN }}
