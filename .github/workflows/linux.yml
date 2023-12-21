@@ -110,7 +110,6 @@ jobs:
 
       - name: Build wheel
         run: |
-          python setup.py v8
           python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-linux-wheelhouse-${{ matrix.python-version }}
         env:
           V8_DEPS_LINUX: 0
