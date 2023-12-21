@@ -108,7 +108,6 @@ jobs:
 
       - name: Restore Google V8 from cache
         id: restore-v8
-        working-directory: stpyv8/stpyv8
         uses: actions/cache/restore@main
         with:
           path: |
