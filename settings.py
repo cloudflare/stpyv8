@@ -119,7 +119,12 @@ if os.name in ("nt", ):
     os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
 
 elif os.name in ("posix", ):
-    libraries = ["boost_system", "boost_iostreams", "boost_filesystem", "v8_monolith", STPYV8_BOOST_PYTHON]
+    libraries = ["boost_system",
+                 "boost_iostreams",
+                 "boost_filesystem",
+                 "v8_monolith",
+                 STPYV8_BOOST_PYTHON.replace('.', '')]
+
     extra_compile_args.append('-std=c++17')
 
     if platform.system() in ('Linux', ):
