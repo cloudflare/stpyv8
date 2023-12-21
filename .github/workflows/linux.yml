@@ -69,6 +69,7 @@ jobs:
           pwd
           ls -lh
           ls -lh ..
+          ls -lh ../..
 
   build:
     name: Build Linux wheel
