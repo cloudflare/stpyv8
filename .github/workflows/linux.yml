@@ -115,6 +115,9 @@ jobs:
           pip install --upgrade pip setuptools wheel auditwheel pytest pytest-order
 
       - name: Build wheel
+        env:
+          # Set include and library files which will be picked up by setuptools
+          INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include
         run: |
           python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-linux-wheelhouse-${{ matrix.python-version }}
         env:
