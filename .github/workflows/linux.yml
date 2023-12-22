@@ -121,6 +121,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip setuptools wheel auditwheel pytest pytest-order
+          pip install --upgrade patchelf
 
       - name: Build wheel
         run: |
