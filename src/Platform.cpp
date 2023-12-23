@@ -20,3 +20,8 @@ void CPlatform::Init()
 
     inited = true;
 }
+
+v8::Platform *CPlatform::GetPlatform(void)
+{
+    return CPlatform::platform.get();
+}

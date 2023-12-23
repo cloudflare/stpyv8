@@ -29,4 +29,5 @@ public:
     CPlatform(std::string argv0) : argv(argv0) {};
     ~CPlatform() {};
     void Init();
+    static v8::Platform *GetPlatform(void);
 };
