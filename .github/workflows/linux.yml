@@ -134,11 +134,11 @@ jobs:
         run: |
           pytest -v
 
-      - name: Upload wheel zip
+      - name: Upload wheel
         uses: actions/upload-artifact@v4
         if: ${{ github.event_name != 'release' }}
         with:
-          name: wheels
+          name: stpyv8-linux-${{ matrix.python-version }}
           path: stpyv8-linux-${{ matrix.python-version }}/*.whl
 
       - name: Release
