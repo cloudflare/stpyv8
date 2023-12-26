@@ -19,10 +19,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -56,23 +56,16 @@ jobs:
         run: |
           pytest -v
 
-      - name: Create wheel zip
-        uses: vimtor/action-zip@v1.1
-        with:
-          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/
-          recursive: false
-          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
-      
-      - name: Upload wheel zip
-        uses: actions/upload-artifact@v3
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
         if: ${{ github.event_name != 'release' }}
         with:
-          name: wheels
-          path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip
+          name: stpyv8-${{ matrix.os }}-python${{ matrix.python-version }}
+          path: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/*.whl
 
       - name: Release
         uses: softprops/action-gh-release@v1
         if: ${{ github.event_name == 'release' }}
         with:
-          files: 'stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}.zip'
+          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/*.whl
           token: ${{ secrets.GITHUB_TOKEN }}

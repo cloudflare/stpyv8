@@ -13,10 +13,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -54,15 +54,8 @@ jobs:
         env:
           STPYV8_DEBUG: 1
 
-      - name: Create wheel zip
-        uses: vimtor/action-zip@v1.1
-        with:
-          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/
-          recursive: false
-          dest: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip
-
-      - name: Upload wheel zip
+      - name: Upload wheel
         uses: actions/upload-artifact@v3
         with:
-          name: wheels
-          path: stpyv8-${{ matrix.os }}-python-${{ matrix.python-version }}-debug.zip
+          name: stpyv8-${{ matrix.os }}-python${{ matrix.python-version }}-debug
+          path: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}-debug/*.whl
