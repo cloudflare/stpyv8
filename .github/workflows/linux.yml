@@ -13,16 +13,16 @@ env:
 
 jobs:
   build-v8:
-    # If Google V8 is in the workflow cache, don't build
-    # Clone is necessary in any case to calculate a hash
-    # for the cache key
+    # If Google V8 is in the workflow cache, don't build it.
+    # Cloning the repository is still necessary in any case
+    # to calculate the hash for the cache key
     name: Build Google V8
     runs-on: ubuntu-20.04
     outputs:
       v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Clone Google V8
         run: |
@@ -64,13 +64,6 @@ jobs:
             v8/include
           key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
-      - name: Debug
-        run: |
-          pwd
-          ls -lh
-          ls -lh ..
-          ls -lh ../..
-
   build:
     name: Build Linux wheel
     needs: build-v8
@@ -87,7 +80,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -106,7 +99,6 @@ jobs:
           unzip -q ${{ steps.download-boost.outputs.filename }}
           cd boost_${{ matrix.boost-version-snake }}
           ./bootstrap.sh
-          # sudo ./b2 install -j 8 link=static runtime-link=static --with-system --with-python --with-filesystem --with-iostreams --with-date_time --with-thread
           sudo ./b2 install -j 8 --with-system --with-python --with-filesystem --with-iostreams --with-date_time --with-thread
       - name: Restore Google V8 from cache
         id: restore-v8
@@ -142,23 +134,16 @@ jobs:
         run: |
           pytest -v
 
-      - name: Create wheel zip
-        uses: vimtor/action-zip@v1.1
-        with:
-          files: stpyv8-linux-${{ matrix.python-version }}/
-          recursive: false
-          dest: stpyv8-linux-python-${{ matrix.python-version }}.zip
-
       - name: Upload wheel zip
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ github.event_name != 'release' }}
         with:
           name: wheels
-          path: stpyv8-linux-python-${{ matrix.python-version }}.zip
+          path: stpyv8-linux-${{ matrix.python-version }}/*.whl
 
       - name: Release
         uses: softprops/action-gh-release@v1
         if: ${{ github.event_name == 'release' }}
         with:
-          files: 'stpyv8-linux-python-${{ matrix.python-version }}.zip'
+          files: stpyv8-linux-${{ matrix.python-version }}/*.whl
           token: ${{ secrets.GITHUB_TOKEN }}
