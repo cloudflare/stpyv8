@@ -56,8 +56,8 @@ jobs:
         uses: actions/cache/save@main
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         with:
-          # Save compiled binary and header files
-          # This will save an additional clone of v8 for the linker
+          # Save compiled binary and header files. This will save an
+          # additional clone of Google V8 for the linker
           path: |
             v8/out.gn/x64.release.sample/obj/libv8_monolith.a
             v8/out.gn/x64.release.sample/icudtl.dat
@@ -100,6 +100,7 @@ jobs:
           cd boost_${{ matrix.boost-version-snake }}
           ./bootstrap.sh
           sudo ./b2 install -j 8 --with-system --with-python --with-filesystem --with-iostreams --with-date_time --with-thread
+
       - name: Restore Google V8 from cache
         id: restore-v8
         uses: actions/cache/restore@main
