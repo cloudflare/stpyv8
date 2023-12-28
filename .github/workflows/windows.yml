@@ -14,9 +14,10 @@ env:
 
 jobs:
   build-v8:
-    # If v8 is in Workflow cache, don't build
-    # Clone is necessary in any event to calculate a hash for the cache key
-    name: Build v8
+    # If Google V8 is in the workflow cache, don't build it.
+    # Cloning the repository is still necessary in any case
+    # to calculate the hash for the cache key
+    name: Build Google V8
     runs-on: windows-latest
     outputs:
       v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
@@ -62,8 +63,8 @@ jobs:
         uses: actions/cache/save@main
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         with:
-          # Save compiled binary and header files
-          # This will save an additional clone of v8 for the linker
+          # Save compiled binary and header files. This will save an
+          # additional clone of Google V8 for the linker
           path: |
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
             v8\out.gn\x64.release.sample\icudtl.dat
@@ -83,7 +84,6 @@ jobs:
         python-version: ['3.9', '3.10']
         boost-version: ['1.74.0']
         boost-version-snake: ['1_74_0']
-
         include:
           - python-version: '3.11'
             os: 'windows-2019'
@@ -93,7 +93,6 @@ jobs:
             os: 'windows-2019'
             boost-version: '1.73.0'
             boost-version-snake: '1_73_0'
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

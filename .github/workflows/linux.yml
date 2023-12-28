@@ -8,9 +8,6 @@ on:
     branches:
       - master
 
-env:
-  BOOST_ROOT: boost
-
 jobs:
   build-v8:
     # If Google V8 is in the workflow cache, don't build it.
@@ -77,7 +74,6 @@ jobs:
         python-version: ['3.9', '3.10', '3.11']
         boost-version: ['1.84.0']
         boost-version-snake: ['1_84_0']
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

@@ -65,7 +65,6 @@ jobs:
         python-version: ['3.12']
         boost-version: ['1.84.0']
         boost-version-snake: ['1_84_0']
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
