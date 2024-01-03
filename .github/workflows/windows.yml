@@ -44,7 +44,7 @@ jobs:
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
             v8\out.gn\x64.release.sample\icudtl.dat
             v8\include
-          key: ${{ matrix.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+          key: windows-build-v8-${{ hashFiles('v8/src/**') }}
 
       - name: Initialize MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
@@ -73,7 +73,7 @@ jobs:
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
             v8\out.gn\x64.release.sample\icudtl.dat
             v8\include
-          key: ${{ matrix.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+          key: windows-build-v8-${{ hashFiles('v8/src/**') }}
 
   build:
     name: Build ${{ matrix.python-version }} wheel
@@ -171,7 +171,7 @@ jobs:
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
             v8\out.gn\x64.release.sample\icudtl.dat
             v8\include
-          key: ${{ matrix.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
+          key: windows-build-v8-${{ needs.build-v8.outputs.v8-hash }}
 
       - name: Build wheel
         env:
