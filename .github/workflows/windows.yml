@@ -40,7 +40,7 @@ jobs:
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
             v8\out.gn\x64.release.sample\icudtl.dat
             v8\include
-          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+          key: ${{ matrix.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
       - name: Initialize MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
@@ -69,7 +69,7 @@ jobs:
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
             v8\out.gn\x64.release.sample\icudtl.dat
             v8\include
-          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+          key: ${{ matrix.os }}-build-v8-${{ hashFiles('v8/src/**') }}
 
   build:
     name: Build ${{ matrix.python-version }} wheel
@@ -108,7 +108,7 @@ jobs:
         uses: actions/cache/restore@main
         with:
           path: ${{ env.BOOST_ROOT }}\stage\lib
-          key: boost${{ matrix.boost-version }}_py${{ matrix.python-version }}_vc142
+          key: boost-${{ matrix.boost-version }}-python${{ matrix.python-version }}-vc142
 
       - name: Initialize MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
@@ -157,7 +157,7 @@ jobs:
         if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
         with:
           path: ${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib
-          key: boost${{ matrix.boost-version }}_py${{ matrix.python-version }}_vc142
+          key: boost-${{ matrix.boost-version }}-python${{ matrix.python-version }}-vc142
 
       - name: Restore Google V8 from cache
         id: restore-v8
@@ -167,7 +167,7 @@ jobs:
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
             v8\out.gn\x64.release.sample\icudtl.dat
             v8\include
-          key: ${{ runner.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
+          key: ${{ matrix.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
 
       - name: Build wheel
         env:

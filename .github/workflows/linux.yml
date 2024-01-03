@@ -36,7 +36,7 @@ jobs:
             v8/out.gn/x64.release.sample/obj/libv8_monolith.a
             v8/out.gn/x64.release.sample/icudtl.dat
             v8/include
-          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+          key: linux-build-v8-${{ hashFiles('v8/src/**') }}
 
       - name: Build Google V8
         id: build-v8
@@ -59,7 +59,7 @@ jobs:
             v8/out.gn/x64.release.sample/obj/libv8_monolith.a
             v8/out.gn/x64.release.sample/icudtl.dat
             v8/include
-          key: ${{ runner.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+          key: linux-build-v8-${{ hashFiles('v8/src/**') }}
 
   build:
     name: Build Linux wheel
@@ -105,7 +105,7 @@ jobs:
             v8/out.gn/x64.release.sample/obj/libv8_monolith.a
             v8/out.gn/x64.release.sample/icudtl.dat
             v8/include
-          key: ${{ runner.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
+          key: linux-build-v8-${{ needs.build-v8.outputs.v8-hash }}
 
       - name: Install dependencies
         run: |
