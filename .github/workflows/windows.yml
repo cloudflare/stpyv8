@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         # Needed for MSVC toolset 14.2
-        os: [windows-2019]
+        os: [windows-latest]
     outputs:
       v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
     steps:
