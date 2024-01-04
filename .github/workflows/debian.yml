@@ -1,0 +1,61 @@
+name: Debian build/release workflow
+
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build wheel on debian-11.5
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        python-version: ['3.9']
+
+    steps:
+      - name: Initialization
+        run: |
+          rm -rf stpyv8
+          pip uninstall -y stpyv8
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt install libboost-dev libboost-system-dev libboost-iostreams-dev libboost-filesystem-dev libboost-python-dev
+          pip install --upgrade pip setuptools wheel pytest pytest-order
+
+      - name: Build wheel
+        run: |
+          python setup.py v8
+          python setup.py sdist bdist_wheel -d stpyv8-debian-11-${{ matrix.python-version }}
+        env:
+          V8_DEPS_LINUX: 0
+          LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
+
+      - name: Install wheel
+        run : |
+          python -m pip install --find-links=stpyv8-debian-11-${{ matrix.python-version }} stpyv8
+
+      - name: Test wheel
+        run: |
+          pytest -v
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        if: ${{ github.event_name != 'release' }}
+        with:
+          name: stpyv8-debian-11-python${{ matrix.python-version }}
+          path: stpyv8-debian-11-${{ matrix.python-version }}/*.whl
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: ${{ github.event_name == 'release' }}
+        with:
+          files: stpyv8-debian-11-${{ matrix.python-version }}/*.whl
+          token: ${{ secrets.GITHUB_TOKEN }}
