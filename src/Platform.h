@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fstream>
+#include <boost/filesystem.hpp>
 #include <v8.h>
 
 #include "Config.h"
@@ -11,17 +12,11 @@ class CPlatform
 private:
     static bool inited;
     static std::unique_ptr<v8::Platform> platform;
-    constexpr static const char *icu_data = ICU_DATA;
 
-    const char *GetICUDataFile()
-    {
-        if (icu_data == nullptr) return nullptr;
+    constexpr static const char *icu_data_system = ICU_DATA_SYSTEM;
+    constexpr static const char *icu_data_user = ICU_DATA_USER;
 
-        std::ifstream ifile(icu_data);
-        if (ifile) return icu_data;
-
-        return nullptr;
-    }
+    const char *GetICUDataFile();
 
     std::string argv;
 public:

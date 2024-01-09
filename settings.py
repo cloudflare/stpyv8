@@ -16,15 +16,6 @@ STPYV8_VERSION = V8_GIT_TAG_STABLE
 
 v8_deps_linux = os.environ.get('V8_DEPS_LINUX', '1') in ('1', )
 
-ICU_DATA_FOLDER_UNIX = "/usr/share/stpyv8"
-ICU_DATA_FOLDER_OSX  = "/Library/Application Support/STPyV8/"
-ICU_DATA_FOLDER_WINDOWS = os.path.join(os.environ["PROGRAMDATA"], "STPyV8") if "PROGRAMDATA" in os.environ else None
-
-if os.name in ("posix", ):
-    icu_data_folder = ICU_DATA_FOLDER_OSX if sys.platform in ("darwin", ) else ICU_DATA_FOLDER_UNIX
-else:
-    icu_data_folder = None
-
 os.environ['PATH'] = f"{os.environ.get('PATH', '')}:{DEPOT_HOME}"
 
 gn_args = {
@@ -107,8 +98,6 @@ def get_libboost_python_name():
 STPYV8_BOOST_PYTHON = os.getenv('STPYV8_BOOST_PYTHON', default = get_libboost_python_name())
 
 if os.name in ("nt", ):
-    icu_data_folder = ICU_DATA_FOLDER_WINDOWS
-
     include_dirs.add(os.path.join(V8_HOME, "include"))
     library_dirs.add(os.path.join(V8_HOME, "out.gn", "x64.release.sample", "obj"))
 
@@ -130,7 +119,12 @@ if os.name in ("nt", ):
     os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
 
 elif os.name in ("posix", ):
-    libraries = ["boost_system", "boost_iostreams", "v8_monolith", STPYV8_BOOST_PYTHON]
+    libraries = ["boost_system",
+                 "boost_iostreams",
+                 "boost_filesystem",
+                 "v8_monolith",
+                 STPYV8_BOOST_PYTHON.replace('.', '')]
+
     extra_compile_args.append('-std=c++17')
 
     if platform.system() in ('Linux', ):

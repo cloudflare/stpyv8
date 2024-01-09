@@ -1,4 +1,4 @@
-name: MacOSX build/release workflow
+name: Linux build/release workflow
 
 on:
   push:
@@ -14,10 +14,7 @@ jobs:
     # Cloning the repository is still necessary in any case
     # to calculate the hash for the cache key
     name: Build Google V8
-    runs-on: ${{ matrix.os }} 
-    strategy:
-      matrix:
-        os: [macos-12, macos-13]
+    runs-on: ubuntu-20.04
     outputs:
       v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
     steps:
@@ -26,7 +23,7 @@ jobs:
 
       - name: Clone Google V8
         run: |
-          python -m pip install wheel setuptools
+          python -m pip install wheel
           echo "::group::Clone Google V8"
           python setup.py checkout_v8
           echo "::endgroup::"
@@ -39,7 +36,7 @@ jobs:
             v8/out.gn/x64.release.sample/obj/libv8_monolith.a
             v8/out.gn/x64.release.sample/icudtl.dat
             v8/include
-          key: ${{ matrix.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+          key: linux-build-v8-${{ hashFiles('v8/src/**') }}
 
       - name: Build Google V8
         id: build-v8
@@ -62,15 +59,18 @@ jobs:
             v8/out.gn/x64.release.sample/obj/libv8_monolith.a
             v8/out.gn/x64.release.sample/icudtl.dat
             v8/include
-          key: ${{ matrix.os }}-build-v8-${{ hashFiles('v8/src/**') }}
+          key: linux-build-v8-${{ hashFiles('v8/src/**') }}
 
   build:
-    name: Build wheel on ${{ matrix.os }}
+    name: Build Linux wheel
     needs: build-v8
     runs-on: ${{ matrix.os }}
+    env:
+      DIST_NAME: stpyv8-linux-py${{ matrix.python-version }}
+      STPYV8_BOOST_PYTHON: boost_python${{ matrix.python-version }}
     strategy:
       matrix:
-        os: [macos-12, macos-13]
+        os: [ubuntu-20.04]
         python-version: ['3.9', '3.10', '3.11', '3.12']
         boost-version: ['1.84.0']
         boost-version-snake: ['1_84_0']
@@ -105,23 +105,27 @@ jobs:
             v8/out.gn/x64.release.sample/obj/libv8_monolith.a
             v8/out.gn/x64.release.sample/icudtl.dat
             v8/include
-          key: ${{ matrix.os }}-build-v8-${{ needs.build-v8.outputs.v8-hash }}
+          key: linux-build-v8-${{ needs.build-v8.outputs.v8-hash }}
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip setuptools delocate wheel pytest pytest-order
+          pip install --upgrade pip setuptools wheel auditwheel patchelf pytest pytest-order
 
       - name: Build wheel
         run: |
-          python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
+          python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-linux-wheelhouse-${{ matrix.python-version }}
+        env:
+          INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path }}include
+          V8_DEPS_LINUX: 0
+          LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
       - name: Repair wheel
         run: |
-          delocate-wheel stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/stpyv8*.whl
+          auditwheel repair --plat manylinux_2_31_x86_64 -w stpyv8-linux-${{ matrix.python-version }} stpyv8-linux-wheelhouse-${{ matrix.python-version }}/*.whl
 
       - name: Install wheel
         run: |
-          python -m pip install --find-links=stpyv8-${{ matrix.os }}-${{ matrix.python-version }} stpyv8
+          python -m pip install stpyv8-linux-${{ matrix.python-version }}/*.whl
 
       - name: Test wheel
         run: |
@@ -131,12 +135,12 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ github.event_name != 'release' }}
         with:
-          name: stpyv8-${{ matrix.os }}-python${{ matrix.python-version }}
-          path: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/*.whl
+          name: stpyv8-linux-python${{ matrix.python-version }}
+          path: stpyv8-linux-${{ matrix.python-version }}/*.whl
 
       - name: Release
         uses: softprops/action-gh-release@v1
         if: ${{ github.event_name == 'release' }}
         with:
-          files: stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/*.whl
+          files: stpyv8-linux-${{ matrix.python-version }}/*.whl
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,1 +1,2 @@
 devm18426 - Windows support
+Stefano 'antelox' Antenucci <anteloxrce@gmail.com> - Extremely relevant contributions to the manylinux wheels build workflow on different versions of Python

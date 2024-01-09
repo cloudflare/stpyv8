@@ -1,9 +1,9 @@
 build
+dist
 .cache
 .cipd
 *.egg-info
-.gclient
-.gclient_entries
+.gclient*
 depot_tools
 v8
 switch_repo*

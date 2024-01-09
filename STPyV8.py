@@ -4,6 +4,8 @@
 from __future__ import with_statement
 from __future__ import print_function
 
+import os
+import sys
 import re
 import collections.abc
 
@@ -31,6 +33,19 @@ __all__ = ["ReadOnly",
            "JSLocker",
            "JSUnlocker",
            "JSPlatform"]
+
+
+# ICU
+ICU_DATA_FOLDERS_UNIX    = ("/usr/share/stpyv8", os.path.expanduser("~/.local/share/stpyv8"))
+ICU_DATA_FOLDERS_OSX     = ("/Library/Application Support/STPyV8", os.path.expanduser('~/Library/Application Support/STPyV8'))
+ICU_DATA_FOLDERS_WINDOWS = (os.path.join(os.environ["PROGRAMDATA"], "STPyV8") if "PROGRAMDATA" in os.environ else None,
+                            os.path.join(os.environ["APPDATA"], "STPyV8") if "APPDATA" in os.environ else None)
+
+icu_data_folders = None
+if os.name in ("posix", ):
+    icu_data_folders = ICU_DATA_FOLDERS_OSX if sys.platform in ("darwin", ) else ICU_DATA_FOLDERS_UNIX
+else:
+    icu_data_folders = ICU_DATA_FOLDERS_WINDOWS
 
 
 class JSAttribute:
@@ -325,6 +340,52 @@ class JSContext(_STPyV8.JSContext):
 
         del self
 
+
+def icu_sync():
+    if sys.version_info < (3 ,10):
+        from importlib_resources import files
+    else:
+        from importlib.resources import files
+
+    for folder in icu_data_folders:
+        if not folder or not os.path.exists(folder):
+            continue
+
+        version_file = os.path.join(folder, 'stpyv8-version.txt')
+        if not os.path.exists(version_file):
+            continue
+
+        with open(version_file, encoding = 'utf-8', mode = 'r') as fd:
+            version = fd.read()
+
+        if version.strip() in (__version__, ):
+            return
+
+    try:
+        stpyv8_icu_files = files('stpyv8-icu')
+    except ModuleNotFoundError:
+        return
+
+    for f in stpyv8_icu_files.iterdir():
+        if f.name not in ('icudtl.dat', ):
+            continue
+
+        data = f.read_bytes()
+
+        for folder in icu_data_folders:
+            try:
+                os.makedirs(folder, exist_ok = True)
+                with open(os.path.join(folder, 'icudtl.dat'), mode = 'wb') as fd:
+                    fd.write(data)
+
+                version_file = os.path.join(folder, 'stpyv8-version.txt')
+                with open(version_file, encoding = 'utf-8', mode = 'w') as fd:
+                    fd.write(__version__)
+            except PermissionError:
+                pass
+
+
+icu_sync()
 
 v8_default_platform = JSPlatform()
 v8_default_platform.init()

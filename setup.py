@@ -13,6 +13,8 @@ from settings import *  # pylint:disable=wildcard-import,unused-wildcard-import
 
 log = logging.getLogger()
 
+ICU_DATA_PACKAGE_FOLDER = os.path.join(os.pardir, os.pardir, "stpyv8-icu")
+ICU_DATA_V8_FILE_PATH   = os.path.join("v8", "out.gn", "x64.release.sample", "icudtl.dat")
 
 def exec_cmd(cmdline, *args, **kwargs):
     msg    = kwargs.get('msg')
@@ -196,12 +198,6 @@ class stpyv8_build_no_v8(build_ext):
 class stpyv8_install(install):
     def run(self):
         self.skip_build = True # pylint:disable=attribute-defined-outside-init
-
-        if icu_data_folder:
-            os.makedirs(icu_data_folder, exist_ok = True)
-            shutil.copy(os.path.join(V8_HOME, os.path.join("out.gn", "x64.release.sample", "icudtl.dat")),
-                        icu_data_folder)
-
         install.run(self)
 
 
@@ -229,7 +225,13 @@ setup(name             = "stpyv8",
       license          = "Apache License 2.0",
       py_modules       = ["STPyV8"],
       ext_modules      = [stpyv8],
-      install_requires = ["wheel"],
+      install_requires = [
+          "wheel",
+          "importlib_resources; python_version < '3.10'"
+      ],
+      data_files       = [
+              (ICU_DATA_PACKAGE_FOLDER, [ICU_DATA_V8_FILE_PATH]),
+      ],
       classifiers  = [
         "Development Status :: 4 - Beta",
         "Environment :: Plugins",
