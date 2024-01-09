@@ -98,27 +98,40 @@ Find more in the [tests](tests) directory.
 The easiest way to install STPyV8 is to use one of the Python wheels provided at
 [Releases](https://github.com/cloudflare/stpyv8/releases). The wheels are automatically
 generated using Github Actions and multiple platforms and Python versions are already
-supported, with others planned for the future.
+supported.
 
-Be aware that boost-python and some other boost dependencies are needed (see later for
-details). Most Linux distributions and MacOS provide easy to install Boost packages and
-this is the suggested way to install the library.
+Be aware that, starting from STPyV8 v12.0.267.14, installing boost-python and some other
+boost dependencies is not required anymore while it is still required if you're installing
+older versions (see later for details). Most Linux distributions and MacOS provide easy to
+install Boost packages and this is the suggested way to install the library in case you
+need it.
 
-Each zip file contains the ICU data file icudtl.dat and the wheel itself. First of all you
-should copy icudtl.data to the STPyV8 ICU data folder (Linux: /usr/share/stpyv8, MacOS:
+Installing a recent STPyV8 version is extremely easy. Retrieve the STPyV8 wheel you need
+from [Releases](https://github.com/cloudflare/stpyv8/releases) and install using pip
+
+```Shell
+$ pip install --upgrade stpyv8-12.0.267.14-cp312-cp312-macosx_10_9_universal2.whl
+Processing ./stpyv8-12.0.267.14-cp312-cp312-macosx_10_9_universal2.whl
+Installing collected packages: stpyv8
+Successfully installed stpyv8-12.0.267.14
+```
+
+If you're installing a older STPyV8 version, you need to download a zip file from
+[Releases](https://github.com/cloudflare/stpyv8/releases). Each zip file contains the
+ICU data file icudtl.dat and the wheel itself. First of all you should copy icudtl.data
+to the STPyV8 ICU data folder (Linux: /usr/share/stpyv8, MacOS:
 /Library/Application Support/STPyV8/) and then install/upgrade STPyV8 using pip.
 
 Installing on MacOS
 
-```
-Shell
+```Shell
 $ unzip stpyv8-macos-10.15-python-3.9.zip
 Archive:  stpyv8-macos-10.15-python-3.9.zip
   inflating: stpyv8-macos-10.15-3.9/icudtl.dat
   inflating: stpyv8-macos-10.15-3.9/stpyv8-9.9.115.8-cp39-cp39-macosx_10_15_x86_64.whl
 $ cd stpyv8-macos-10.15-3.9
 $ sudo mv icudtl.dat /Library/Application\ Support/STPyV8
-$ sudo pip install --upgrade stpyv8-9.9.115.8-cp39-cp39-macosx_10_15_x86_64.whl
+$ pip install --upgrade stpyv8-9.9.115.8-cp39-cp39-macosx_10_15_x86_64.whl
 Processing ./stpyv8-9.9.115.8-cp39-cp39-macosx_10_15_x86_64.whl
 Installing collected packages: stpyv8
 Successfully installed stpyv8-9.9.115.8
