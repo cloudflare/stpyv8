@@ -208,7 +208,6 @@ jobs:
 
       - name: Upload wheel
         uses: actions/upload-artifact@v4
-        if: ${{ github.event_name != 'release' }}
         with:
           name: stpyv8-${{ matrix.os }}-python${{ matrix.python-version }}
           path: ${{ env.DIST_NAME }}/*.whl
@@ -219,3 +218,24 @@ jobs:
         with:
           files: ${{ env.DIST_NAME }}/*.whl
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  pypi-publish:
+    name: Upload release to PyPI
+    if: ${{ github.event_name == 'release' }}
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/stpyv8
+    permissions:
+      id-token: write
+    steps:
+      - name: Download wheels
+        uses: actions/download-artifact@v4
+        with:
+          pattern: stpyv8-windows*
+          path: stpyv8-windows-dist
+      - name: Publish wheels to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: stpyv8-windows-dist
