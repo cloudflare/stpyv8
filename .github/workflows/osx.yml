@@ -154,8 +154,9 @@ jobs:
       - name: Download wheels
         uses: actions/download-artifact@v4
         with:
-          pattern: stpyv8-macos*
           path: stpyv8-macos-dist
+          pattern: stpyv8-macos*
+          merge-multiple: true
       - name: Publish wheels to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:

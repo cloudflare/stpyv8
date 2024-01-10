@@ -233,8 +233,9 @@ jobs:
       - name: Download wheels
         uses: actions/download-artifact@v4
         with:
-          pattern: stpyv8-windows*
           path: stpyv8-windows-dist
+          pattern: stpyv8-windows*
+          merge-multiple: true
       - name: Publish wheels to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
