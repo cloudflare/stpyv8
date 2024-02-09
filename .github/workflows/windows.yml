@@ -89,14 +89,19 @@ jobs:
         boost-version: ['1.74.0']
         boost-version-snake: ['1_74_0']
         include:
-          - python-version: '3.11'
-            os: 'windows-2019'
-            boost-version: '1.83.0'
-            boost-version-snake: '1_83_0'
+          # Python 3.8 support should be dropped
           - python-version: '3.8'
             os: 'windows-2019'
             boost-version: '1.73.0'
             boost-version-snake: '1_73_0'
+          - python-version: '3.11'
+            os: 'windows-2019'
+            boost-version: '1.83.0'
+            boost-version-snake: '1_83_0'
+          - python-version: '3.12'
+            os: 'windows-2019'
+            boost-version: '1.83.0'
+            boost-version-snake: '1_83_0'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
