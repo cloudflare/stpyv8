@@ -86,8 +86,8 @@ jobs:
         # Needed for MSVC toolset 14.2
         os: [windows-2019]
         python-version: ['3.9', '3.10']
-        boost-version: ['1.74.0']
-        boost-version-snake: ['1_74_0']
+        boost-version: ['1.84.0']
+        boost-version-snake: ['1_84_0']
         include:
           - python-version: '3.11'
             os: 'windows-2019'
