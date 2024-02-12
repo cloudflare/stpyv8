@@ -27,7 +27,7 @@ jobs:
       v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Clone Google V8
         run: |
@@ -99,11 +99,11 @@ jobs:
             boost-version-snake: '1_73_0'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         id: install-python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -123,7 +123,7 @@ jobs:
       - name: Download Boost
         if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
         id: download-boost
-        uses: suisei-cn/actions-download-file@v1.4.0
+        uses: suisei-cn/actions-download-file@v1.6.0
         with:
           url: https://boostorg.jfrog.io/artifactory/main/release/${{ matrix.boost-version }}/source/boost_${{ matrix.boost-version-snake }}.zip
 
