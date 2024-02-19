@@ -10,7 +10,7 @@ class TestContext(unittest.TestCase):
     def testEval(self):
         with STPyV8.JSContext() as context:
             self.assertEqual(2, context.eval("1+1"))
-            self.assertEqual('Hello world', context.eval("'Hello ' + 'world'"))
+            self.assertEqual("Hello world", context.eval("'Hello ' + 'world'"))
 
     def testMultiNamespace(self):
         self.assertTrue(not bool(STPyV8.JSContext.inContext))
@@ -63,7 +63,8 @@ class TestContext(unittest.TestCase):
 
     def testPromiseResolved(self):
         with STPyV8.JSContext() as ctxt:
-            ctxt.eval("""
+            ctxt.eval(
+                """
                 var message;
                 let done = true;
 
@@ -86,13 +87,15 @@ class TestContext(unittest.TestCase):
                 }
 
                 checkIfItsDone()
-            """)
+            """
+            )
 
-            self.assertEqual('Here is the thing I built', ctxt.locals.message)
+            self.assertEqual("Here is the thing I built", ctxt.locals.message)
 
     def testPromiseRejected(self):
         with STPyV8.JSContext() as ctxt:
-            ctxt.eval("""
+            ctxt.eval(
+                """
                 var message;
                 let done = false;
 
@@ -115,9 +118,10 @@ class TestContext(unittest.TestCase):
                 }
 
                 checkIfItsDone()
-            """)
+            """
+            )
 
-            self.assertEqual('Still working on something else', ctxt.locals.message)
+            self.assertEqual("Still working on something else", ctxt.locals.message)
 
     def testSecurityChecks(self):
         with STPyV8.JSContext() as env1:

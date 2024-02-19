@@ -27,7 +27,8 @@ class TestThread(unittest.TestCase):
         def run():
             with STPyV8.JSIsolate():
                 with STPyV8.JSContext(g) as ctxt:
-                    ctxt.eval("""
+                    ctxt.eval(
+                        """
                         started.wait();
 
                         for (i=0; i<10; i++)
@@ -36,9 +37,10 @@ class TestThread(unittest.TestCase):
                         }
 
                         finished.release();
-                    """)
+                    """
+                    )
 
-        t = threading.Thread(target = run)
+        t = threading.Thread(target=run)
         t.start()
 
         now = time.time()
@@ -67,13 +69,14 @@ class TestThread(unittest.TestCase):
         def run():
             with STPyV8.JSIsolate():
                 with STPyV8.JSContext(g) as ctxt:
-                    ctxt.eval("""
+                    ctxt.eval(
+                        """
                         for (i=0; i<10; i++)
                             add(i);
-                    """)
+                    """
+                    )
 
-        threads = [threading.Thread(target = run),
-                   threading.Thread(target = run)]
+        threads = [threading.Thread(target=run), threading.Thread(target=run)]
 
         with STPyV8.JSLocker():
             for t in threads:
