@@ -1,4 +1,4 @@
-name: MacOSX build/release workflow
+name: MacOSX ARM64 build/release workflow
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }} 
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [macos-14]
     outputs:
       v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
     steps:
@@ -26,9 +26,9 @@ jobs:
 
       - name: Clone Google V8
         run: |
-          python -m pip install wheel setuptools
+          python3 -m pip install wheel setuptools
           echo "::group::Clone Google V8"
-          python setup.py checkout_v8
+          python3 setup.py checkout_v8
           echo "::endgroup::"
 
       - name: Restore Google V8 from cache
@@ -47,9 +47,9 @@ jobs:
         continue-on-error: false
         run: |
           echo "v8-hash=${{ hashFiles('v8/src/**') }}" >> "$GITHUB_OUTPUT"
-          python -m pip install wheel
+          python3 -m pip install wheel
           echo "::group::v8"
-          python setup.py v8
+          python3 setup.py v8
           echo "::endgroup::"
 
       - name: Save Google V8 to cache
@@ -70,10 +70,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest]
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        os: [macos-14]
+        python-version: ['3.12']
         boost-version: ['1.84.0']
         boost-version-snake: ['1_84_0']
+    env:
+      ARCH: arm64
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -113,19 +116,19 @@ jobs:
 
       - name: Build wheel
         run: |
-          python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
+         python3 setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
         env:
-          ARCHFLAGS: '-arch x86_64'
-          _PYTHON_HOST_PLATFORM: 'macosx-10.9-x86_64'
+          ARCHFLAGS: '-arch arm64'
+          _PYTHON_HOST_PLATFORM: 'macosx-11.0-arm64'
 
       - name: Repair wheel
         run: |
           delocate-listdeps stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/stpyv8*.whl
-          delocate-wheel --require-archs x86_64 stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/stpyv8*.whl
+          delocate-wheel --require-archs arm64 -w stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/stpyv8*.whl
 
       - name: Install wheel
         run: |
-          python -m pip install stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/*.whl
+          python3 -m pip install stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/*.whl
 
       - name: Test wheel
         run: |
