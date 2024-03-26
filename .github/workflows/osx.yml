@@ -33,7 +33,7 @@ jobs:
 
       - name: Restore Google V8 from cache
         id: restore-v8
-        uses: actions/cache/restore@4
+        uses: actions/cache/restore@main
         with:
           path: |
             v8/out.gn/x64.release.sample/obj/libv8_monolith.a
@@ -53,7 +53,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Save Google V8 to cache
-        uses: actions/cache/save@4
+        uses: actions/cache/save@main
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         with:
           # Save compiled binary and header files. This will save an
@@ -99,7 +99,7 @@ jobs:
 
       - name: Restore Google V8 from cache
         id: restore-v8
-        uses: actions/cache/restore@4
+        uses: actions/cache/restore@main
         with:
           path: |
             v8/out.gn/x64.release.sample/obj/libv8_monolith.a
