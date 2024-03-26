@@ -62,7 +62,7 @@ jobs:
           key: linux-build-v8-${{ hashFiles('v8/src/**') }}
 
   build:
-    name: Build Linux wheel
+    name: Build Linux wheel (Python ${{ matrix.python-version }})
     needs: build-v8
     runs-on: ${{ matrix.os }}
     env:

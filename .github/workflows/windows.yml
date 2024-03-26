@@ -76,7 +76,7 @@ jobs:
           key: windows-build-v8-${{ hashFiles('v8/src/**') }}
 
   build:
-    name: Build ${{ matrix.python-version }} wheel
+    name: Build Windows wheel (Python ${{ matrix.python-version }})
     needs: build-v8
     runs-on: ${{ matrix.os }}
     env:

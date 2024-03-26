@@ -65,7 +65,7 @@ jobs:
           key: ${{ matrix.os }}-arm64-build-v8-${{ hashFiles('v8/src/**') }}
 
   build:
-    name: Build wheel on ${{ matrix.os }}
+    name: Build OSX ARM64 wheel (Python ${{ matrix.python-version }})
     needs: build-v8
     runs-on: ${{ matrix.os }}
     strategy:
