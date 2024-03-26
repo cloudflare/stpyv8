@@ -85,7 +85,7 @@ jobs:
 
       - name: Download Boost
         id: download-boost
-        uses: suisei-cn/actions-download-file@v1
+        uses: suisei-cn/actions-download-file@v1.6.0
         with:
           url: https://boostorg.jfrog.io/artifactory/main/release/${{ matrix.boost-version }}/source/boost_${{ matrix.boost-version-snake }}.zip
 
