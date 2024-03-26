@@ -30,7 +30,7 @@ jobs:
 
       - name: Restore Google V8 from cache
         id: restore-v8
-        uses: actions/cache/restore@main
+        uses: actions/cache/restore@4
         with:
           path: |
             v8/out.gn/x64.release.sample/obj/libv8_monolith.a
@@ -50,7 +50,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Save Google V8 to cache
-        uses: actions/cache/save@main
+        uses: actions/cache/save@4
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         with:
           # Save compiled binary and header files. This will save an
@@ -85,7 +85,7 @@ jobs:
 
       - name: Download Boost
         id: download-boost
-        uses: suisei-cn/actions-download-file@v1.6.0
+        uses: suisei-cn/actions-download-file@v1
         with:
           url: https://boostorg.jfrog.io/artifactory/main/release/${{ matrix.boost-version }}/source/boost_${{ matrix.boost-version-snake }}.zip
 
@@ -99,7 +99,7 @@ jobs:
 
       - name: Restore Google V8 from cache
         id: restore-v8
-        uses: actions/cache/restore@main
+        uses: actions/cache/restore@4
         with:
           path: |
             v8/out.gn/x64.release.sample/obj/libv8_monolith.a
@@ -138,7 +138,7 @@ jobs:
           path: stpyv8-linux-${{ matrix.python-version }}/*.whl
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: ${{ github.event_name == 'release' }}
         with:
           files: stpyv8-linux-${{ matrix.python-version }}/*.whl

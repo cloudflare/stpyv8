@@ -38,7 +38,7 @@ jobs:
 
       - name: Restore Google V8 from cache
         id: restore-v8
-        uses: actions/cache/restore@main
+        uses: actions/cache/restore@4
         with:
           path: |
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
@@ -64,7 +64,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Save Google V8 to cache
-        uses: actions/cache/save@main
+        uses: actions/cache/save@4
         if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
         with:
           # Save compiled binary and header files. This will save an
@@ -100,7 +100,7 @@ jobs:
 
       - name: Restore Boost from cache
         id: restore-boost
-        uses: actions/cache/restore@main
+        uses: actions/cache/restore@4
         with:
           path: ${{ env.BOOST_ROOT }}\stage\lib
           key: boost-${{ matrix.boost-version }}-python${{ matrix.python-version }}-vc142
@@ -114,7 +114,7 @@ jobs:
       - name: Download Boost
         if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
         id: download-boost
-        uses: suisei-cn/actions-download-file@v1.6.0
+        uses: suisei-cn/actions-download-file@v1
         with:
           url: https://boostorg.jfrog.io/artifactory/main/release/${{ matrix.boost-version }}/source/boost_${{ matrix.boost-version-snake }}.zip
 
@@ -148,7 +148,7 @@ jobs:
           ls stage\lib
 
       - name: Save Boost to cache
-        uses: actions/cache/save@main
+        uses: actions/cache/save@4
         if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
         with:
           path: ${{ steps.install-boost.outputs.BOOST_ROOT }}\stage\lib
@@ -156,7 +156,7 @@ jobs:
 
       - name: Restore Google V8 from cache
         id: restore-v8
-        uses: actions/cache/restore@main
+        uses: actions/cache/restore@4
         with:
           path: |
             v8\out.gn\x64.release.sample\obj\v8_monolith.lib
@@ -204,7 +204,7 @@ jobs:
           path: ${{ env.DIST_NAME }}/*.whl
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: ${{ github.event_name == 'release' }}
         with:
           files: ${{ env.DIST_NAME }}/*.whl
