@@ -62,7 +62,7 @@ jobs:
           key: linux-build-v8-${{ hashFiles('v8/src/**') }}
 
   build:
-    name: Build Linux wheel
+    name: Build Linux wheel (Python ${{ matrix.python-version }})
     needs: build-v8
     runs-on: ${{ matrix.os }}
     env:
@@ -138,7 +138,7 @@ jobs:
           path: stpyv8-linux-${{ matrix.python-version }}/*.whl
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: ${{ github.event_name == 'release' }}
         with:
           files: stpyv8-linux-${{ matrix.python-version }}/*.whl
