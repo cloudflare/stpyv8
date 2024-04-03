@@ -26,7 +26,7 @@ jobs:
 
       - name: Clone Google V8
         run: |
-          python3 -m pip install wheel setuptools
+          python3 -m pip install --break-system-packages wheel setuptools
           echo "::group::Clone Google V8"
           python3 setup.py checkout_v8
           echo "::endgroup::"
@@ -47,7 +47,7 @@ jobs:
         continue-on-error: false
         run: |
           echo "v8-hash=${{ hashFiles('v8/src/**') }}" >> "$GITHUB_OUTPUT"
-          python3 -m pip install wheel
+          python3 -m pip install --break-system-packages wheel
           echo "::group::v8"
           python3 setup.py v8
           echo "::endgroup::"
@@ -112,7 +112,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip setuptools delocate wheel pytest pytest-order
+          pip install --upgrade --break-system-packages pip setuptools delocate wheel pytest pytest-order
 
       - name: Build wheel
         run: |
@@ -128,7 +128,7 @@ jobs:
 
       - name: Install wheel
         run: |
-          python3 -m pip install stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/*.whl
+          python3 -m pip install --break-system-packages stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/*.whl
 
       - name: Test wheel
         run: |
