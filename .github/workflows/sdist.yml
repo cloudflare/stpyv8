@@ -16,6 +16,10 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip setuptools wheel
+
       - name: Install pypa/build
         run: |
           python3 -m pip install build --user
