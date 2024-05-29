@@ -5,7 +5,7 @@
 import STPyV8
 
 with STPyV8.JSContext() as ctxt:
-  ctxt.eval("""
+    ctxt.eval("""
     class Circle {
       constructor(radius) {
         this.radius = radius;
@@ -18,5 +18,5 @@ with STPyV8.JSContext() as ctxt:
       }
   }
   """)
-  circle = ctxt.eval("new Circle(10)")
-  print("Area of the circle: " + str(circle.area))
+    circle = ctxt.eval("new Circle(10)")
+    print("Area of the circle: " + str(circle.area))
