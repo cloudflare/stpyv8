@@ -134,10 +134,13 @@ elif os.name in ("posix",):
         STPYV8_BOOST_PYTHON.replace(".", ""),
     ]
 
-    extra_compile_args.append("-std=c++20")
+    # extra_compile_args.append("-std=c++20")
 
     if platform.system() in ("Linux",):
         libraries.append("rt")
+        extra_compile_args.append("-std=c++2a")
+    else:
+        extra_compile_args.append("-std=c++20")
 
 
 GN_ARGS = " ".join(f"{key}={value}" for key, value in gn_args.items())
