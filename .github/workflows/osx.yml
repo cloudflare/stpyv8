@@ -120,7 +120,7 @@ jobs:
 
       - name: Repair wheel
         run: |
-          # delocate-listdeps stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/stpyv8*.whl
+          delocate-listdeps stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/stpyv8*.whl
           delocate-wheel --require-archs x86_64 stpyv8-${{ matrix.os }}-${{ matrix.python-version }}/stpyv8*.whl
 
       - name: Install wheel
