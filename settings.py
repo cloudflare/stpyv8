@@ -141,6 +141,7 @@ elif os.name in ("posix",):
         extra_compile_args.append("-std=c++2a")
     else:
         extra_compile_args.append("-std=c++20")
+        extra_link_args.append("-headerpad_max_install_names")
 
 
 GN_ARGS = " ".join(f"{key}={value}" for key, value in gn_args.items())
