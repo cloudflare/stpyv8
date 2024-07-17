@@ -116,7 +116,7 @@ jobs:
 
       - name: Build wheel
         run: |
-         python3 -m build --wheel --no-isolation --outdir stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
+         python3 -m build --wheel --no-isolation --skip-dependency-check --outdir stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
          # python3 setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
         env:
           ARCHFLAGS: '-arch arm64'
