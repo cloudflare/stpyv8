@@ -112,11 +112,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade --break-system-packages pip setuptools delocate wheel pytest pytest-order
+          pip install --upgrade --break-system-packages pip setuptools delocate build wheel pytest pytest-order
 
       - name: Build wheel
         run: |
-         python3 setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
+         python3 -m build --wheel --no-isolation --outdir stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
+         # python3 setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-${{ matrix.os }}-${{ matrix.python-version }}
         env:
           ARCHFLAGS: '-arch arm64'
           _PYTHON_HOST_PLATFORM: 'macosx-11.0-arm64'
