@@ -259,7 +259,7 @@ setup(
         (ICU_DATA_PACKAGE_FOLDER, [ICU_DATA_V8_FILE_PATH]),
     ],
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Plugins",
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
@@ -274,10 +274,12 @@ setup(
         "Topic :: Utilities",
         "Operating System :: POSIX :: Linux",
         "Operating System :: MacOS :: MacOS X",
+        "Operating System :: Microsoft :: Windows",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
     long_description_content_type="text/markdown",
     cmdclass=dict(
