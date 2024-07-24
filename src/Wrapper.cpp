@@ -750,7 +750,7 @@ void CPythonObject::SetupObjectTemplate(v8::Isolate *isolate, v8::Handle<v8::Obj
 
     clazz->SetInternalFieldCount(1);
     clazz->SetHandler(v8::NamedPropertyHandlerConfiguration(NamedGetter, NamedSetter, NamedQuery, NamedDeleter, NamedEnumerator));
-    clazz->SetIndexedPropertyHandler(IndexedGetter, IndexedSetter, IndexedQuery, IndexedDeleter, IndexedEnumerator);
+    clazz->SetHandler(v8::IndexedPropertyHandlerConfiguration(IndexedGetter, IndexedSetter, IndexedQuery, IndexedDeleter, IndexedEnumerator));
     clazz->SetCallAsFunctionHandler(Caller);
 }
 
