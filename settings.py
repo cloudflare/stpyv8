@@ -7,7 +7,7 @@ DEPOT_HOME = os.environ.get("DEPOT_HOME", os.path.join(STPYV8_HOME, "depot_tools
 V8_HOME = os.environ.get("V8_HOME", os.path.join(STPYV8_HOME, "v8"))
 
 V8_GIT_URL = "https://chromium.googlesource.com/v8/v8.git"
-V8_GIT_TAG_STABLE = "12.6.228.21"
+V8_GIT_TAG_STABLE = "12.7.224.16"
 V8_GIT_TAG_MASTER = "master"
 V8_GIT_TAG = V8_GIT_TAG_STABLE
 DEPOT_GIT_URL = "https://chromium.googlesource.com/chromium/tools/depot_tools.git"
@@ -117,7 +117,7 @@ if os.name in ("nt",):
         library_dirs.add(os.path.join(os.environ["Python_ROOT_DIR"], "libs"))
 
     libraries += ["winmm", "ws2_32", "Advapi32", "dbghelp", "v8_monolith"]
-    extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi", "/std:c++20"]
+    extra_compile_args += ["/O2", "/GL", "/MT", "/EHsc", "/Gy", "/Zi", "/std:c++20", "/Zc:__cplusplus"]
     extra_link_args += ["/DLL", "/OPT:REF", "/OPT:ICF", "/MACHINE:X64"]
     macros += [
         ("HAVE_SNPRINTF", None),
@@ -134,10 +134,12 @@ elif os.name in ("posix",):
         STPYV8_BOOST_PYTHON.replace(".", ""),
     ]
 
-    extra_compile_args.append("-std=c++17")
-
     if platform.system() in ("Linux",):
         libraries.append("rt")
+        extra_compile_args.append("-std=c++2a")
+    else:
+        extra_compile_args.append("-std=c++20")
+        extra_link_args.append("-headerpad_max_install_names")
 
 
 GN_ARGS = " ".join(f"{key}={value}" for key, value in gn_args.items())
