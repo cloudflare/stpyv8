@@ -5,10 +5,9 @@
 import STPyV8
 
 with STPyV8.JSContext() as ctxt:
-  upcase = ctxt.eval("""
+    upcase = ctxt.eval("""
     ( (lowerString) => {
         return lowerString.toUpperCase();
     })
   """)
-  print(upcase("hello world!"))
-
+    print(upcase("hello world!"))

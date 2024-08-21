@@ -25,7 +25,7 @@ jobs:
           python3 -m pip install build --user
 
       - name: Build a source tarball
-        run: python3 -m build --sdist
+        run: python3 setup.py sdist
 
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4

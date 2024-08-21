@@ -157,12 +157,12 @@ std::shared_ptr<CScript> CEngine::InternalCompile(v8::Handle<v8::String> src,
 
     if (line >= 0 && col >= 0)
     {
-        v8::ScriptOrigin script_origin(m_isolate, name, line, col);
+        v8::ScriptOrigin script_origin(name, line, col);
         script = v8::Script::Compile(context, source, &script_origin);
     }
     else
     {
-        v8::ScriptOrigin script_origin(m_isolate, name);
+        v8::ScriptOrigin script_origin(name);
         script = v8::Script::Compile(context, source, &script_origin);
     }
 
