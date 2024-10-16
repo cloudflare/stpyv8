@@ -290,11 +290,11 @@ v8::Intercepted CPythonObject::NamedGetter(v8::Local<v8::Name> prop, const v8::P
 
     py::object obj = CJavascriptObject::Wrap(info.Holder());
     if (PyGen_Check(obj.ptr()))
-        CALLBACK_RETURN_NOT_HANDLED(v8::Undefined(info.GetIsolate()));
+        CALLBACK_RETURN_HANDLED(v8::Undefined(info.GetIsolate()));
 
     v8::String::Utf8Value name(info.GetIsolate(), v8::Local<v8::String>::Cast(prop));
     if (*name == nullptr)
-        CALLBACK_RETURN_NOT_HANDLED(v8::Undefined(info.GetIsolate()));
+        CALLBACK_RETURN_HANDLED(v8::Undefined(info.GetIsolate()));
 
     PyObject *value = ::PyObject_GetAttrString(obj.ptr(), *name);
 
@@ -428,6 +428,7 @@ v8::Intercepted CPythonObject::NamedQuery(v8::Local<v8::Name> prop, const v8::Pr
     if (exists)
         CALLBACK_RETURN_HANDLED(v8::Integer::New(info.GetIsolate(), v8::None));
 
+    CALLBACK_RETURN_NOT_HANDLED(v8::Integer::New(info.GetIsolate(), v8::None));
     END_HANDLE_EXCEPTION(v8::Handle<v8::Integer>())
 }
 
@@ -554,7 +555,7 @@ v8::Intercepted CPythonObject::IndexedGetter(uint32_t index, const v8::PropertyC
 
     py::object obj = CJavascriptObject::Wrap(info.Holder());
     if (PyGen_Check(obj.ptr()))
-        CALLBACK_RETURN_NOT_HANDLED(v8::Undefined(info.GetIsolate()));
+        CALLBACK_RETURN_HANDLED(v8::Undefined(info.GetIsolate()));
 
     if (::PySequence_Check(obj.ptr()))
     {
@@ -586,6 +587,7 @@ v8::Intercepted CPythonObject::IndexedGetter(uint32_t index, const v8::PropertyC
         }
     }
 
+    CALLBACK_RETURN_NOT_HANDLED(v8::Undefined(info.GetIsolate()));
     END_HANDLE_EXCEPTION(v8::Undefined(info.GetIsolate()))
 }
 
@@ -615,7 +617,6 @@ v8::Intercepted CPythonObject::IndexedSetter(uint32_t index, v8::Local<v8::Value
     }
 
     CALLBACK_RETURN_HANDLED(value);
-
     END_HANDLE_EXCEPTION(v8::Undefined(info.GetIsolate()))
 }
 
@@ -652,6 +653,7 @@ v8::Intercepted CPythonObject::IndexedQuery(uint32_t index, const v8::PropertyCa
         }
     }
 
+    CALLBACK_RETURN_NOT_HANDLED(v8::Integer::New(info.GetIsolate(), v8::None));
     END_HANDLE_EXCEPTION(v8::Handle<v8::Integer>())
 }
 
@@ -678,6 +680,7 @@ v8::Intercepted CPythonObject::IndexedDeleter(uint32_t index, const v8::Property
         CALLBACK_RETURN_HANDLED(PyMapping_DelItemString(obj.ptr(), buf) == 0);
     }
 
+    CALLBACK_RETURN_NOT_HANDLED(v8::Handle<v8::Boolean>())
     END_HANDLE_EXCEPTION(v8::Handle<v8::Boolean>())
 }
 
