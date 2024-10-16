@@ -44,6 +44,7 @@ inline bool isfinite(double val) {
 #endif // _WIN32
 
 #if defined(__APPLE__) && !defined(isalnum)
+#undef LONG_BIT
 #include <pyport.h>
 #undef isalnum
 #undef isalpha
