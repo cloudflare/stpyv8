@@ -968,7 +968,7 @@ v8::Handle<v8::Value> CPythonObject::WrapInternal(py::object obj)
 
         result = v8::Date::New(isolate->GetCurrentContext(), ((double) mktime(&ts)) * 1000 + ms / 1000).ToLocalChecked();
     }
-    else if (PyCFunction_Check(obj.ptr()) || PyFunction_Check(obj.ptr()) || PyMethod_Check(obj.ptr()) || PyType_CheckExact(obj.ptr()))
+    else if (PyCFunction_Check(obj.ptr()) || PyFunction_Check(obj.ptr()) || PyMethod_Check(obj.ptr()) || PyType_Check(obj.ptr()))
     {
         v8::Handle<v8::FunctionTemplate> func_tmpl = v8::FunctionTemplate::New(isolate);
         py::object *object = new py::object(obj);
