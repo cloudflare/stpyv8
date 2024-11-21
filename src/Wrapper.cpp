@@ -313,7 +313,7 @@ v8::Intercepted CPythonObject::NamedGetter(v8::Local<v8::Name> prop, const v8::P
         }
 
         if (::PyMapping_Check(obj.ptr()) &&
-#if PY_VERSION_EX >= 0x030d0000
+#if PY_VERSION_HEX >= 0x030d0000
                 ::PyMapping_HasKeyStringWithError(obj.ptr(), *name) == 1
 #else
                 ::PyMapping_HasKeyString(obj.ptr(), *name)
@@ -429,7 +429,7 @@ v8::Intercepted CPythonObject::NamedQuery(v8::Local<v8::Name> prop, const v8::Pr
     if (*name)
         exists = PyGen_Check(obj.ptr()) || ::PyObject_HasAttrString(obj.ptr(), *name) ||
                  (::PyMapping_Check(obj.ptr()) &&
-#if PY_VERSION_EX >= 0x030d0000
+#if PY_VERSION_HEX >= 0x030d0000
                   ::PyMapping_HasKeyStringWithError(obj.ptr(), *name) == 1
 #else
                   ::PyMapping_HasKeyString(obj.ptr(), *name)
@@ -457,7 +457,7 @@ v8::Intercepted CPythonObject::NamedDeleter(v8::Local<v8::Name> prop, const v8::
 
     if (!::PyObject_HasAttrString(obj.ptr(), *name) &&
             ::PyMapping_Check(obj.ptr()) &&
-#if PY_VERSION_EX >= 0x030d0000
+#if PY_VERSION_HEX >= 0x030d0000
             ::PyMapping_HasKeyStringWithError(obj.ptr(), *name) == 1
 #else
             ::PyMapping_HasKeyString(obj.ptr(), *name)
@@ -663,7 +663,7 @@ v8::Intercepted CPythonObject::IndexedQuery(uint32_t index, const v8::PropertyCa
         snprintf(buf, sizeof(buf), "%d", index);
 
         if (
-#if PY_VERSION_EX >= 0x030d0000
+#if PY_VERSION_HEX >= 0x030d0000
                 ::PyMapping_HasKeyStringWithError(obj.ptr(), buf) == 1
 #else
                 ::PyMapping_HasKeyString(obj.ptr(), buf)
