@@ -134,6 +134,9 @@ elif os.name in ("posix",):
         STPYV8_BOOST_PYTHON.replace(".", ""),
     ]
 
+    extra_compile_args.append("-Wno-strict-aliasing")
+    extra_compile_args.append("-Wno-array-bounds")
+
     if platform.system() in ("Linux",):
         libraries.append("rt")
         extra_compile_args.append("-std=c++2a")
