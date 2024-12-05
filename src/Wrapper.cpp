@@ -126,7 +126,7 @@ void CWrapper::Expose(void)
     ;
     py::objects::class_value_wrapper<std::shared_ptr<CJavascriptObject>,
     py::objects::make_ptr_instance<CJavascriptObject,
-    py::objects::pointer_holder<std::shared_ptr<CJavascriptObject>,CJavascriptObject> > >();
+    py::objects::pointer_holder<std::shared_ptr<CJavascriptObject>, CJavascriptObject> > >();
 }
 
 void CPythonObject::ThrowIf(v8::Isolate* isolate)
@@ -831,21 +831,21 @@ void CPythonObject::SetupObjectTemplate(v8::Isolate *isolate, v8::Handle<v8::Obj
     clazz->SetInternalFieldCount(1);
 
     clazz->SetHandler(v8::NamedPropertyHandlerConfiguration(
-                NamedGetter,
-                NamedSetter,
-                NamedQuery,
-                NamedDeleter,
-                NamedEnumerator)
-            );
+                          NamedGetter,
+                          NamedSetter,
+                          NamedQuery,
+                          NamedDeleter,
+                          NamedEnumerator)
+                     );
 
     clazz->SetHandler(v8::IndexedPropertyHandlerConfiguration(
-                IndexedGetter,
-                IndexedSetter,
-                IndexedQuery,
-                IndexedDeleter,
-                IndexedEnumerator
-                )
-            );
+                          IndexedGetter,
+                          IndexedSetter,
+                          IndexedQuery,
+                          IndexedDeleter,
+                          IndexedEnumerator
+                      )
+                     );
 
     clazz->SetCallAsFunctionHandler(Caller);
 }
