@@ -312,18 +312,24 @@ v8::Intercepted CPythonObject::NamedGetter(v8::Local<v8::Name> prop, const v8::P
             }
         }
 
-        if (::PyMapping_Check(obj.ptr()) &&
-#if PY_VERSION_HEX >= 0x030d0000
-                ::PyMapping_HasKeyStringWithError(obj.ptr(), *name) == 1
-#else
-                ::PyMapping_HasKeyString(obj.ptr(), *name)
-#endif
-        )
+        if (::PyMapping_Check(obj.ptr()))
         {
-            py::object result(py::handle<>(::PyMapping_GetItemString(obj.ptr(), *name)));
+            int rc;
 
-            if (!result.is_none())
-                CALLBACK_RETURN_HANDLED(Wrap(result));
+#if PY_VERSION_HEX >= 0x030d0000
+            rc = ::PyMapping_HasKeyStringWithError(obj.ptr(), *name);
+            if (rc == -1)
+                ::PyErr_Clear();
+#else
+            rc = ::PyMapping_HasKeyString(obj.ptr(), *name);
+#endif
+            if (rc == 1)
+            {
+                py::object result(py::handle<>(::PyMapping_GetItemString(obj.ptr(), *name)));
+
+                if (!result.is_none())
+                    CALLBACK_RETURN_HANDLED(Wrap(result));
+            }
         }
 
         CALLBACK_RETURN_NOT_HANDLED(v8::Handle<v8::Value>());
@@ -424,20 +430,36 @@ v8::Intercepted CPythonObject::NamedQuery(v8::Local<v8::Name> prop, const v8::Pr
 
     v8::String::Utf8Value name(info.GetIsolate(), prop);
 
-    bool exists = false;
-
     if (*name)
-        exists = PyGen_Check(obj.ptr()) || ::PyObject_HasAttrString(obj.ptr(), *name) ||
-                 (::PyMapping_Check(obj.ptr()) &&
-#if PY_VERSION_HEX >= 0x030d0000
-                  ::PyMapping_HasKeyStringWithError(obj.ptr(), *name) == 1
-#else
-                  ::PyMapping_HasKeyString(obj.ptr(), *name)
-#endif
-                  );
+    {
+        int rc;
 
-    if (exists)
-        CALLBACK_RETURN_HANDLED(v8::Integer::New(info.GetIsolate(), v8::None));
+        if (PyGen_Check(obj.ptr()))
+            CALLBACK_RETURN_HANDLED(v8::Integer::New(info.GetIsolate(), v8::None));
+
+#if PY_VERSION_HEX >= 0x030d0000
+        rc = ::PyObject_HasAttrStringWithError(obj.ptr(), *name);
+        if (rc == -1)
+            ::PyErr_Clear();
+#else
+        rc = ::PyObject_HasAttrString(obj.ptr(), *name);
+#endif
+        if (rc == 1)
+            CALLBACK_RETURN_HANDLED(v8::Integer::New(info.GetIsolate(), v8::None));
+
+        if (::PyMapping_Check(obj.ptr()))
+        {
+#if PY_VERSION_HEX >= 0x030d0000
+            rc = ::PyMapping_HasKeyStringWithError(obj.ptr(), *name);
+            if (rc == -1)
+                ::PyErr_Clear();
+#else
+            rc = ::PyMapping_HasKeyString(obj.ptr(), *name);
+#endif
+            if (rc == 1)
+                CALLBACK_RETURN_HANDLED(v8::Integer::New(info.GetIsolate(), v8::None));
+        }
+    }
 
     CALLBACK_RETURN_NOT_HANDLED(v8::Integer::New(info.GetIsolate(), v8::None));
     END_HANDLE_EXCEPTION(v8::Handle<v8::Integer>())
@@ -456,15 +478,21 @@ v8::Intercepted CPythonObject::NamedDeleter(v8::Local<v8::Name> prop, const v8::
     v8::String::Utf8Value name(info.GetIsolate(), prop);
 
     if (!::PyObject_HasAttrString(obj.ptr(), *name) &&
-            ::PyMapping_Check(obj.ptr()) &&
-#if PY_VERSION_HEX >= 0x030d0000
-            ::PyMapping_HasKeyStringWithError(obj.ptr(), *name) == 1
-#else
-            ::PyMapping_HasKeyString(obj.ptr(), *name)
-#endif
-            )
+            ::PyMapping_Check(obj.ptr()))
     {
-        CALLBACK_RETURN_HANDLED(-1 != ::PyMapping_DelItemString(obj.ptr(), *name));
+        int rc;
+
+#if PY_VERSION_HEX >= 0x030d0000
+        rc = ::PyMapping_HasKeyStringWithError(obj.ptr(), *name);
+        if (rc == -1)
+            ::PyErr_Clear();
+#else
+        rc = ::PyMapping_HasKeyString(obj.ptr(), *name);
+#endif
+        if (rc == 1)
+        {
+            CALLBACK_RETURN_HANDLED(-1 != ::PyMapping_DelItemString(obj.ptr(), *name));
+        }
     }
     else
     {
@@ -659,16 +687,19 @@ v8::Intercepted CPythonObject::IndexedQuery(uint32_t index, const v8::PropertyCa
     else if (::PyMapping_Check(obj.ptr()))
     {
         char buf[65];
+        int rc;
 
         snprintf(buf, sizeof(buf), "%d", index);
 
-        if (
 #if PY_VERSION_HEX >= 0x030d0000
-                ::PyMapping_HasKeyStringWithError(obj.ptr(), buf) == 1
+        rc = ::PyMapping_HasKeyStringWithError(obj.ptr(), buf);
+        if (rc == -1)
+            ::PyErr_Clear();
 #else
-                ::PyMapping_HasKeyString(obj.ptr(), buf)
+        rc = ::PyMapping_HasKeyString(obj.ptr(), buf);
 #endif
-                || ::PyMapping_HasKey(obj.ptr(), py::long_(index).ptr()))
+
+        if (rc == 1 || ::PyMapping_HasKey(obj.ptr(), py::long_(index).ptr()))
         {
             CALLBACK_RETURN_HANDLED(v8::Integer::New(info.GetIsolate(), v8::None));
         }
