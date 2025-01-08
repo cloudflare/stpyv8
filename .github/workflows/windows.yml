@@ -103,8 +103,7 @@ jobs:
         id: download-boost
         uses: suisei-cn/actions-download-file@v1.6.0
         with:
-          url: https://boostorg.jfrog.io/artifactory/main/release/${{ matrix.boost-version }}/source/boost_${{
-            matrix.boost-version-snake }}.zip
+          url: https://archives.boost.io/release/${{ matrix.boost-version }}/source/boost_${{matrix.boost-version-snake }}.zip
       - name: Install Boost
         if: ${{ steps.restore-boost.outputs.cache-hit != 'true' }}
         id: install-boost
