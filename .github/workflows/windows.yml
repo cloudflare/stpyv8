@@ -77,8 +77,8 @@ jobs:
         # Needed for MSVC toolset 14.2
         os: [windows-2019]
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
-        boost-version: [1.84.0]
-        boost-version-snake: ['1_84_0']
+        boost-version: [1.87.0]
+        boost-version-snake: ['1_87_0']
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
