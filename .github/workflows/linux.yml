@@ -12,7 +12,7 @@ jobs:
     # Cloning the repository is still necessary in any case
     # to calculate the hash for the cache key
     name: Build Google V8
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
     steps:
@@ -63,7 +63,7 @@ jobs:
       STPYV8_BOOST_PYTHON: boost_python${{ matrix.python-version }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04]
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
         boost-version: [1.87.0]
         boost-version-snake: ['1_87_0']
@@ -108,7 +108,7 @@ jobs:
           LDFLAGS: -L/usr/lib -L/usr/lib/x86_64-linux-gnu
       - name: Repair wheel
         run: |
-          auditwheel repair --plat manylinux_2_31_x86_64 -w stpyv8-linux-${{ matrix.python-version }} stpyv8-linux-wheelhouse-${{ matrix.python-version }}/*.whl
+          auditwheel repair --plat manylinux_2_35_x86_64 -w stpyv8-linux-${{ matrix.python-version }} stpyv8-linux-wheelhouse-${{ matrix.python-version }}/*.whl
       - name: Install wheel
         run: |
           python -m pip install stpyv8-linux-${{ matrix.python-version }}/*.whl
