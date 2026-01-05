@@ -1,0 +1,154 @@
+---
+name: Linux ARM64 build/release workflow
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+    branches: [master]
+jobs:
+  build-v8:
+    # If Google V8 is in the workflow cache, don't build it.
+    # Cloning the repository is still necessary in any case
+    # to calculate the hash for the cache key
+    name: Build Google V8
+    runs-on: ubuntu-22.04-arm
+    outputs:
+      v8-hash: ${{ steps.build-v8.outputs.v8-hash }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential g++
+      - name: Clone Google V8
+        run: |
+          python -m pip install wheel
+          echo "::group::Clone Google V8"
+          python setup.py checkout_v8
+          echo "::endgroup::"
+      - name: Restore Google V8 from cache
+        id: restore-v8
+        uses: actions/cache/restore@main
+        with:
+          path: |
+            v8/out.gn/x64.release.sample/obj/libv8_monolith.a
+            v8/out.gn/x64.release.sample/icudtl.dat
+            v8/include
+          key: linux-arm64-build-v8-${{ hashFiles('v8/src/**') }}
+      - name: Build Google V8
+        id: build-v8
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
+        continue-on-error: false
+        run: |
+          echo "v8-hash=${{ hashFiles('v8/src/**') }}" >> "$GITHUB_OUTPUT"
+          python -m pip install wheel
+          echo "::group::v8"
+          python setup.py v8
+          echo "::endgroup::"
+      - name: Save Google V8 to cache
+        uses: actions/cache/save@main
+        if: ${{ steps.restore-v8.outputs.cache-hit != 'true' }}
+        with:
+          # Save compiled binary and header files. This will save an
+          # additional clone of Google V8 for the linker
+          path: |
+            v8/out.gn/x64.release.sample/obj/libv8_monolith.a
+            v8/out.gn/x64.release.sample/icudtl.dat
+            v8/include
+          key: linux-arm64-build-v8-${{ hashFiles('v8/src/**') }}
+  build:
+    name: Build Linux ARM64 wheel (Python ${{ matrix.python-version }})
+    needs: build-v8
+    runs-on: ${{ matrix.os }}
+    env:
+      ARCH: arm64
+      DIST_NAME: stpyv8-linux-arm64-py${{ matrix.python-version }}
+      STPYV8_BOOST_PYTHON: boost_python${{ matrix.python-version }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04-arm]
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+        boost-version: [1.87.0]
+        boost-version-snake: ['1_87_0']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Download Boost
+        id: download-boost
+        uses: suisei-cn/actions-download-file@v1.6.0
+        with:
+          url: https://archives.boost.io/release/${{ matrix.boost-version }}/source/boost_${{matrix.boost-version-snake }}.zip
+      - name: Install Boost
+        id: install-boost
+        run: |
+          unzip -q ${{ steps.download-boost.outputs.filename }}
+          cd boost_${{ matrix.boost-version-snake }}
+          ./bootstrap.sh
+          sudo ./b2 install -j 8 --with-system --with-python --with-filesystem --with-iostreams --with-date_time --with-thread
+      - name: Restore Google V8 from cache
+        id: restore-v8
+        uses: actions/cache/restore@main
+        with:
+          path: |
+            v8/out.gn/x64.release.sample/obj/libv8_monolith.a
+            v8/out.gn/x64.release.sample/icudtl.dat
+            v8/include
+          key: linux-arm64-build-v8-${{ needs.build-v8.outputs.v8-hash }}
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel auditwheel patchelf pytest pytest-order
+      - name: Build wheel
+        run: |
+          python setup.py sdist bdist_wheel --skip-build-v8 -d stpyv8-linux-arm64-wheelhouse-${{ matrix.python-version }}
+        env:
+          INCLUDE: ${{ env.INCLUDE }};${{ steps.install-python.outputs.python-path
+            }}include
+          V8_DEPS_LINUX: 0
+          LDFLAGS: -L/usr/lib -L/usr/lib/aarch64-linux-gnu
+      - name: Repair wheel
+        run: |
+          auditwheel repair --plat manylinux_2_35_aarch64 -w stpyv8-linux-arm64-${{ matrix.python-version }} stpyv8-linux-arm64-wheelhouse-${{ matrix.python-version }}/*.whl
+      - name: Install wheel
+        run: |
+          python -m pip install stpyv8-linux-arm64-${{ matrix.python-version }}/*.whl
+      - name: Test wheel
+        run: |
+          pytest -v
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: stpyv8-linux-arm64-python${{ matrix.python-version }}
+          path: stpyv8-linux-arm64-${{ matrix.python-version }}/*.whl
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: ${{ github.event_name == 'release' }}
+        with:
+          files: stpyv8-linux-arm64-${{ matrix.python-version }}/*.whl
+          token: ${{ secrets.GITHUB_TOKEN }}
+  pypi-publish:
+    name: Upload release to PyPI
+    if: ${{ github.event_name == 'release' }}
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/stpyv8
+    permissions:
+      id-token: write
+    steps:
+      - name: Download wheels
+        uses: actions/download-artifact@v4
+        with:
+          path: stpyv8-linux-arm64-dist
+          pattern: stpyv8-linux-arm64*
+          merge-multiple: true
+      - name: Publish wheels to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: stpyv8-linux-arm64-dist
